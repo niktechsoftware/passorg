@@ -92,7 +92,7 @@ $this->db->where("id" , $this->session->userdata("id"));
 $custdt=  $this->db->get("customers")->row();
 if($custdt->tstatus==1){
  ?>
-<div style="margin:10px;">    
+<div class ="col-xs-12 " style="margin:10px;">    
 <a class="button1"  href="<?php echo base_url();?>subscriberController/change_status">Click me!! To Change Permanent Subscriber</a>
 </div>
 <?php } ?>
@@ -132,21 +132,21 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
 
 
 <div class="row">
-    <div class="col-md-6 col-lg-3 col-sm-6">
+    <div class="col-md-6 col-lg-3 col-sm-6 col-xs-12" >
         <div class="panel panel-default panel-white core-box">
-            <div class="panel-body no-padding">
+            <div class="panel-body no-padding ">
                 <div class="partition-green text-center core-icon">
                     <i class="fa fa-inr fa-3x icon-big"></i><br>
 					<span class="subtitle"></span>
                 </div>
                 <a href="<?php echo base_url();?>subscriberController/wallet">
-	                <div class="padding-20 core-content">
+	                <div class="padding-20 core-content" style="height:260px; >
 	                	<!--	<h3 class="title block no-margin">Fee Reports</h3>-->
 	               		<!-- <h3 class="title block no-margin">Today Fees Collection</h3>-->
 	                	<!--<br/>-->
 	                	<!--<span class="subtitle"> Find Out Fee Reports  </span>-->
 	                	
-	                	 <h2 class="text-black">Total Pass Value</h2>
+	                	 <span >Total Pass Value</span> 
                                                 <?php 
                                                      $cid=$this->session->userdata("id");
                                                       $usernm=$this->session->userdata("username");
@@ -165,13 +165,13 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
                                                      {
                                                       $dt= $row1->row();
                                                       $totpv=$dt->pv+$pv; ?>
-                                                      <h4 class="text-black m-b-0">Pv: <?php echo $totpv. "  Pv "; ?></h4>
+                                                      <h4 class="text-black ">Pv: <?php echo $totpv. "  Pv "; ?></h4>
                                                   <?php } else { ?>
-                                                  <h4 class="text-black m-b-0">Pv: <?php echo $pv." Pv"; ?></h4>
+                                                  <h4 class="text-black ">Pv: <?php echo $pv." Pv"; ?></h4>
                                                <?php   } ?></a>
                                                 
                                                     <div class="card-footer"> <?php $date=date('d-M-Y h:i:s a');?>
-                                                        <p class="text-black m-b-0"><i class="feather icon-clock text-black f-14 m-r-10"></i>Update : <?php echo $date;?></p>
+                                                        <p class="text-black"><i class="feather icon-clock text-black "></i>Update : <?php echo $date;?></p>
                                                     </div>
 	                	
 	                	
@@ -180,7 +180,7 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-lg-3 col-sm-6">
+     <div class="col-md-6 col-lg-3 col-sm-6 col-xs-12" >
         <div class="panel panel-default panel-white core-box">
             <div class="panel-body no-padding">
                 <div class="partition-azure text-center core-icon">
@@ -190,8 +190,8 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
                 </div>
                 
                 <a href="#">
-                <div class="padding-20 core-content">
-                   <h2 class="text-black">Total Rs. Value</h2>
+                <div class="padding-20 core-content" style="height:260px;">
+                   <h3 class="text-black">Total Rs. Value</h3>
                     <?php $cid=$this->session->userdata("id");
                      $this->db->where("cid",$cid);
                      $row1= $this->db->get("pv");
@@ -226,17 +226,17 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
         </div>
     </div>
 
-<div class="col-md-6 col-lg-3 col-sm-6">
-        <div class="panel panel-default panel-white core-box">
-            <div class="panel-body no-padding">
-                <div class="partition-pink text-center core-icon">
+ <div class="col-md-6 col-lg-3 col-sm-6 col-xs-12" >
+        <div class="panel panel-default panel-white core-box" >
+            <div class="panel-body no-padding" >
+                <div class="partition-pink text-center core-icon" >
                     <i class="fa fa-users fa-2x icon-big"></i>
                      <br>
                     	<span class="subtitle"> </span>
                 </div>
                 <a href="#">
-                <div class="padding-20 core-content">
-                   <h2 class="text-black">Up/Down line Subscribers</h2>
+                <div class="padding-20 core-content" style="height:260px;" >
+                   <h3 class="text-black">Up/Down line Subscribers</h3>
                       <?php $this->db->where('parentID',$this->session->userdata('id'));
                     $tree=  $this->db->get('tree')->num_rows();
                     if($tree > 0)
@@ -256,12 +256,10 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
             </div>
         </div>
     </div>
-  </div>  
-  <div class="row">
-        <div class="panel panel-default panel-white core-box" style="margin-left:20px; width:550px; height:350px;">
-            <div class="panel-body no-padding">
+    <div class="col-md-6 col-lg-3 col-sm-6 col-xs-12" >
+           
                 <div class="partition-pink text-center core-icon">
-                    <div class="card-block text-center text-black" style="margin-top:50px">
+                    <div class="card-block text-center text-black" >
                        <div class="m-b-25">
                            <?php if(strlen($custdt->image)>0){?><img src="<?php echo $this->config->item('asset_url');?>/images/subscriber/<?php echo $custdt->image;?>" style="max-height: 70px; max-width: 100px;"> <?php } else { ?> <img src="<?php echo base_url();?>assets/tree/userlogo.png" style="max-height: 70px; max-width: 100px;"> <?php }?>
                         </div>
@@ -270,37 +268,41 @@ if(($custdt->tstatus==1) || ($custdt->pstatus==1)){
                      
                     </div>
                 </div>
-                <div class="col-md-12" style="margin-top:50px;">
-                    <div class="card-block" style="margin-left:200px">
+                <div class="col-md-12 col-xs-12" >
+                   <div class="panel panel-default panel-white core-box" >
+                        <div class="panel-body no-padding" >
                         <center><h3 style="margin-right:30px"><u>Subscriber Information</u></h3></center>
                         <hr>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 col-xs-6">
                                 <h6>Phone</h6>
                             </div>
-                            <div class="col-md-6">    
+                            <div class="col-md-6 col-xs-6">    
                                 <h6><?php echo $custdt->mobile;?></h6>
                             </div>
                         </div>
                         <!--<center><h3>Login</h3></center>-->
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 col-xs-6">
                                 <h6>Username</h6>
                             </div>
-                            <div class="col-md-6">    
+                            <div class="col-md-6 col-xs-6">    
                                 <h6><?php echo $custdt->username;?></h6>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 col-xs-6">
                                 <h6>Password</h6>
                             </div>
-                            <div class="col-md-6">    
+                            <div class="col-md-6 col-xs-6">    
                                 <h6><?php echo $custdt->password;?></h6>
                             </div>
                         </div>
                     </div>
-                </div>
+                 </div>
             </div>
         </div>
+  </div>  
+  <div class="row">
+        
     </div>
 
    

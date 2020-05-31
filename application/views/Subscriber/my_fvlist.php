@@ -134,8 +134,13 @@
 										foreach($p_data->result() as $pdata)
 										{
 											if($data->product_code==$pdata->id)
+											{
 											//echo $pdata->name."<br>";
-											{?>
+										$this->db->where("branch_id",$this->session->userdata("district"));
+										$this->db->where("p_code",$pdata->id);
+									$branchprice=	$this->db->get("branch_wallet");
+									if($branchprice->num_rows()>0){
+											?>
 												<tr class="text-uppercase text-center">
 													<td width:"10px"><?php echo $i; ?></td>
 													<td width:"10px"><?php echo $pdata->company; ?></td>
@@ -143,12 +148,12 @@
 													<td width:"10px"><?php if(strlen($pdata->file1)>0){?><img class="zoom1" src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } elseif(strlen($pdata->file2)>0) { ?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file2;?>" style="max-height: 50px; max-width: 100px;"><?php } else { echo "N/A"; } ?></td>
 													<td width:"10px"><?php echo $pdata->size; ?></td>
 													<td width:"10px"><?php echo $pdata->p_type; ?></td>
-													<td width:"10px"><?php echo $pdata->selling_price; ?></td>
+													<td width:"10px"><?php echo $branchprice->row()->selling_price; ?></td>
 													<td width:"10px"><?php if(strlen($pdata->file3)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file3;?>" style="max-height: 50px; max-width: 100px;"> <?php } else { echo "N/A"; ?><?php }?></td>
 													<!--<td width:"10px"></td>
 													<td width:"10px"></td>
 													<td width:"10px"></td> -->
-												</tr><?php
+												</tr><?php }
 											}
 										} $i++;
 									}

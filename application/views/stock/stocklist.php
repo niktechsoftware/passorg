@@ -72,18 +72,18 @@
                                 <thead>
                                     <tr style="background-color:#1ba593; color:white;">
                                         <th>S.No.</th>
-                                        <th style="width:30px;">Product Name</th>
-                                        <th style="width:30px;">Company Name</th>
-                                        <th style="width:30px;">Product Type</th>
-                                        <th style="width:20px;">Size</th>
-                                            <th style="width:20px;">P Code</th>
-                                        <th style="width:20px;">Price</th>
-                                        <th style="width:20px;">MRP Price</th>
-                                        <th style="width:8px;">Qty</th>
-                                        <th style="width:30px;">Image1</th>
+                                        <th width="200">Product Name</th>
+                                        <th >Company Name</th>
+                                        <th >Product Type</th>
+                                        <th >Size</th>
+                                            <th >P Code</th>
+                                        <th >Price</th>
+                                        <th >MRP Price</th>
+                                        <th >Qty</th>
+                                        <th >Image1</th>
                                        <!-- <th style="width:30px;">Image2</th>-->
                                          <?php if($this->session->userdata("login_type")==1) { ?>
-                                         <th style="width:100px;">Action</th>
+                                         <th >Action</th>
                                        <?php   } ?>
                                         <!-- <th  style="width:20px;">Product Status</th> -->
                                         <!--<th style="width:100px;">Activity</th>-->
@@ -109,24 +109,30 @@
                
                  	if($row2->num_rows()>0){
                  		$row=$row2->row();
+                 		$this->db->where("branch_id",$this->session->userdata("district"));
+                 		$this->db->where("p_code",$row->id);
+                 		$branchProduct = $this->db->get("branch_wallet");
+                 		if($branchProduct->num_rows()>0){
+                 		    $branchPro=$branchProduct->row();
+                 		
                   ?>
                                     <tr class="text-uppercase text-center">
-                                        <td style="width:10px;"><?php echo $i;?></td>
+                                        <td ><?php echo $i;?></td>
                                         
-                                                <td style="width:30px;">
+                                                <td width="200">
                                                 <a href="<?php echo base_url();?>stockController/editstockitem/<?php echo $row->id;?>">
                                                 <?php echo $row->name;?>
-                                            <input type="hidden" name="rowid" value="<?php echo $row->id; ?>" id="rowid<?php echo $i;?>" />
-                                            <input type="hidden" name="currentstatus" value="<?php echo $row->status?>"
+                                                    <input type="hidden" name="rowid" value="<?php echo $row->id; ?>" id="rowid<?php echo $i;?>" />
+                                                    <input type="hidden" name="currentstatus" value="<?php echo $row->status?>"
                                                 id="currentstatus<?php echo $i; ?>" /></a>
                                         </td>
-                                        <td style="width:30px;"><?php echo $row->company;?></td>
-                                        <td style="width:30px;"><?php echo $row->p_type;?></td>
-                                        <td style="width:20px;"><?php echo $row->size;?></td>
-                                         <td style="width:20px;"><?php echo $row->hsn;?></td>
-                                        <td style="width:20px;"><?php echo $row->selling_price;?></td>
-                                            <td style="width:20px;"><?php echo $row->mrp_price;?></td>
-                                        <td style="width:8px;"><?php 
+                                        <td ><?php echo $row->company;?></td>
+                                        <td ><?php echo $row->p_type;?></td>
+                                        <td ><?php echo $row->size;?></td>
+                                         <td ><?php echo $row->hsn;?></td>
+                                        <td ><?php echo $branchPro->selling_price;?></td>
+                                            <td ><?php echo $branchPro->mrp_price;?></td>
+                                        <td ><?php 
                                         if($this->session->userdata('login_type')==1){
                                         echo $row1->quantity;
                                         } elseif($this->session->userdata('login_type')==2){
@@ -195,7 +201,7 @@
                                     });
                                     </script>
                                     <?php  $i++;
-                 	} endforeach; }?>
+                 }	} endforeach; }?>
                                 </tbody>
                             </table>
                        

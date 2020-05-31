@@ -12,7 +12,13 @@
     <div class="user-profile border-top padding-horizontal-10 block">
     <div class="inline-block">
     
-                        <img src="<?php echo $this->config->item('asset_url'); ?>/images/anonymous.jpg" class="img-circle" style="width:50px; margin-left:-6px; margin-top:-10px;" alt="">
+                      	<?php 
+                    	if(strlen($this->session->userdata('photo')) > 1):?>
+				    		<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $this->session->userdata('photo');?>" class="img-circle" style="margin-top:0px; width:30px;" alt="">
+				       <?php else:?>
+				        	<img src="<?php echo $this->config->item('asset_url'); ?>/images/anonymous.jpg" class="img-circle" style="margin-top:0px; width:30px;" alt="">
+				        <?php endif;?>
+
                             
                     </div>
                         <div class="inline-block">
@@ -48,6 +54,11 @@
         <li>
             <a href="<?php echo base_url(); ?>index.php/branchController/branchListinActive">
                 <span class="title"> Branch Inactive List </span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo base_url(); ?>index.php/branchController/reportAskfor">
+                <span class="title"> Ask of Branch</span>
             </a>
         </li>
        
@@ -132,26 +143,17 @@
         <!--        <span class="title">Product Sale</span>-->
         <!--    </a>-->
         <!--</li>-->
+        <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/2">
+                <span class="title">Transfer Product List </span>
+            </a>
+        </li>
          <li>
             <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/3">
-                <span class="title">Total Transfer Product List </span>
+                <span class="title">Recieve Product List </span>
             </a>
         </li>
-         <li>
-            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/5">
-                <span class="title">Today's Transfer Product List </span>
-            </a>
-        </li>
-         <li>
-            <a href="<?php echo base_url(); ?>index.php/shopController/assignproduct/">
-                <span class="title">Assign Transfer Product List </span>
-            </a>
-        </li>
-         <li>
-            <a href="<?php echo base_url(); ?>index.php/shopController/recieveproductlist">
-                <span class="title">Today's Receive Product List </span>
-            </a>
-        </li>
+        
          <li>
             <a href="<?php echo base_url(); ?>index.php/branchController/branchstocklist">
                 <span class="title">Branch Product List</span>
@@ -207,6 +209,11 @@
                 <span class="title">Cashback Request</span>
             </a>
         </li>
+           <li>
+            <a href="<?php echo base_url(); ?>index.php/subscriberController/pvtable">
+                <span class="title">PV Table</span>
+            </a>
+        </li>
         <!--<li>-->
         <!--    <a href="<?php echo base_url(); ?>index.php/subscriberController/subsciberInactiveList">-->
         <!--        <span class="title">Inactive List</span>-->
@@ -256,7 +263,7 @@
 </li>
        <li>
 			<a href="javascript:;">
-				<i class="fa fa-book"></i> <span class="title">Order List</span><i class="icon-arrow"></i> <span class="arrow "></span>
+				<i class="fa fa-book"></i> <span class="title">Order List Branch</span><i class="icon-arrow"></i> <span class="arrow "></span>
 			</a>
 			<ul class="sub-menu">
 	               <li>
@@ -270,10 +277,34 @@
 					<a href="<?php echo base_url();?>shopController/sborder/a">Over All Demand Order Of Branch<i class="icon-arrow"></i>
 					</a>
 				</li>
-				 <li>
-					<a href="<?php echo base_url();?>shopController/availableOrderList/3/a">Confirmed Order List<i class="icon-arrow"></i>
+				
+			<!--	<li>
+					<a href="<?php echo base_url();?>shopController/sborder">Pending Orders<i class="icon-arrow"></i>
+					</a>
+				</li>-->
+				<!--<li>
+					<a href="<?php echo base_url();?>shopController/sbpaidorder">Paid Orders<i class="icon-arrow"></i>
+					</a>
+				</li>-->
+			</ul>
+       </li>  
+         <li>
+			<a href="javascript:;">
+				<i class="fa fa-book"></i> <span class="title">Order List Shop</span><i class="icon-arrow"></i> <span class="arrow "></span>
+			</a>
+			<ul class="sub-menu">
+	               <li>
+					<a href="<?php echo base_url();?>shopController/availableOrderList/2/b">Demand Orders List By Shop.<i class="icon-arrow"></i>
+					</a>
+				</li>	<li>
+					<a href="<?php echo base_url();?>shopController/availableOrderList/1/b">Available Orders List of Shop.<i class="icon-arrow"></i>
 					</a>
 				</li>
+					<li>
+					<a href="<?php echo base_url();?>shopController/sborder/b">Over All Demand Order Of shop<i class="icon-arrow"></i>
+					</a>
+				</li>
+			
 			<!--	<li>
 					<a href="<?php echo base_url();?>shopController/sborder">Pending Orders<i class="icon-arrow"></i>
 					</a>
@@ -384,6 +415,11 @@
 		                Send Message<i class="icon-arrow"></i>
 		            </a>
                 </li>
+                <li>
+		            <a href="<?php echo base_url(); ?>index.php/smsAjax/smsPanel">
+		                SMS Panel<i class="icon-arrow"></i>
+		            </a>
+                </li>
                 <!-- <li>
 		            <a href="<?php echo base_url(); ?>index.php/adminController/mobileNotice/Parent%20Message">
 		              Parent Message <i class="icon-arrow"></i>
@@ -419,6 +455,11 @@
 		            <a href="<?php echo base_url(); ?>index.php/stockController/admin_to_other">
 		                 Admin To Other<i class="icon-arrow"></i>
 		            </a>
+                </li>
+                 <li>
+                    <a href="<?php echo base_url(); ?>index.php/shopController/assignproduct/">
+                        <span class="title">Assign Transfer Product List </span>
+                    </a>
                 </li>
         		<!--<li>-->
 		        <!--    <a href="<?php echo base_url(); ?>index.php/stockController/branch_to_other">-->
@@ -465,6 +506,12 @@
                 <li>
             <a href="<?php echo base_url(); ?>adminController/pvdayBook">
               Pv Day Book<i class="icon-arrow"></i>
+            </a>
+
+                </li>
+                  <li>
+            <a href="<?php echo base_url(); ?>reports/reportPanel">
+              Reports Panel<i class="icon-arrow"></i>
             </a>
 
                 </li>
@@ -630,27 +677,50 @@
         <i class="fa fa-book"></i> <span class="title">Stock And Item </span><i class="icon-arrow"></i> <span class="arrow "></span>
     </a>
     <ul class="sub-menu">
+        
+            <li>
+                <a href="<?php echo base_url(); ?>index.php/stockController/addProduct">
+               Add Product  <i class="icon-arrow"></i>
+                </a>
+            </li>
+             <li>
+            <a href="<?php echo base_url(); ?>index.php/branchController/branchstocklist">
+                Branch Stock Product List <i class="icon-arrow"></i>
+            </a>
+        </li>
          <li>
-            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/5">
-                <span class="title">Today's Transfer Product List </span>
+            <a href="<?php echo base_url(); ?>index.php/branchController/subbranchstocklist">
+                Shop Product List <i class="icon-arrow"></i>
+            </a>
+        </li>
+         <li>
+            <a href="<?php echo base_url(); ?>index.php/branchController/askForProduct">
+                <span class="title">Ask For Product </span>
+            </a>
+        </li>
+         <li>
+            <a href="<?php echo base_url(); ?>index.php/branchController/reportAskfor">
+                <span class="title"> Status of Ask</span>
             </a>
         </li>
         <li>
-            <a href="<?php echo base_url(); ?>index.php/shopController/recieveproductlist">
-                <span class="title">Today's Receive Product List </span>
+            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/2">
+                <span class="title">Transfer Product List </span>
+            </a>
+        </li>
+         <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/3">
+                <span class="title">Recieve Product List </span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/assignproduct/">
+                <span class="title">Assign Transfer Product </span>
             </a>
         </li>
 
-        <li>
-            <a href="<?php echo base_url(); ?>index.php/branchController/branchstocklist">
-            Branch Stock Product List <i class="icon-arrow"></i>
-            </a>
-        </li>
-        <li>
-            <a href="<?php echo base_url(); ?>index.php/branchController/subbranchstocklist">
-            Shop Product List <i class="icon-arrow"></i>
-            </a>
-        </li>
+       
+       
     </ul>
 </li>
         <!--<li>-->
@@ -845,21 +915,26 @@
 					    <i class="fa fa-indent"></i></i> <span class="title"> Stock Product List</span><i class="icon-arrow"></i>
 					</a>
 				</li>
-				<li>
-					<a href="<?php echo base_url();?>shopController/transferproductlist/5">
-					    <i class="fa fa-money"></i> <span class="title">Transfer Product List</span> <i class="icon-arrow"></i>
-					</a>
-				</li>
-				<li>
-                    <a href="<?php echo base_url(); ?>index.php/shopController/recieveproductlist">
-                       <i class="fa fa-bullseye"></i>  <span class="title"> Receive Product List </span>  <i class="icon-arrow"></i>
-                    </a>
-               </li>
+			  <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/2">
+               <i class="fa-toggle-up"></i> <span class="title">Transfer Product List </span><i class="icon-arrow"></i>
+            </a>
+        </li>
+         <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/transferproductlist/3">
+               <i class="fa-toggle-up"></i> <span class="title">Recieve Product List </span><i class="icon-arrow"></i>
+            </a>
+        </li>
                	<li>
                     <a href="<?php echo base_url();?>stockController/newsaleproduct">
                        <i class="fa-toggle-up"></i> <span class="title">Product Sale</span> <i class="icon-arrow"></i>
                     </a>
                 </li>
+                <li>
+            <a href="<?php echo base_url(); ?>index.php/shopController/assignproduct/">
+                <i class="fa fa-money"></i><span class="title">Assign Transfer Product List </span><i class="icon-arrow"></i>
+            </a>
+        </li>
                  <li>
                     <a href="<?php echo base_url();?>shopController/pay_and_receive ">
                        <i class="fa fa-inbox"></i> <span class="title">Product Receive And Pay</span> <i class="icon-arrow"></i>
@@ -877,7 +952,44 @@
 			</ul>
             </li>
  
-        
+        <li>
+    <a href="javascript:void(0)"><i class="fa fa-sitemap"></i> <span class="title"> Employee </span><i class="icon-arrow"></i> </a>
+    <ul class="sub-menu">
+    <li>
+            <a href="<?php echo base_url(); ?>index.php/employeeController/empRegistration">
+                <span class="title">Employee Registration</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo base_url(); ?>index.php/employeeController/empActiveList">
+                <span class="title">Employee Active  List </span>
+            </a>
+        </li>
+        <li>
+
+            <a href="<?php echo base_url(); ?>index.php/employeeController/empInactiveList">
+
+                <span class="title">Employee Inactive  List </span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo base_url(); ?>index.php/employeeController/top10Employee">
+                <span class="title"> Top 10 Employee </span>
+            </a>
+        </li>
+        <!--<li>-->
+        <!--    <a href="<?php echo base_url(); ?>index.php/login/stuAttendanceReport">-->
+        <!--        <span class="title"> Authority Set </span>-->
+        <!--    </a>-->
+        <!--</li>-->
+       <li>
+            <a href="<?php echo base_url(); ?>index.php/employeeController/deliveryInchargeList">
+                <span class="title"> Delivery Incharge List </span>
+            </a>
+        </li>
+  
+    </ul>
+</li>
        
          <li>
 			<a href="javascript:;">
@@ -899,6 +1011,7 @@
 					<a href="<?php echo base_url();?>shopController/availableOrderList/3/s">Confirmed Order List<i class="icon-arrow"></i>
 					</a>
 				</li>
+				
 			<!--	<li>
 					<a href="<?php echo base_url();?>shopController/sborder">Pending Orders<i class="icon-arrow"></i>
 					</a>
@@ -980,6 +1093,12 @@
 				
 			</ul>
        </li>
+       <li>
+               <a href="<?php echo base_url(); ?>index.php/shopController/lockManage">
+                   <i class="fa fa-lock"></i> <span class="title">Lock System</span>
+                </a>
+            </li>       
+    
          
    </ul>
 
@@ -1068,12 +1187,23 @@
               <i class="fa fa-user"></i>  <span class="title"> Full Profile </span>
             </a>
         </li>
-      
        <li>
-            <a href="<?php echo base_url();?>employeeController/deliveryOrderList">
-              <i class="fa fa-user"></i>  <span class="title"> OrderList </span>
-            </a>
-        </li>
+			<a href="javascript:;">
+				<i class="fa fa-book"></i> <span class="title"> Order Details </span><i class="icon-arrow"></i> <span class="arrow "></span>
+			</a>
+			<ul class="sub-menu">
+
+				<li>
+					<a href="<?php echo base_url();?>employeeController/deliveryOrderList">Painding<i class="icon-arrow"></i>
+					</a>
+				</li>
+				<li>
+					<a href="<?php echo base_url();?>employeeController/deliveryOrderListc">Confirmed Order<i class="icon-arrow"></i>
+					</a>
+				</li>
+			</ul>
+       </li>
+     
 	  <li>
             <a href="<?php echo base_url();?>employeeController/empid_card">
               <i class="fa fa-user"></i>  <span class="title"> ID Card </span>

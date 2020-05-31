@@ -163,7 +163,7 @@ function myFunction() {
                              <?php 
                              $this->db->select_sum('quantity');
                              $this->db->select_sum('subtotal');
-                             $this->db->where('order_no',$custusr->order_no);
+                             $this->db->where('order_id',$custusr->id);
                              $this->db->where('cust_id',$custusr->cust_id);
                             // $this->db->where('date',$custusr->order_date);
                              $dt1= $this->db->get("shopbill")->row();
@@ -252,7 +252,7 @@ function myFunction() {
                                         <tr>
                                              <?php 
                             
-                             $this->db->where('order_no',$custusr->order_no);
+                             $this->db->where('order_id',$custusr->id);
                              $row= $this->db->get("shopbill");
                                   $i=1; foreach($row->result() as $data):
                                   $this->db->where('id',$data->p_code);

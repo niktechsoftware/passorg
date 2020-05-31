@@ -36,7 +36,7 @@
                     { 
                         $p_data = $pdata->row();?>
                         <td><?php echo $p_data->name;?></td>
-                        <td><?php echo $p_data->sec;?></td>
+                        <td><?php echo $p_data->hsn;?></td>
                         <td><?php echo $p_data->size;?></td>  
                     <?php }
                     else
@@ -57,7 +57,6 @@
                         var dlt_id = $("#dlt_id<?php echo $j;?>").val();
                         alert("Are You Sure delete the product with trasferlist");
                         $.post("<?php echo site_url();?>stockController/delete_tranfr_pro",{dlt_id:dlt_id},function(data){
-                           
                             $("#dltt<?php echo $j;?>").val(data);
                             // $("#");
                         });
@@ -79,6 +78,7 @@
                                                             <?php if($this->session->userdata("login_type")==1){
                                                                
                     $aa= array('district'=>0,
+                            'sub_branchid'=>0,
                                 'emp_type'=>'5',
                                 'status'=>'1');
                      
@@ -88,6 +88,7 @@
                                                                  $id= $this->session->userdata("id");
                     $aa= array('district'=>$id,
                                 'emp_type'=>'5',
+                                'sub_branchid'=>0,
                                 'status'=>'1');
                      
                       $this->db->where($aa);

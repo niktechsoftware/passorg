@@ -1,3 +1,12 @@
+<style>
+@media only screen and (max-device-width : 730px) {
+    .fixed {
+        position:fixed;
+        top:0;
+        left:0;
+    }
+}
+</style>
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <!-- start: PAGE CONTENT -->
@@ -81,67 +90,77 @@
                     Category.You should not change Category after creating and declare the Stocks.
                     Please type in the Category Name into the box given below the Category
                       Name and Press <strong>Add Category </strong> Button.To <strong>Edit</strong> existing Category Edit
-                      it's Name and Press <strong>Edit</strong> Button , And to <strong>Delete</strong> a Category simply Press <strong>Delete</strong> Button.
+                      it's Name and Press <strong>Edit</strong> Button , And to <strong>Delete</strong> A Category simply Press <strong>Delete</strong> Button.
                   </div>
                   <div class="row">
-                    <div class="col-sm-12">
+                   	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
                       <div class="panel panel-calendar">
                         <div class="panel-heading panel-blue border-light">
                           <h4 class="panel-title">My Bill</h4>   
                         </div>
-                        <div class="table-responsive">
+                       
                           <div class="table-responsive" >
                             <table class="table table-striped table-hover" id="sample-table-2">
                               <thead>
                                 <tr style="background-color:#1ba593; color:white;">
-                                                      <th width:"10px">SNO</th>
-                                                      <th width:"10px">Company</th>
-                                                      <th width:"10px">Product Name</th> 
-                                                      <th width:"10px">Image</th>
-                                                      <th width:"10px">Size</th>
-                                                      <th width:"10px">Price</th>
-                                                      <th width:"10px">Quantity</th>
-                                                      <th width:"10px">T Amount</th>
+                                                      <th >SNO</th>
+                                                      <th >Company</th>
+                                                      <th width="200">Product Name</th> 
+                                                      <th >Image</th>
+                                                      <th >Size</th>
+                                                      <th >Price</th>
+                                                      <th >Quantity</th>
+                                                      <th >T Amount</th>
                                                       <!-- <th width:"10px">Total Price</th> -->
-                                                      <th width:"10px">Type Of Product</th>
-                                                      <th width:"10px">Remove</th>
+                                                      <th >Type Of Product</th>
+                                                      <th >Remove</th>
                                                       <!-- <th width:"10px">Image 2</th>
                                                       <th width:"10px">Like</th>
                                                       <th width:"10px">DisLike</th> -->
                                 </tr>
                               </thead>
                                               <tbody>
-                                              <?php $i=1; if($ph_data->num_rows()>0) { 
-                                                      foreach($ph_data->result() as $phdata) { 
-                                                          if($p_data->num_rows()>0) {
-                                                              // print_r($p_data);
-                                                              // exit;
-                                                              foreach($p_data->result() as $pdata) { 
-                                                                  if($phdata->pt_code == $pdata->id){
+                                              <?php 
+                                             $cid =  $this->session->userdata("id");
+                                             $this->db->where("id",$cid);
+                                            $cusdata= $this->db->get("customers")->row();
+                                              $i=1; if($ph_data->num_rows()>0) { 
+                                                
+                                                      foreach($ph_data->result() as $phdata) : 
+                                                         $this->db->where("id",$phdata->pt_code);
+                                                        $pdata= $this->db->get("stock_products")->row();
+                                                        $this->db->where("p_code",$phdata->pt_code);
+                                                        $this->db->where("branch_id",$cusdata->district);
+                                                        $branchP1 = $this->db->get("branch_wallet");
+                                                        if($branchP1->num_rows()>0){
+                                                            $branchP=$branchP1->row();
+                                                        
                                                                  // if($phdata->qyt>0){?>
                                                   <tr class="text-uppercase">
-                                                  <td width:"10px"><?php echo $i; ?></td>
-                                                  <td width:"10px"> <?php echo $pdata->company; ?> </td>
-                                                  <td width:"10px"> <?php echo $pdata->name; ?> </td>
-                                                  <td width:"10px"> <?php if(strlen($pdata->file1)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } elseif(strlen($pdata->file2)>0) { ?><img src="<?php echo base_url();?>assets/productimg/<?php echo $pdata->file2;?>" style="max-height: 50px; max-width: 100px;"><?php } else { echo "N/A"; } ?> </td>
-                                                  <td width:"10px"> <?php echo $pdata->size; ?> </td>
-                                                   <td width:"10px"> <?php echo $pdata->selling_price; ?>   <input type="hidden" id="subranchid" value="<?php $this->db->where('id',$id); $sb_data=$this->db->get('customers')->row(); echo $sb_data->sub_branchid;?>"></td>
+                                                  <td ><?php echo $i; ?></td>
+                                                  <td > <?php echo $pdata->company; ?> </td>
+                                                  <td width="200"> <?php echo $pdata->name; ?> </td>
+                                                  <td > <?php if(strlen($pdata->file1)>0){?>
+                                                    <img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } elseif(strlen($pdata->file2)>0) { ?><img src="<?php echo base_url();?>assets/productimg/<?php echo $pdata->file2;?>" style="max-height: 50px; max-width: 100px;"><?php } else { echo "N/A"; } ?> </td>
+                                                  <td > <?php echo $pdata->size; ?> </td>
+                                                   <td > <?php echo $branchP->selling_price; ?>   
+                                                        <input type="hidden" id="subranchid" value="<?php $this->db->where('id',$id); $sb_data=$this->db->get('customers')->row(); echo $sb_data->sub_branchid;?>"></td>
                                                 
                                        
                                           
-                                        <td  style="width:130px;"><input type="hidden" value="<?php echo $phdata->id; ?>" id="iid<?php echo $i;?>">
-                                        <button style="border-radius:50%;" type='button' class="btn btn-success" id="minusbutton<?php echo $i;?>">-</button>&nbsp;&nbsp;&nbsp;
-                                        <input type="text" readonly=""  value="<?php echo $phdata->qyt;?>" class="from-control text-center"  style="width:50px;" id="qt<?php echo $i;?>" > 
-                                        <button style="border-radius:50%;" type='button' class="btn btn-primary" id="puls<?php echo $i;?>" >+</button></td>
+                                        <td  style="width:120px;"><input type="hidden" value="<?php echo $phdata->id; ?>" id="iid<?php echo $i;?>">
+                                        <button style="border-radius:30%;" type='button' class="btn btn-success" id="minusbutton<?php echo $i;?>">-</button>&nbsp;&nbsp;&nbsp;
+                                        <input type="text" readonly=""  value="<?php echo $phdata->qyt;?>" class="from-control text-center"  style="width:40px;" id="qt<?php echo $i;?>" > 
+                                        <button style="border-radius:30%;" type='button' class="btn btn-primary" id="puls<?php echo $i;?>" >+</button></td>
 
                                         
 
-                                        <td width:"10px"><input type="hidden"  value="<?php echo $pdata->id;?>" id="code<?php echo $i;?>">
-                                            <input type="hidden"  value="<?php echo $pdata->selling_price;?>" id="price<?php echo $i;?>">
-                                      <input type="text"  readonly class="form-control text-center" value="<?php echo $phdata->price;?>" style="width:100px;" id="totalprice<?php echo $i;?>" >
+                                        <td ><input type="hidden"  value="<?php echo $pdata->id;?>" id="code<?php echo $i;?>">
+                                            <input type="hidden"  value="<?php echo $branchP->selling_price;?>" id="price<?php echo $i;?>">
+                                      <input type="text"  readonly class="form-control text-center" value="<?php echo $phdata->qyt*$branchP->selling_price;?>" style="width:100px;" id="totalprice<?php echo $i;?>" >
                                           </td>
 
-                                      <td width:"10px"><?php echo $pdata->p_type; ?></td>
+                                      <td ><?php echo $pdata->p_type; ?></td>
                                     <td >
                                         <input type="hidden"  value="<?php echo $phdata->id;?>" id="dtid<?php echo $i;?>" >
                                         <button class="btn btn-danger" id="delete<?php echo $i;?>"  style="border:none;width:100px;">
@@ -211,6 +230,9 @@
                                       window.location.reload();
                                     }
                                       });
+                                      
+                                      
+                                      
                                       $("#minusbutton<?php echo $i;?>").click(function(){
                                                   
                                                       var qty=Number($("#qt<?php echo $i;?>").val());
@@ -251,7 +273,6 @@
 							$("#sbtotal1").val("Error")
 						}
                                         
-                                                 
                                                           
                                                   });
                                                   }
@@ -282,14 +303,15 @@
                                         </tr>
                                      
 
-                                              <?php  $i++; }}
+                                              <?php  $i++; } endforeach;}
                                             //  }
-                                          }
-                                          } 
-                                          } ?>
-                                           </tbody>  
-                                          <tfooter>
-                                           <tr style=" background:#bc6cff;" >
+                                          
+                                          
+                                          ?>
+                                           </tbody> 
+                                        
+                                          <tfooter >
+                                           <tr class="fixed">
                                             <th></th>
                                               <th></th>
                                               <th><span style="color:red" >Total</span></th>
@@ -297,15 +319,15 @@
                                                   <th></th>
                                                     <th></th>
                                                       <th>  
-                              <?php
-                              $this->db->select_sum('price');
-                              $this->db->where('cust_usr',$this->session->userdata('id'));
-                              $dt1= $this->db->get("purchase_list")->row();
-                            
-                              ?> 
-                              
-                              <input type="text" value ="<?php echo $dt1->price;?>" style="color:red" name ="sbtotal1"  id="sbtotal1" readonly/>
-                              </th>
+                                                              <?php
+                                                              $this->db->select_sum('price');
+                                                              $this->db->where('cust_usr',$this->session->userdata('id'));
+                                                              $dt1= $this->db->get("purchase_list")->row();
+                                                            
+                                                              ?> 
+                                                              
+                                                              <input type="text" value ="<?php echo $dt1->price;?>" style="color:red" name ="sbtotal1"  id="sbtotal1" readonly/>
+                                                              </th>
                                                         <th></th>
                                                           <th></th>
                                                             <th></th>
@@ -314,8 +336,6 @@
                                               
                             </table>
                            
-                          </div>
-                          <!--<a class="btn btn-success" href="<?php echo base_url();?>subscriberController/my_bill/6">NEXT</a>-->
 					              </div>
                       </div>
                     </div>
@@ -325,7 +345,7 @@
                
                 <div role="tabpanel" class="tab-pane fade" id="myTab_example2">
 								  	         <div class="row">
-								  	         <div class="col-sm-12">
+								  	        	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
 								  	            
 										             
 											<h3 style="text-align:center; margin:10px;"><u>Delivery Detail</u></h3>
@@ -334,51 +354,51 @@
 												    
 												<div  id="addressinsert"  >
 												      
-												    <div class="col-md-12 space20">
+												  	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
                                                   
-                                                    <div class="col-sm-6">
+                                                   	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                                                       <div class="form-group">
-                                                          	<div class="col-md-4">
+                                                          	<div class="col-md-4 col-sm-4 col-lg-4 col-xs-4">
                                                                     <label for="card-number" class="form-label">Your Name<span style="color:red;"> *</span> </label>
                                                             </div> 
-                                                            	<div class="col-md-8">
+                                                            		<div class="col-md-8 col-sm-8 col-lg-8 col-xs-8">
                                                                     <input id="name" name="name"  required="" type="text" class="form-control text-uppercase">
                                                                 </div>    
                                                       </div>
                                                     </div>
                                                   
-                                                  <div class="col-md-6">
+                                                	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                                                   
                                                       <div class="form-group">
-                                                          	<div class="col-md-4">
-                                                                <label for="address" class="form-label">Your Address <span style="color:red;"> *</span></label>
+                                                          	<div class="col-md-4 col-sm-4 col-lg-4 col-xs-4">="form-label">Your Address <span style="color:red;"> *</span></label>
                                                         </div> 
-                                                        	<div class="col-md-8">
-                                                        <input id="address"  required=""  name="address" type="text" class="form-control text-uppercase">
+                                                        	<div class="col-md-8 col-sm-8 col-lg-8 col-xs-8">
+                                                        <input id="address1"  required=""  name="address" type="text" class="form-control text-uppercase">
                                                         </div>
                                                       </div>
                                                     </div>
                                                   </div>
                                                   
-                                                   <div class="col-md-12 space20">
+                                                  	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
                                                   
-                                                    <div class="col-sm-6">
+                                                   	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                                                       <div class="form-group">
-                                                          <div class="col-md-4">
+                                                        <div class="col-md-4 col-sm-4 col-lg-4 col-xs-4">
                                                        <label for="city" class="form-label">Your City <span style="color:red;"> *</span></label>
-                                                       </div><div class="col-md-8">
+                                                       </div>
+                                                       	<div class="col-md-8 col-sm-8 col-lg-8 col-xs-8">
                                                         <input id="city"  required=""   name="city" type="text" class="form-control text-uppercase">
                                                         </div>
                                                       </div>
                                                     </div>
                                                   
-                                                  <div class="col-md-6 ">
+                                                 	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                                                   
                                                       <div class="form-group">
-                                                          <div class="col-md-4">
+                                                           <div class="col-md-4 col-sm-4 col-lg-4 col-xs-4">
                                                         <label for="phone-2" class="form-label">Your Mobile Number <span style="color:red;"> *</span></label>
                                                         </div>
-                                                        <div class="col-md-8">
+                                                       	<div class="col-md-8 col-sm-8 col-lg-8 col-xs-8">
                                                         <input id="phonenumber" maxlength="10"  minlength="10"  required="" onkeypress="return isNumber(event)" name="phonenumber" type="text" class="form-control phone">
                                                      </div>
                                                       </div>
@@ -426,13 +446,11 @@
                                                 </form>
                                                 
                                               </div>
-                                              <!--<div class="col-md-9">-->
-                                              <!--      <button id="deleteaddresss"  type="button" class="btn btn-warning">back</button> -->
-                                              <!--      </div>-->
+                                            
                                               </div>
                                          <form action="<?php echo base_url();?>subscriberController/subscriber_order" method="post">      
-                                             <div  id="addressprint" style="margin-top:10px;" >
-                                         <table  id="sample-table-2" class="table table-responsive table-striped" style="width: 100%;">
+                                             <div  id="addressprint" style="margin-top:10px;" class="table-responsive" >
+                                         <table  id="sample-table-2" class="table table-responsive table-striped" >
                                                     <thead>
                                                       <tr>
                                                     <th width:"10px">SNO</th>
@@ -442,7 +460,7 @@
                                                   <th width:"10px">Mobile Number</th>
                                                   <th style="width:auto;">Email</th>
                                                  <th width:"10px"> Remove</th>
-                                                 <th width:"10px">Select Address</th>
+                                                 <th width:"10px">Select</th>
                                                   </tr>
                                                     </thead>
                                                     <tbody>
@@ -468,7 +486,7 @@
                                            
                                               <td width:"10px">
                                                   <input type="radio"  class="btn btn-danger" value="<?php echo $row->id;?>" name="checkaddress" style="height:35px; width:25px; vertical-align: middle;">
-                                                   </td>
+                                                  
                                             
                                                          <script>
                                                          $(document).ready(function(){
@@ -484,30 +502,27 @@
                                                          
                                                             
                                                     </script>
-                                                   
+                                                    </td>
                                                       </tr>
                                                       <?php $i++;endforeach; } ?>
                                                     </tbody>
                                                   </table> 
                                                 </div>
-                                                 <!--<a class="btn btn-success" href="<?php echo base_url();?>subscriberController/my_bill/3">NEXT</a>-->
-                            		  	          </div>
+                                                
+                                                  </div>
                
-                            		  	       
-                            		  	       
-               
-                <div class="tab-pane fade"            id="myTab_example3">
+                <div class="tab-pane fade" id="myTab_example3">
                   <div class="alert btn-azure">
                     <button data-dismiss="alert" class="close">
                       ×
                     </button>
                     <h3 class="media-heading text-center">Welcome To Address Area </h3>
                     <a class="alert-link" href="#"></a>
-                    a Section simply Press <strong>Delete</strong> Button.
+                    A Section simply Press <strong>Delete</strong> Button.
                   </div>
 
                                     <div class="row">
-                    <div class="col-sm-6">
+                  	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                       <div class="panel panel-calendar">
                         <div class="panel-heading panel-red border-light">
                           <h4 class="panel-title">Select Your Payment Mode</h4>
@@ -749,7 +764,7 @@
                                     </div> -->
                       </div>            
                     </div>
-                      <div class="col-sm-6">
+                      	<div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
                         <div class="panel panel-calendar">
                           <div class="panel-heading panel-red border-light">
                             <h4 class="panel-title">Submit Your Payment Transaction Id</h4>

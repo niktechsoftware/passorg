@@ -136,7 +136,7 @@
             			<input type="text" style="max-width:300px;max-height:50px;" class=" form-control"    readonly=""/>
             		</div> -->
             		<div class="form-group">
-            			<label class="control-label" style="float: left;"><span style="font-size:15px;">Bank Deposite</span></label>
+            			<label class="control-label" style="float: left;"><span style="font-size:15px;">Bank Deposit</span></label>
             			<input type="text" class=" form-control" readonly="" />
             		</div>
             		<div class="form-group">

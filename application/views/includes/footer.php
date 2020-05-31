@@ -294,7 +294,7 @@
                     </div>
                     <div class="form-group">
                         <div class="fileupload fileupload-new contributor-avatar" data-provides="fileupload">
-                            <div class="fileupload-new thumbnail"><img src="assets/images/anonymous.jpg" alt="" width="50" height="50"/>
+                            <div class="fileupload-new thumbnail"><img src="<?php echo base_url();?>assets/images/anonymous.jpg" alt="" width="50" height="50"/>
                             </div>
                             <div class="fileupload-preview fileupload-exists thumbnail"></div>
                             <div class="contributor-avatar-options">

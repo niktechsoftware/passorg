@@ -152,6 +152,7 @@
                   
                   </td>
                   <td><input type="button" value="Delete" id="dlts<?php echo $i;?>" class="btn btn-danger"></td>
+                  <?php if($this->session->userdata("login_type")==1){?>
                   <script>
                   	$("#dlts<?php echo $i;?>").click(function(){
                   	    var rowid= $("#rowid<?php echo $i;?>").val();
@@ -170,6 +171,11 @@
 					});
 				});
 				  </script>
+				  <?php }else{?>
+				    <script>
+				    alert("Please Contact to admin");
+				    </script>
+				  <?php }?>
                 </tr>
                 <?php  $i++;
                 endforeach;}?>

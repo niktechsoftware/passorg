@@ -22,7 +22,7 @@
                               <select class="form-control" id="bselectid" style="height:40px;">
                                 <option value="">Select Branch</option>
                                 <?php foreach($dt as $bdt) { ?>
-                                <option value="<?php echo $bdt->id;?>"><?php echo $bdt->b_name;?></option>
+                                <option value="<?php echo $bdt->username;?>"><?php echo $bdt->b_name;?></option>
                                 <?php } ?>
                                 <!--<option value="2">Shop</option>-->
                                 <!--<option value="3"></option>-->

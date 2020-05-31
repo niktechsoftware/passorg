@@ -133,54 +133,42 @@ function myFunction() {
                      $empd = $this->db->get("employee")->row();echo $empd->name;?>
                         </div>
                        <div class="col-md-4 col-sm-6"> 
-                       <?php 
-                            if($this->session->userdata('login_type')==1)
-                           { 
-                                $this->db->where('admin_username',$this->session->userdata('username'));
-                             $admindt=$this->db->get('general_settings');
-                                 $name=$admindt->row()->owner_name;
-                                  $mobile=$admindt->row()->mobile_number;
-                           ?>
-                               <h6 class="m-b-20 ">Sender Detail -<br><br> Username:-<span class="text-primary"><?php echo $this->session->userdata('username');?></span></h6>
-                                <h6 class="text-uppercase">Name :
-                                <span class=" text-primary"><?php echo $name;?></span>
+                      
+                               <h6 class="m-b-20 ">Sender Detail -<br><br> Username:-<span class="text-primary"><?php echo $dt1->sender_username;
+                             
+                               
+                               ?></span></h6>
+                              
+                                 <h6 class="text-uppercase">Mobile :
+                                <span class=" text-primary"><?php 
+                                
+                                 $this->db->where("username",$dt1->sender_username);
+	    $bvv = $this->db->get("branch");
+	     
+	    if($bvv->num_rows()>0){
+	        echo  $bvv->row()->mobile;
+	        $usernamefinal = "b";
+	    }else{
+	         $this->db->where("username",$dt1->sender_username);
+	    $svv = $this->db->get("sub_branch");
+	     $usernamefinal ="sb";
+	     if($svv->num_rows()>0){
+	        echo  $svv->row()->mob_no;
+	    }else{
+	       $this->db->where("admin_username",$dt1->sender_username);
+	    $svv = $this->db->get("general_settings");
+	     if($svv->num_rows()>0){
+	        echo  $svv->row()->mobile_number;
+	    } else{
+	         echo  "8382829593";
+	    }
+	    }
+	    }
+                                
+                                
+            ?></span>
                                  </h6>
-                           <?php }
-                           elseif($this->session->userdata('login_type')==2)
-                           {
-                               $this->db->where('username',$this->session->userdata('username'));
-                             $branchdt=$this->db->get('branch');
-                                 $name=$branchdt->row()->b_name;
-                                  $mobile=$branchdt->row()->mobile;
-                           ?>
-                                <h6 class="m-b-20 ">Sender Detail -<br><br> Username:-<span class="text-primary"><?php echo $this->session->userdata('username');?></span></h6>
-                                <h6 class="text-uppercase">Branch Name :
-                                   <span class=" text-primary"><?php echo $name;?></span>
-                                </h6>
-                                <h6 class="text-uppercase">Branch Owner Name :
-                                   <span class=" text-primary"><?php echo $branchdt->row()->name;?></span>
-                                </h6>
-                          <?php }
-                           elseif($this->session->userdata('login_type')==4)
-                           { 
-                                 $this->db->where('username',$this->session->userdata('username'));
-                             $sbranchdt=$this->db->get('sub_branch');
-                                 $name=$sbranchdt->row()->bname;
-                                  $mobile=$sbranchdt->row()->mob_no;
-                           ?>
-                                <h6 class="m-b-20 ">Sender Detail -<br><br> Username:-<span class="text-primary"><?php echo $this->session->userdata('username');?></span></h6>   
-                                <h6 class="text-uppercase">Shop Name :
-                                    <span class=" text-primary"><?php echo $name;?></span>
-                                </h6>
-                                <h6 class="text-uppercase">Shop Owner Name :
-                                   <span class=" text-primary"><?php echo $sbranchdt->row()->ownername;?></span>
-                                </h6>
-                          <?php }
-                       ?>
-                            
-                            <h6 class="text-uppercase ">Mobile Number :
-                                <span class="text-primary"><?php echo $mobile;?></span>
-                            </h6>
+                          
                            
                         </div>
                       
@@ -190,9 +178,11 @@ function myFunction() {
                                <?php 
                               $this->db->where('admin_username',$dt1->reciver_usernm);
                              $admindt1=$this->db->get('general_settings');
+                            
                              if($admindt1->num_rows()>0){
                                  $name1=$admindt1->row()->owner_name;
                                   $mobile1=$admindt1->row()->mobile_number;
+                                  
                                   ?>
                                    <h6 class="text-uppercase">Name :
                                 <span class=" text-primary"><?php echo $name1;?></span>
@@ -220,8 +210,8 @@ function myFunction() {
                                    <h6 class="text-uppercase">Name :
                                 <span class=" text-primary"><?php echo $name1;?></span>
                             </h6>
-                             <h6 class="text-uppercase">Name :
-                                <span class=" text-primary"><?php echo $sbranchdt1->row()->ownername;?></span>
+                             <h6 class="text-uppercase">Address :
+                                <span class=" text-primary"><?php echo $sbranchdt1->row()->address;?></span>
                             </h6>
                           <?php   }
                              }
@@ -268,15 +258,24 @@ function myFunction() {
                                                 $this->db->where('id',$data->p_code);
                                                 // $this->db->or_where('sec',$data->p_code);
                                                       $productdetail=$this->db->get('stock_products')->row();
-                                                     $amount= $productdetail->selling_price *$data->quantity;
+                                                      if($usernamefinal=="sb"){
+                                                          $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$data->p_code);
+                                                         $pprice =$this->db->get("branch_wallet")->row()->selling_price;
+                                                      }else{
+                                                            $this->db->where("branch_id",$this->session->userdata("id"));
+                                                          $this->db->where("p_code",$data->p_code);
+                                                         $pprice =$this->db->get("branch_wallet")->row()->selling_price;
+                                                      }
+                                                     $amount= $pprice *$data->quantity;
                                                          ?>
                                                 <h6><?php echo $productdetail->name;?></h6>
                                                 <p><?php  echo $productdetail->company ."[ ". $productdetail->p_type . " ] ";?></p>
                                             </td>
                                             <td><?php echo $productdetail->size; ?></td>
                                             <td><?php echo $data->quantity; ?></td>
-                                            <td><?php echo $productdetail->selling_price; ?></td>
-                                            <td><?php echo $amount ; ?></td>
+                                            <td><?php echo number_format($pprice, 2,'.', ''); ?></td>
+                                            <td><?php echo number_format($amount, 2,'.', '') ; ?></td>
                                             <?php $total =$total + $amount;?>
                                         </tr>
                                         
@@ -309,7 +308,7 @@ function myFunction() {
                                         </td>
                                         <td>
                                             <hr />
-                                            <h5 class="text-primary"><?php echo $total;?></h5>
+                                            <h5 class="text-primary"><?php echo number_format($total, 2,'.', '');?></h5>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -25,10 +25,21 @@
                     $data=$sub_data->row();
                 
                 ?>
+                <div class="row space15">     
+                 <div class="col-md-12">
+                            <div class="col-md-6">
+                            Image
+                            </div>
+                            <div class="col-md-6">
+                            <?php if(strlen($data->image)>0){?> <img class="zoom1" width=50px; height=50px; src="<?php echo $this->config->item('asset_url');?>/images/subscriber/<?php echo $data->image;?>"> <?php } else { ?><img class="zoom1" width=50px; height=50px; src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png"> <?php } ?>
+                            
+                            </div>
+                        </div>
+                    </div>
 	        	<form action="<?php echo base_url();?>index.php/subscriberController/update_profile"  method ="post" role="form" id="form">
-                <div class="row"> 
+	        	    
                 
-                    <div class="col-md-12 space20">
+                    <div class="row space15">
                         <div class="col-md-6">
                             <div class="col-md-6">
                                 Name
@@ -46,7 +57,8 @@
                             
                             </div>
                         </div> 
-                        <br><br>
+                    </div>    
+                   <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                 Mobile Number
@@ -65,7 +77,8 @@
                             
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                   <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                 Address 
@@ -84,7 +97,8 @@
                             
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                District 
@@ -105,7 +119,8 @@
                             
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                Aadhar Number
@@ -124,7 +139,8 @@
                             
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                               <label> Gender</label>
@@ -148,7 +164,8 @@
                                 
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                1 Nominee Name
@@ -167,7 +184,8 @@
                                
                             </div>
                         </div>
-                        <br><br>
+                   </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                1 Nominee Relation
@@ -186,7 +204,8 @@
                                 
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                    <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                2 Nominee Aadhar No.
@@ -205,7 +224,8 @@
                                 
                             </div>
                         </div>
-                        <br><br>
+                     </div>  
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                                UserName
@@ -224,20 +244,73 @@
                                 
                             </div>
                         </div>
-                        <br><br>
-                        <div class="col-md-6">
+                    </div>
+                       
+                      <div class="row space15"> 
+					 <div class="col-md-6 ">
+                 
+                    		 <div class="col-md-6">
+                   				 Branch Name<span class="symbol required"></span>
+                    		</div>
+                			<div class="col-md-6">
+                    			<?php 
+                    			$id =$this->session->userdata('id');
+                    		$this->db->where("id",$id);
+                    		$empd= $this->db->get("customers")->row();
+                    			  
+                    			   $this->db->where("id",$empd->district);
+                    			   $subbranch = $this->db->get("branch")->row();;
+                    			  $branchlist= $this->db->get("branch");
+                    			     ?>
+                                        <select class="form-control" name="branch" id="branch" required="required">
+                                            <option value="">-Select Branch Name-</option>
+                                           <?php foreach($branchlist->result() as $bl):?>
+                                            <option value="<?php echo $bl->id;?>" <?php if($bl->id==$subbranch->id){echo "selected ='selected'";}?> ><?php echo $bl->b_name; ?></option>
+                                           <?php endforeach;?>
+                                        </select>
+                       
+                    		</div>
+               			
+                    
+                   		              
+               		</div>	 
+            	
+                         <div class="col-md-6">
                             <div class="col-md-6">
-                                 Shop Name
-                                 </div>
-                            <div class="col-md-6">
-                                <? $this->db->where("id",$data->sub_branchid);
-                               $sbname = $this->db->get("sub_branch")->row();?>
-                                 <input type="hidden" name="branch_name" value="<?php echo $data->sub_branchid;?>" />
-                            <input type="text" name="branch_name1" class="form-control" value="<?php echo $sbname->bname;?>" readonly/>
-                                
-                            </div>
+                   				Sub Branch Name
+                    		</div>
+                    		<?php 	
+                    		$id =$this->session->userdata('id');
+                    		$this->db->where("id",$id);
+                    		$empd= $this->db->get("customers")->row();
+                    		$this->db->where("id",$empd->sub_branchid);
+                    		$sbdetails=$this->db->get("sub_branch")->row();
+                    		?>
+                    		<div class="col-md-6">
+                    			<select class="form-control" id="subbranch" name="subbranch" required="required">
+                    			       <option value="<?php echo $sbdetails->id;?>"><?php echo $sbdetails->bname; ?></option>
+                                </select>
+                    		</div>
+                    	
+                		
+                    	
+               			</div> 
                         </div>
-                        <div class="col-md-6">
+                       <script>
+                            
+                             $('#branch').change(function(){
+                                  var branch= $('#branch').val();
+                                  //alert(branch);
+                                  $.post("<?php echo site_url("employeeController/subBranch") ?>", {
+                                    branch: branch
+                                        }, function(data) {
+                                          $("#subbranch").html(data);
+                                         // alert("data");
+                                        });
+                              });
+                        </script>
+                       <div class="row space15">     
+                           <div class="col-md-6">
                             <div class="col-md-6">
                                 Joiner Id
                             </div>
@@ -251,16 +324,6 @@
                            <?php }?>
                             </div>
                         </div>
-                        <br><br>
-                        <div class="col-md-6">
-                            <div class="col-md-6">
-                            Image
-                            </div>
-                            <div class="col-md-6">
-                            <?php if(strlen($data->image)>0){?> <img class="zoom1" width=50px; height=50px; src="<?php echo $this->config->item('asset_url');?>/images/subscriber/<?php echo $data->image;?>"> <?php } else { ?><img class="zoom1" width=50px; height=50px; src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png"> <?php } ?>
-                            
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="col-md-6">
                             Bank Name
@@ -270,7 +333,8 @@
                                 
                             </div>
                         </div>
-                        <br><br>
+                    </div>    
+                     <div class="row space15">     
                         <div class="col-md-6">
                             <div class="col-md-6">
                             Account Number
@@ -289,11 +353,20 @@
                             
                             </div>
                         </div>
-
+                    </div>
                 <?php } ?>
-                    </div>	 
-                </div>
-                <div><center><input class="btn btn-primary" type="submit" class="form-control" name="update" value="Submit"/></center></div>
+                  
+                <div class="col-md-12">
+                            <div class="col-md-6">
+                               
+                            </div>
+                            <div class="col-md-6">
+                          <input class="btn btn-primary" type="submit" class="form-control" name="update" value="Submit"/>
+                            
+                            </div>
+                        </div>
+                 </div>
+                  </div>
             </div>
         </div>
     </div>

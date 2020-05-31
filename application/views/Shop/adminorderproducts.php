@@ -103,6 +103,9 @@
                           $this->db->where('id',$row->p_code);
                           $dt1= $this->db->get("stock_products")->row();
 
+                    $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$row->p_code);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
                           $this->db->where('order_no',$invoice);
                           $dt2= $this->db->get("order_serial")->row();
                            $this->db->where('id',$dt2->cust_id);
@@ -116,7 +119,7 @@
                       <td style="width:10px;"  class="text-center"><?php  echo $dt1->size;?></td> 
                       <td style="width:10px;"><?php echo $dt1->hsn;?></td>
                        <td style="width:10px;" class="text-center"><?php $tq+=$row->quantity; echo $row->quantity;?></td>
-                      <td style="width:10px;" class="text-center"><?php $tp+=$dt1->selling_price; echo $dt1->selling_price;?></td> 
+                      <td style="width:10px;" class="text-center"><?php $tp+=$pprice->selling_price; echo $pprice->selling_price;?></td> 
                       <td style="width:10px;" class="text-center"><?php $tt+=$row->subtotal; echo $row->subtotal;?></td>
                       <td style="width:10px;"><?php echo $row->date;?></td>
                       <td style="width:10px;"><?php echo $invoice;?></td>

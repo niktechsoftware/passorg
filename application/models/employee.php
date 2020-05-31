@@ -58,11 +58,26 @@
           $query =  $this->db->get('employee');
             return $query;
        }
-        function empSubbranch1($subbranch){
-          $this->db->where('emp_type',5);
-           $this->db->where('status',1);
-           $this->db->where('sub_branchid',$subbranch);
-          $query =  $this->db->get('employee');
+        function empSubbranch1($subbranch,$branch){
+           
+                 $this->db->where('emp_type',5);
+                    $this->db->where('status',1);
+                    $this->db->where('district',$branch);
+                     $this->db->where('sub_branchid',$subbranch);
+                    $query =  $this->db->get('employee');
+           
+         
+            return $query;
+       }
+       function empSubbranchna($subbranch,$branch){
+           
+                 $this->db->where('emp_type',5);
+                    $this->db->where('status',0);
+                    $this->db->where('district',$branch);
+                     $this->db->where('sub_branchid',$subbranch);
+                    $query =  $this->db->get('employee');
+           
+         
             return $query;
        }
 

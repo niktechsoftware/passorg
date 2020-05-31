@@ -51,13 +51,29 @@
                     </div>               
                   </div>   
               </div>
+              
+               <div class="row"> 
+                     <div class="col-md-12 space20">
+                        <div class="col-md-6">
+                             <div class="col-md-4">
+                                 User ID<span class="symbol required">
+                            </div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" name="username" value="<?php echo $row->username;?>" readonly=""/>
+                            </div>
+                        </div>
+                        
+                                       
+                    </div>   
+                </div>
+              
 				<div class="row"> 
 					 <div class="col-md-12 space20">
             			 <div class="col-md-6">
             			 	<div class="col-md-4">
                    				Sub Branch Name<span class="symbol required"></div>
                    				 <div class="col-md-8">
-                   				 <input type="text"  class="form-control"  name="bname" minlength="1" maxlength="30" style="text-transform:uppercase" required="required" onkeypress="return isalphabate(event)" value="<?php echo $row->bname;?>" readonly= "readonly"/>
+                   				 <input type="text"  class="form-control"  name="bname" minlength="1" maxlength="30" style="text-transform:uppercase" required="required" onkeypress="return isalphabate(event)" value="<?php echo $row->bname;?>" <?php if($this->session->userdata("login_type")==1){?> <?php }else {?> readonly= "readonly"<?php }?>/>
                    				</div>
                    		</div>
                    		<div class="col-md-6">
@@ -76,7 +92,7 @@
             			 	<div class="col-md-4">
                    				 Mobile Number<span class="symbol required"></div>
                    				 <div class="col-md-8">
-                   				 <input type="text"  class="form-control" name="mob_no" pattern="^[6-9]\d{9}$"  required="required" value="<?php echo $row->mob_no;?>" readonly= "readonly"/>
+                   				 <input type="text"  class="form-control" name="mob_no" pattern="^[6-9]\d{9}$"  required="required" value="<?php echo $row->mob_no;?>" <?php if($this->session->userdata("login_type")==1){?> <?php }else {?> readonly= "readonly" <?php }?>/>
                    				</div>
                    		</div>
                    		<div class="col-md-6">
@@ -84,7 +100,7 @@
                    				 Aadhaar Number<span class="symbol required">
                     		</div>
                 			<div class="col-md-8">
-                    			<input type="text" data-type="adhaar-number" class="form-control" name="adhar_no" minlength="14" maxlength="14" required ="required" value="<?php echo $row->adhar_no;?>" readonly= "readonly"/>
+                    			<input type="text" data-type="adhaar-number" class="form-control" name="adhar_no" minlength="14" maxlength="14" required ="required" value="<?php echo $row->adhar_no;?>" <?php if($this->session->userdata("login_type")==1){?> <?php }else {?> readonly= "readonly" <?php }?>/>
                     		</div>
                			</div>               
                		</div>	 

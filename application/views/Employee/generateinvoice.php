@@ -37,8 +37,7 @@
 				<div class="row">
 				<?php $order_no = $this->uri->segment(3);?>
 					<div class="col-sm-12">
-						<IFRAME SRC="<?php echo base_url(); ?>employeeController/genrateinvoice/<?php echo $order_no;?>" width="100%" height="150px" id="iframe1" style="border: 1px;" onLoad="autoResize('iframe1');"></iframe>
-					</div>
+					   <IFRAME SRC="<?php echo base_url(); ?>stockController/productinvoice/<?php echo $order_no;?>" width="100%" height="150px" id="iframe1" style="border: 1px;" onLoad="autoResize('iframe1');"></iframe>	</div>
 				</div>
 			</div>
 			<!-- end: INLINE TABS PANEL -->

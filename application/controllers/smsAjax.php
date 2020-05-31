@@ -70,7 +70,10 @@ class SmsAjax extends CI_Controller{
 		$msg =	$this->input->post("meg");
 		//print_r($msg);exit;
 		$fmobile = $this->input->post("m_number");
-		sms($fmobile,$msg,$sende_Detail1->uname,$sende_Detail1->password,$sende_Detail1->sender_id);
+		$getv =sms($fmobile,$msg);
+		$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 		redirect("index.php/login/mobileNotice/Notice");
 	}
 	
@@ -398,7 +401,7 @@ class SmsAjax extends CI_Controller{
 	}
 	
 	function smsPanel(){
-		$sender = $this->smsmodel->getsmssender($this->session->userdata("school_code"))->row();
+		$sender = $this->smsmodel->getsmssender()->row();
 		
 		$data['sender_Detail'] =$sender;
 		$data['cbs']=checkBalSms($sender->uname,$sender->password);
@@ -407,9 +410,89 @@ class SmsAjax extends CI_Controller{
 		$data['mainPage'] = 'SMS Panel Area';
 		$data['subPage'] = 'SMS Panel';
 		$data['title'] = 'SMS Panel Area ';
-		$data['headerCss'] = 'headerCss/noticeCss';
-		$data['footerJs'] = 'footerJs/noticeJs';
+		$data['headerCss'] = 'headerCss/listCss';
+		$data['footerJs'] = 'footerJs/listJs';
 		$data['mainContent'] = 'smsPanel';
 		$this->load->view("includes/mainContent", $data);
 	}	
+	function smsreport(){
+	
+		$sent_report = $this->db->get("sent_sms_master");
+		$data['result']  =$sent_report;
+		$data['pageTitle'] = 'SMS Report Panel';
+		$data['smallTitle'] = 'SMS PAnel';
+		$data['mainPage'] = 'SMS Report Panel';
+		$data['subPage'] = 'Get Sms Report / SMS Panel';
+
+		$data['title'] = 'Get SMS Report / SMS Panel';
+		$data['headerCss'] = 'headerCss/smsCss';
+		$data['footerJs'] = 'footerJs/smsJs';
+		$data['mainContent'] = 'smsreport';
+		$this->load->view("includes/mainContent", $data);
+	}
+	
+	function viewsmsdetail(){
+			$data['pageTitle'] = 'View SMS Report';
+		$data['smallTitle'] = 'View SMS Report';
+		$data['mainPage'] = 'View SMS Report';
+		$data['subPage'] = 'View SMS Report';
+		$data['title'] = 'View SMS Report ';
+		$data['headerCss'] = 'headerCss/smsCss';
+		$data['footerJs'] = 'footerJs/smsJs';
+		$data['mainContent'] = 'viewsmsdetail';
+		$this->load->view("includes/mainContent", $data);
+	}	
+	function resendsms(){
+    
+    	$count=0;
+		$smsc =0;
+		$smscount=0;
+// 		$totsmssent = $this->input->post("totsmsv");
+// 		$totbal = $this->input->post("totbal");
+	
+// 		if($totbal > $totsmssent){
+
+	
+		$sender = $this->smsmodel->getsmssender();
+		$sende_Detail =$sender->row();
+// 		print_r($sende_Detail);
+		$msg =	$this->input->post("meg");
+	    
+		$fmobile1 = $this->input->post("m_number");
+		$fmobile1=substr($fmobile1,2);
+		$str_arr=explode(",",$fmobile1);
+		$totnumb =  sizeof($str_arr);
+		$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		$master_id=$max_id->maxid+1;
+		
+		$fmobile = $fmobile1;
+	    $getv=  sms($fmobile,$msg);
+		$dt= $this->smsmodel->sentmasterRecord($msg,$totnumb,$master_id,$getv);
+		if($dt){
+		   echo "Send-".$fmobile; 
+		}	
+
+}
+	function wrongsmsdetail(){
+		$data['pageTitle'] = 'View SMS Report';
+		$data['smallTitle'] = 'View SMS Report';
+		$data['mainPage'] = 'View SMS Report';
+		$data['subPage'] = 'View SMS Report';
+		$data['title'] = 'View SMS Report ';
+		$data['headerCss'] = 'headerCss/smsCss';
+		$data['footerJs'] = 'footerJs/smsJs';
+		$data['mainContent'] = 'wrongsmsdetail';
+		$this->load->view("includes/mainContent", $data);
+}
+function reminderSms(){
+    	$data['pageTitle'] = 'Reminder SMS ';
+		$data['smallTitle'] = 'Reminder SMS';
+		$data['mainPage'] = 'Reminder SMS';
+		$data['subPage'] = 'Reminder SMS Report';
+		$data['title'] = 'Reminder SMS ';
+		$data['headerCss'] = 'headerCss/smsCss';
+		$data['footerJs'] = 'footerJs/smsJs';
+		$data['mainContent'] = 'reminderSMS';
+		$this->load->view("includes/mainContent", $data);
+}
 }

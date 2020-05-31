@@ -7,6 +7,7 @@ class SubscriberController extends CI_Controller{
 	$this->load->model('subscriber');
 	$this->load->model('branch');
 	$this->load->model('shop');
+	$this->load->model("smsmodel");
 	}
 	public function is_login(){
 		
@@ -24,6 +25,30 @@ class SubscriberController extends CI_Controller{
 		}
 	
 	}
+	
+	public function editLevelc(){
+	   $level = $this->input->post("level");
+	    $levelv = $this->input->post("levelv");
+	    $updata['com_percentage']=$levelv;
+	    $this->db->where("id",$level);
+	    if($this->db->update("commission",$updata)){
+	    echo "Success";
+	    }else{
+	        echo "Wait";
+	    }
+	}
+	
+	public function pvtable(){
+	    	$data['pageTitle'] = 'Dashboard';
+			$data['smallTitle'] = 'Subscriber Dashboard';
+			$data['mainPage'] = 'Dashboard';
+			$data['subPage'] = 'Dashboard';
+			$data['title'] = 'Subscriber Dashboard';
+			$data['headerCss'] = 'headerCss/dashboardCss';
+			$data['footerJs'] = 'footerJs/dashboardJs';
+			$data['mainContent'] = 'Subscriber/pvtable';
+			$this->load->view("includes/mainContent", $data);
+	}
 	public function index(){
 		if($this->session->userdata("login_type")>5)
 		{
@@ -31,10 +56,10 @@ class SubscriberController extends CI_Controller{
 		}
 		else
 		{
-			$data['pageTitle'] = 'Subscriber Dashboard';
-			$data['smallTitle'] = 'Overview of all Section';
-			$data['mainPage'] = 'Subscriber Dashboard';
-			$data['subPage'] = 'Subscriber dashboard';
+			$data['pageTitle'] = 'Dashboard';
+			$data['smallTitle'] = 'Subscriber Dashboard';
+			$data['mainPage'] = 'Dashboard';
+			$data['subPage'] = 'Dashboard';
 			$data['title'] = 'Subscriber Dashboard';
 			$data['headerCss'] = 'headerCss/dashboardCss';
 			$data['footerJs'] = 'footerJs/dashboardJs';
@@ -53,9 +78,9 @@ public function profile(){
 			$this->load->model('subscriber_m');
 			$data['sub_data']=$this->subscriber_m->subscriber_profile($username);
 			
-			$data['pageTitle'] = 'Subscriber Profile';
-			$data['smallTitle'] = 'Profile';
-			$data['mainPage'] = 'Subscriber Profile';
+			$data['pageTitle'] = 'Profile';
+			$data['smallTitle'] = 'Subscriber Profile';
+			$data['mainPage'] = ' Profile';
 			$data['subPage'] = 'Subscriber Profile';
 			$data['title'] = 'Subscriber Profile';
 			$data['headerCss'] = 'headerCss/dashboardCss';
@@ -148,7 +173,7 @@ public function profile(){
 	}
 	
 	public function change_status()
-	{
+	{ if($this->session->userdata("login_type")==1){
 	    $id= $this->session->userdata('id');
 	    $this->load->model('subscriber_m');
 	    $check= $this->subscriber_m->change_status($id);
@@ -160,10 +185,17 @@ public function profile(){
 	    {
 	        redirect("index.php/subscriberController/index/6");
 	    }
+	}else{
+	    {?>
+	    	    <script>alert("Please Contact To admin for activation");</script>
+	    <?php	}
+	}
 	}
 	
 	public function active_inactive()
 	{
+	    $this->load->model("smsmodel");
+	    if($this->session->userdata("login_type")==1){
 	    $username = $this->input->post("username");
 	    $this->db->where('username',$username);
 	    $ddt = $this->db->get('customers')->row();
@@ -175,6 +207,7 @@ public function profile(){
 	    }
 	    else
 	    {
+	       
 	        $v = array('status'=> 1);
 	        $this->db->where('username',$username);
 	        $c = $this->db->update('customers',$v);
@@ -195,8 +228,7 @@ public function profile(){
 	               else{
 	                $this->db->where("cid",$v->row()->id);
 	               $oldpv =  $this->db->get("pv")->row()->pv;
-	               // print_r($oldpv);
-	               // exit();
+	             
 	               $newpv=$oldpv+150;
 	                $value=array( 'pv'=>$newpv);
 	                  $this->db->where("cid",$v->row()->id);
@@ -220,18 +252,19 @@ public function profile(){
      $mobile =	$v->row()->mobile;
      $smsdt=$this->db->get("sms")->row();
              if($smsdt->active==1){
-     sms($mobile,$msg);
+     $getv =sms($mobile,$msg);
+     $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
              }
 	               }
 	            }
 	            else
 	            { 
-	                
 	                $this->db->where("paid_by",$username);
 	               $this->db->where("paid_to",$ddt->ao);
 	               $pvdata=$this->db->get("pvday_book");
 	               if($pvdata->num_rows()>0){
-	                   
 	               }
 	               else{
 	                 $this->db->where("username",$ddt->ao);
@@ -243,8 +276,7 @@ public function profile(){
 	                $value=array( 'pv'=>$newpv);
 	                 $this->db->where("emp_id",$row->id);
 	                $this->db->update('emp_pv', $value);
-	                
-	                  $pvdaybook=array(
+	                 $pvdaybook=array(
                     "paid_to"=>$ddt->ao,
                     "paid_by"=>$username, 
                      "reason"=>"sub. active pv",
@@ -252,46 +284,46 @@ public function profile(){
                       "pv"=>150,
                       //"order_no"=>$orderno,
                         "pay_date"=>Date('y-m-d')
-    
-              );
-           //  $this->db->where("cid",$parentdt->id);
-              $uppv=$this->db->insert("pvday_book",$pvdaybook);
-              
-	          
-	                 $msg = "Congratulation Dear ".$row->name." Your 150 PV has been added in your Account.";
-    
-	                 $mobile =	$row->mobile;
-	                 $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-     sms($mobile,$msg);
-             }
-	            } }
-	            
-	        }
-	        if($ddt->tstatus==1)
+                          );
+                    //  $this->db->where("cid",$parentdt->id);
+                     $uppv=$this->db->insert("pvday_book",$pvdaybook);
+                     $msg = "Congratulation Dear ".$row->name." Your 150 PV has been added in your Account.";
+                    $mobile =	$row->mobile;
+	                $smsdt=$this->db->get("sms")->row();
+                 if($smsdt->active==1){
+                 $getv =sms($mobile,$msg);
+                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
+                      }
+	                 } }
+	             }
+	             if($ddt->tstatus==1)
 	        {   $this->db->where("cust_id",$ddt->id);
 	             $rdt=$this->db->get('register_pv');
 	             if($rdt->num_rows()>0){
-	           
-	        } 
-	        else{
+	                 } 
+	                 else{
 	             $value1=array('cust_id'=>$ddt->id, 'pv'=>'1000');
 	            $this->db->insert('register_pv', $value1);
 	             $msg = "Congratulation Dear ".$ddt->name." Your Account has been Activated Successfully and 1000 PV has been added in your Account.";
-    
-	                 $mobile =	$ddt->mobile;
+                  $mobile =	$ddt->mobile;
 	                 $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-     sms($mobile,$msg);
+                      if($smsdt->active==1){
+                 $getv =sms($mobile,$msg);
+                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
              }
-	            
 	        }
 	        }
-	    }
-	    
+	          }
+	    	}else{?>
+	    	    <script>alert("Please Contact To admin for activation");</script>
+	    <?php	}
 	}
 	
-	public function invoice(){
+    	public function invoice(){
     	if($this->session->userdata("login_type")>5)
     	{
     		redirect("index.php/homeController/index");
@@ -313,11 +345,7 @@ public function profile(){
     		$this->load->view("includes/mainContent", $data);
 		}	
 	}
-	
-	
-	
 	public function new_invoice(){
-    	
     		//$id=$this->session->userdata("id");
     		// $this->load->model('subscriber_m');
     		// $data['fv_data']=$this->subscriber_m->my_Fvlist($id);
@@ -327,14 +355,11 @@ public function profile(){
 			$this->load->view("Subscriber/new_invoice",$data);
 		}	
 		public function genrateinvoice(){
-          
-			$data['orderno'] =$this->uri->segment(3);
+          	$data['orderno'] =$this->uri->segment(3);
 		   $data['title'] = 'Order Products List';    
 		   $this->load->view("Subscriber/generateinvoicedetail", $data);
- 
-		   }
-	
-	public function update_profile(){
+          }
+    	public function update_profile(){
 		$username=$this->session->userdata("username");
 		$up_data=array( 
 			"name" => $this->input->post('name'),
@@ -343,7 +368,8 @@ public function profile(){
 			"email" => $this->input->post('email'),
 			"address" => $this->input->post('address'),
 			"pin" => $this->input->post('pin'),
-			"district" => $this->input->post('district'),
+			"district" => $this->input->post('branch'),
+			"sub_branchid"=>$this->input->post('subbranch'),
 			"state" => $this->input->post('state'),
 			"adhar" => $this->input->post('adhar'),
 			"pan" => $this->input->post('pan'),
@@ -355,22 +381,22 @@ public function profile(){
 			"nom2" => $this->input->post('nom2'),
 			"nom_ad2" => $this->input->post('nom_ad2'),
 			"nom_rel2" => $this->input->post('nom_rel2'),
-			"username" => $this->input->post('username'),
+		
 			"password" => $this->input->post('password'),
 			"bank_name" => $this->input->post('bank_name'),
 			"account_no" => $this->input->post('account_no'),
 			"ifsc" => $this->input->post('ifsc')
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
-			// "" => $this->input->post(''),
+		
 			);
+			$this->db->where("username",$username);
+			$custData = $this->db->get("customers")->row();
+			if($custData->sub_branchid != $this->input->post('subbranch') || $custData->district != $this->input->post('branch')){
+			    $this->db->where("cust_usr",$this->session->userdata("id"));
+			    $this->db->delete("purchase_list");
+			     $this->db->where("customer_id",$this->session->userdata("id"));
+			    $this->db->delete("favourite_list");
+			}
+			
 			$this->load->model('subscriber_m');
 			$check=$this->subscriber_m->update($up_data,$username);
 			if($check)
@@ -385,8 +411,16 @@ public function profile(){
 	}
     public function get_product()
     {
+        $discountid = $this->input->post("fdis");
+       $stdata['discountid']=$discountid;
+       if($this->input->post('subcat_id')>0){
         $this->db->where('sub_category',$this->input->post('subcat_id'));
-        $stdata['custdata'] = $this->db->get('stock_products');
+         $stdata['custdata'] = $this->db->get('stock_products');
+       }else{
+            $stdata['custdata'] = $this->db->get('stock_products');
+       }
+        
+        
         $this->load->view('Subscriber/stock_listp',$stdata);
         // print_r($stdata);
     }
@@ -409,11 +443,11 @@ public function profile(){
 			$username=$this->session->userdata("username");
 			$this->load->model('subscriber_m');
 			$data['sub_data']=$this->subscriber_m->subscriber_profile($username);
-			$data['pageTitle'] = 'Create Favourite List';
+			$data['pageTitle'] = 'Favourite List';
 			$data['smallTitle'] = 'Create Favourite List';
-			$data['mainPage'] = 'Create Favourite List';
+			$data['mainPage'] = 'Favourite List';
 			$data['subPage'] = 'Create Favourite List';
-			$data['title'] = 'Create Favourite List';
+			$data['title'] = 'Favourite List';
 			$data['headerCss'] = 'headerCss/stockCss';
 			$data['footerJs'] = 'footerJs/stockJs';
 			$data['mainContent'] = 'Subscriber/create_fv';
@@ -429,22 +463,20 @@ public function profile(){
 		else
 		{
 			$id=$this->session->userdata("id");
-
-			$this->load->model('subscriber_m');
+        	$this->load->model('subscriber_m');
 			$data['p_data']=$this->subscriber_m->create_fvlist();
 			$data['fv_data']=$this->subscriber_m->check_fvlist($id);
 			$data['id']= $id;
-
-			//print_r($p_data);
+        	//print_r($p_data);
 			//exit();
 			$username=$this->session->userdata("username");
 			$this->load->model('subscriber_m');
 			$data['sub_data']=$this->subscriber_m->subscriber_profile($username);
-			$data['pageTitle'] = 'Create Favourite List';
+			$data['pageTitle'] = 'Favourite List';
 			$data['smallTitle'] = 'Create Favourite List';
-			$data['mainPage'] = 'Create Favourite List';
+			$data['mainPage'] = 'Favourite List';
 			$data['subPage'] = 'Create Favourite List';
-			$data['title'] = 'Create Favourite List';
+			$data['title'] = 'Favourite List';
 			$data['headerCss'] = 'headerCss/stockCss';
 			$data['footerJs'] = 'footerJs/stockJs';
 			$data['mainContent'] = 'Subscriber/new_create_fv';
@@ -502,11 +534,11 @@ public function profile(){
 			$this->load->model('subscriber_m');
 			$data['fv_data']=$this->subscriber_m->my_Fvlist($id);
 			$data['p_data']=$this->subscriber_m->create_fvlist();
-			$data['pageTitle'] = 'My Favourite List';
+			$data['pageTitle'] = 'Favourite List';
 			$data['smallTitle'] = 'My Favourite List';
-			$data['mainPage'] = 'My Favourite List';
+			$data['mainPage'] = 'Favourite List';
 			$data['subPage'] = 'My Favourite List';
-			$data['title'] = 'My Favourite List';
+			$data['title'] = 'Favourite List';
 			$data['headerCss'] = 'headerCss/stockCss';
 			$data['footerJs'] = 'footerJs/stockJs';
 			$data['mainContent'] = 'Subscriber/my_fvlist';
@@ -523,15 +555,14 @@ public function profile(){
 			$id=$this->session->userdata("id");
 			$data['id']= $id;
 			$this->load->model('subscriber_m');
-			
 			$data['fv_data']=$this->subscriber_m->my_Phlist($id);
 			$data['p_data']=$this->subscriber_m->create_fvlist();
 			$data['p_wallet']=$this->subscriber_m->check_product_wallet($id);
-			$data['pageTitle'] = 'My Purchase List';
+			$data['pageTitle'] = 'Purchase List';
 			$data['smallTitle'] = 'My Purchase List';
-			$data['mainPage'] = 'My Purchase List';
+			$data['mainPage'] = 'Purchase List';
 			$data['subPage'] = 'My Purchase List';
-			$data['title'] = 'My Purchase List';
+			$data['title'] = 'Purchase List';
 	    	$data['headerCss'] = 'headerCss/stockCss';
 			$data['footerJs'] = 'footerJs/stockJs';
 			$data['mainContent'] = 'Subscriber/my_phlist';
@@ -541,8 +572,7 @@ public function profile(){
 	
 	public function subscriber_order()
 	{
-	 
-          $payment=$this->input->post('selectforpayment');
+	   $payment=$this->input->post('selectforpayment');
        $transaction=$this->input->post('transactionid');
        $id= $this->session->userdata('id');
        
@@ -551,85 +581,90 @@ public function profile(){
           {
          $address=$this->input->post('checkaddress');
         if($address>0){
-         $this->db->where('id',$address);
-         $deli=$this->db->get('delivery_address')->row();
-        
-      $this->db->where('cust_usr', $id);
-      $purlist=$this->db->get('purchase_list');
+            $this->db->where('id',$address);
+            $deli=$this->db->get('delivery_address')->row();
+            $this->db->where('status', 0);  
+            $this->db->where('cust_usr', $id);
+            $purlist=$this->db->get('purchase_list');
 
-       $this->db->select_sum('price');
-       $this->db->where('cust_usr',$id);
-       $dt1= $this->db->get("purchase_list")->row();
+           $this->db->select_sum('price');
+            $this->db->where('status', 0);
+           $this->db->where('cust_usr',$id);
+           $dt1= $this->db->get("purchase_list")->row();
 
      if($dt1->price>=1999){
-     $username=$this->session->userdata('username');
-    $this->db->where('username',$username);
-    $custdetail=$this->db->get('customers')->row();
-        $date=Date("y-m-d");
-    $dt=date("dmy",strtotime($date));
-     $order_no = $this->db->count_all("order_serial");
-     $order_no1=1000+$order_no;
-     $order_number =$dt.$custdetail->id."O".$order_no1;
-      foreach ($purlist->result() as $value)
-      { 
+        $username=$this->session->userdata('username');
+        $this->db->where('username',$username);
+        $custdetail=$this->db->get('customers')->row();
+        $date=Date("y-m-d ");
+        $dt=date("dmy",strtotime($date));
+        $order_no = $this->db->count_all("order_serial");
+        $order_no1=1000+$order_no;
+        $order_number =$dt.$custdetail->id."O".$order_no1;
+        $this->db->where("order_no",$order_number);
+        $checkold = $this->db->get("order_serial");
+        if($checkold->num_rows()<1){
+        foreach ($purlist->result() as $value):
+            
+             $insert=array(
+                    'cust_id'=>$id,
+                    'p_code' =>$value->pt_code,
+                    'quantity'=>$value->qyt,
+                    'subtotal'=>$value->price, 
+                    'date'=>date('Y-m-d'),
+                    'order_no'=>$order_number, 
+                    );
+                $tupd['status']=1;
+                $this->db->where("pt_code",$value->pt_code);
+                $this->db->where("cust_usr",$id);
+                $this->db->update("purchase_list",$tupd);
+             $inserted=$this->db->insert('order_detail', $insert); 
+             endforeach;
+            $sender = $this->db->get("sms_setting")->row();
+            $sende_Detail =$sender;
+            $msg = "Dear ".$custdetail->name. " Thanks For Shopping With passystem.in .Your Order is Under Process And Your Shopping Amount is " . $dt1->price . " Thank You.";
+            $mobileno=$custdetail->mobile;            
+            $getv =sms($mobileno,$msg);
+                $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
+            $invoice = $this->db->count_all("invoice_serial");
+            $invoice1=1000+$invoice;
+            $invoice_number = $dt.$custdetail->id."I".$invoice1;
+            $invoiceDetail = array(
+                    "invoice_no" => $invoice_number,
+                    "reason" => "Subscriber Shopping",
+                    "invoice_date" =>date('Y-m-d H:i:s'),
+                    "subbranch_id"=> $custdetail->sub_branchid,
+            );
+            $inscin=$this->db->insert("invoice_serial",$invoiceDetail);
+
+            $orderDetail = array(
+                "order_no" => $order_number,
+                "invoice_no" =>$invoice_number,
+                "order_date" =>date('Y-m-d'),
+                "cust_id"=>$id,
+                "sub_branchid"=>$custdetail->sub_branchid,
+                "payment_mode"=>"cashondelivery",
+        		"total_amount"=>$dt1->price,
+        		"deliver_address"=>$deli->recipt_address,
+        		'transaction_id'=>0,
+            );
+            $ordinst=$this->db->insert("order_serial",$orderDetail);
          
-         $insert=array(
-            'cust_id'=>$id,
-            'p_code' =>$value->pt_code,
-             'quantity'=>$value->qyt,
-             'subtotal'=>$value->price, 
-             'date'=>date('Y-m-d'),
-             'order_no'=>$order_number, 
-             );
 
-          $inserted=$this->db->insert('order_detail', $insert); 
-          }
-       
-          $sender = $this->db->get("sms_setting")->row();
-          $sende_Detail =$sender;
-
-           $msg = "Dear ".$custdetail->name. " Thanks For Shopping With passystem.in .Your Order is Under Process And Your Shopping Amount is " . $dt1->price . " Thank You.";
-
-              $mobileno=$custdetail->mobile;            
-          sms($mobileno,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
-
-          $invoice = $this->db->count_all("invoice_serial");
-         $invoice1=1000+$invoice;
-       $invoice_number = $dt.$custdetail->id."I".$invoice1;
-
-        $invoiceDetail = array(
-        "invoice_no" => $invoice_number,
-        "reason" => "Subscriber Shopping",
-        "invoice_date" =>date('Y-m-d h:i:s'),
-        "subbranch_id"=> $custdetail->sub_branchid,
-    );
-    $inscin=$this->db->insert("invoice_serial",$invoiceDetail);
-
-        $orderDetail = array(
-        "order_no" => $order_number,
-        "invoice_no" =>$invoice_number,
-        "order_date" =>date('Y-m-d'),
-        "cust_id"=>$id,
-        "sub_branchid"=>$custdetail->sub_branchid,
-        "payment_mode"=>"cashondelivery",
-		"total_amount"=>$dt1->price,
-		"deliver_address"=>$deli->recipt_address,
-		'transaction_id'=>0,
-    );
-   $ordinst=$this->db->insert("order_serial",$orderDetail);
-         
-
-        if($ordinst &&  $inscin){   
-      $this->db->where('cust_usr',$id);
-      $purdelete=$this->db->delete('purchase_list');
-      if($purdelete){
-          ?><script>
-      alert("Thanks for Order. Please check Your Dashboard !!");
-      window.location.href="<?php echo base_url();?>subscriberController/index";
-      </script>
+            if($ordinst &&  $inscin){   
+              $this->db->where('cust_usr',$id);
+              $purdelete=$this->db->delete('purchase_list');
+              if($purdelete){
+                  ?><script>
+              alert("Thanks for Order. Please check Your Dashboard !!");
+              window.location.href="<?php echo base_url();?>subscriberController/index";
+              </script>
      <?php
     //   redirect('subscriberController/index','refresh'); 
       }
+        }
       }
      }
     else
@@ -654,32 +689,33 @@ public function profile(){
      }
          else
          {
-       $address=$this->input->post('checkaddress');
-       if(strlen($transaction)>5)
-       {
-        if($address>0){
-         $this->db->where('id',$address);
-         $deli=$this->db->get('delivery_address')->row();
+               $address=$this->input->post('checkaddress');
+               if(strlen($transaction)>5)
+                {
+                    if($address>0){
+                 $this->db->where('id',$address);
+                 $deli=$this->db->get('delivery_address')->row();
+                
+              $this->db->where('cust_usr',$id);
+              $purlist=$this->db->get('purchase_list');
         
-      $this->db->where('cust_usr',$id);
-      $purlist=$this->db->get('purchase_list');
-
-       $this->db->select_sum('price');
-       $this->db->where('cust_usr',$id);
-       $dt1= $this->db->get("purchase_list")->row();
+               $this->db->select_sum('price');
+               $this->db->where('cust_usr',$id);
+               $dt1= $this->db->get("purchase_list")->row();
 
      if($dt1->price>=1999){
-     $username=$this->session->userdata('username');
-    $this->db->where('username',$username);
-    $custdetail=$this->db->get('customers')->row();
-    $date=Date("y-m-d");
-    $dt=date("dmy",strtotime($date));
-     $order_no = $this->db->count_all("order_serial");
-     $order_no1=1000+$order_no;
-     $order_number = $dt.$custdetail->id."O".$order_no1;
-      foreach ($purlist->result() as $value)
-      { 
-         
+        $username=$this->session->userdata('username');
+        $this->db->where('username',$username);
+        $custdetail=$this->db->get('customers')->row();
+        $date=Date("y-m-d");
+        $dt=date("dmy",strtotime($date));
+        $order_no = $this->db->count_all("order_serial");
+        $order_no1=1000+$order_no;
+        $order_number = $dt.$custdetail->id."O".$order_no1;
+         $this->db->where("order_no",$order_number);
+        $checkold = $this->db->get("order_serial");
+        if($checkold->num_rows()<1){
+        foreach ($purlist->result() as $value):
          $insert=array(
             'cust_id'=>$id,
             'p_code' =>$value->pt_code,
@@ -688,27 +724,32 @@ public function profile(){
              'date'=>date('Y-m-d'),
              'order_no'=>$order_number, 
              );
-
+                $tupd['status']=1;
+                $this->db->where("pt_code",$value->pt_code);
+                $this->db->where("cust_usr",$id);
+                $this->db->update("purchase_list",$tupd);
+                
           $inserted=$this->db->insert('order_detail', $insert); 
           
-          }
+          endforeach;
       
           $sender = $this->db->get("sms_setting")->row();
           $sende_Detail =$sender;
+          $msg = " Dear ". $custdetail->name. " Thanks For Shopping With passystem.in . Your Order is Under Process And Your  Payment Type " . $payment . " and Shopping Amount is " . $dt1->price  . " and transaction id ( ". $transaction." ) And Check Your Dashboard For Further Order Details Thank You";
 
-           $msg = " Dear ". $custdetail->name. " Thanks For Shopping With passystem.in . Your Order is Under Process And Your  Payment Type " . $payment . " and Shopping Amount is " . $dt1->price  . " and transaction id ( ". $transaction." ) And Check Your Dashboard For Further Order Details Thank You";
-
-              $mobileno=$custdetail->mobile;            
-          sms($mobileno,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
-
+          $mobileno=$custdetail->mobile;            
+          $getv =sms($mobileno,$msg);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
           $invoice = $this->db->count_all("invoice_serial");
-         $invoice1=1000+$invoice;
-       $invoice_number = $dt.$custdetail->id."I".$invoice1;
+          $invoice1=1000+$invoice;
+            $invoice_number = $dt.$custdetail->id."I".$invoice1;
 
         $invoiceDetail = array(
         "invoice_no" => $invoice_number,
         "reason" => "Subscriber Shopping",
-        "invoice_date" =>date('Y-m-d h:i:s'),
+        "invoice_date" =>date('Y-m-d H:i:s'),
         "subbranch_id"=> $custdetail->sub_branchid,
     );
     $inscin=$this->db->insert("invoice_serial",$invoiceDetail);
@@ -730,7 +771,7 @@ public function profile(){
       $this->db->where('cust_usr',$id);
       $purdelete=$this->db->delete('purchase_list');
       }
-
+        }
      }
     else
        {?>
@@ -808,7 +849,7 @@ public function profile(){
 			$customer_id=$this->session->userdata("id");
 			$this->load->model('subscriber_m');
 			$data['ph_data']=$this->subscriber_m->my_bill($customer_id);
-			$data['p_data']=$this->subscriber_m->create_fvlist();
+		
 			$data['id'] = $customer_id; 
 			$data['pageTitle'] = 'My Bill ';
 			$data['smallTitle'] = 'My Bill';
@@ -828,14 +869,10 @@ public function profile(){
 	    $pri = $this->input->post('pri');
 	    $pcode = $this->input->post('code');
        $subbranchid=$this->input->post('subbranchid');
-       
-       $this->db->where('subbranch_id',$subbranchid);
-    	$this->db->where('p_code',$pcode);
-        $stpro=$this->db->get('subbranch_wallet')->row();
-        $st=$stpro->rec_quantity-$stpro->sale_quantity;
-	   if($st>$qty){
-	       
-			  $data = array(
+    	$this->db->where('hsn',$pcode);
+        $stpro=$this->db->get('stock_products')->row();
+        $st=$stpro->selling_price;
+	   	  $data = array(
 	           'qyt'=> $qty,
              'price'=> $pri*$qty ,
 		    	);
@@ -843,16 +880,12 @@ public function profile(){
 			$updateee =$this->db->update('purchase_list',$data);
 			if($updateee && $stpro)
 			 {
-			/* $this->db->select_sum('price');
-           $this->db->where('cust_usr',$this->session->userdata('id'));*/
+		
          $dt1= $this->input->post("subtotal");
             echo   $dt1+$pri;
 			 }
-		   }
-		  else
-		  {
-		      echo "001";
-		  }
+		   
+		  
 	}
 	
     public function removeaddress()
@@ -886,8 +919,7 @@ public function profile(){
 			$updateee =$this->db->update('purchase_list',$data);
 			if($updateee)
 			 {
-		/*	 $this->db->select_sum('price');
-           $this->db->where('cust_usr',$this->session->userdata('id'));*/
+	
            $dt1= $this->input->post("subtotal");
             echo   $dt1-$pri;
 			  }
@@ -895,10 +927,9 @@ public function profile(){
 		  else
 		  {?>
 		<?php  
-		 /* $this->db->select_sum('price');
-           $this->db->where('cust_usr',$this->session->userdata('id'));*/
+		
             $dt1= $this->input->post("subtotal");
-            echo   $dt1-$pri;
+            echo $dt1;
 			    
 		  }
 	}
@@ -1270,10 +1301,10 @@ public function profile(){
 	
 	 function subscriberReg(){
 	   
-		$data['pageTitle'] = ' Subscriber Registration';
+		$data['pageTitle'] = 'Registration';
 		$data['smallTitle'] = 'Subscriber Registration';
 		$data['mainPage'] = 'Add Subscriber Area';
-		$data['subPage'] = 'New Subscriber Registration';
+		$data['subPage'] = 'NewRegistration';
 		$data['title'] = 'Add Subscriber Area';
 		$data['headerCss'] = 'headerCss/subscribercss';
 		$data['footerJs'] = 'footerJs/subscriberJs';
@@ -1394,7 +1425,7 @@ public function subbranchid(){
       $value['gender']=$this->input->post('gender');
       $value['password']=$this->input->post('password');
       $value['parentID']=$joiner_idf;
-      $value['created'] = date('Y-m-d H:s:i');
+      $value['created'] = date('Y-m-d H:i:s');
       $value['status'] = 0;
       $get_id = $maxid;
      // print_r($get_id);exit();
@@ -1421,24 +1452,28 @@ public function subbranchid(){
 							<script>alert('Your Registration  successfully');</script>
 					<?php
 				
-				 $pval = array(
-             'cid' => $cid,
+			
+						$this->db->where("id",$cid);
+						$data= $this->db->get("customers")->row();
+							 $pval = array(
+             'cid' => $data->id,
              'pv' => 0 ,
              );
              
               $trval=array(
-             'CustomerID'=>$cid,
+             'CustomerID'=>$data->id,
              'parentID'=>$joiner_idf,
            //   'child'=>0
                  );
-						$this->db->where("id",$cid);
-						$data= $this->db->get("customers")->row();
 							$count=0;
 							$sender = $this->db->get("sms_setting")->row();
 							$sende_Detail =$sender;
 							$msg = "Dear ".$data->name." Your Registration is under processing. Your Username is  - ". $data->username ." and Password is - ". $data->password." Please call Customer Care for Activation";
 							$mobile =	$this->input->post("mobile");
-							sms($mobile,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
+							$getv =sms($mobile,$msg);
+							$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 						}
 					  //  if(($this->db->insert($pv,$pval))&& ($this->db->insert($tree,$trval))&& ($this->db->insert($rpv,$r_pv))){
 					  if(($this->db->insert($pv,$pval)) && ($this->db->insert($tree,$trval))){
@@ -1512,16 +1547,42 @@ public function sbranchSub(){
 }
 public function adminsbranchSub(){
   
-	$subbranch['view'] = $this->input->post('subbranchid');
+	$data['view'] = $this->input->post('subbranchid');
 	$data['footerJs'] = 'footerJs/dashboardJs';
-	 $this->load->view('Subscriber/subscriberDemandList1',$subbranch);
+	$data['typepage']=0;
+	 $this->load->view('Subscriber/subscriberDemandList1',$data);
 }
 
 public function subscriberDemandList1(){
-	$subbranch['view'] = $this->input->post('subBranch');
+	$data['view'] = $this->input->post('subBranch');
 	$data['footerJs'] = 'footerJs/dashboardJs';
-	 $this->load->view('Subscriber/subscriberDemandList1',$subbranch);
+	$data['typepage']=0;
+	 $this->load->view('Subscriber/subscriberDemandList1',$data);
 }
+
+	function shopdemandtransfer(){
+	      $branchid =  $this->uri->segment("3");
+	     $typepage = $this->uri->segment("4");
+	           $this->db->where("id",$branchid);
+	      $sranchf =  $this->db->get("sub_branch");
+	       if($sranchf->num_rows()>0){
+	         $data['typepage']=$typepage;
+	           $data['shopid'] =$sranchf->row()->id;
+        $data['shopname'] =$sranchf->row()->bname;
+	         
+	    $data['branchname']   ="Branch Panel";
+	    $data['pageTitle'] = 'Shop Wise Demand List';
+		$data['smallTitle'] = 'Branch Panel';
+		$data['mainPage'] = 'Shop Wise Demand';
+		$data['subPage'] = 'Shop Wise Demand List';
+		$data['title'] = 'Branch Panel Shopwise List';
+		$data['headerCss'] = 'headerCss/stockCss';
+		$data['footerJs'] = 'footerJs/stockJs';
+		$data['mainContent'] = 'Shop/shopdemandtransferbranch';
+		$this->load->view("includes/mainContent", $data);   
+	}}
+	
+	
 public function tactive(){
   $unm= $this->uri->segment(3);
   $data['view'] = $this->subscriber->tactive($unm);
@@ -1535,12 +1596,12 @@ public function delete_branch(){
 public function subscriberfull_profile(){
    $tid = $this->uri->segment(3);
   $data['view'] = $this->subscriber->checkjoinerid($tid);
-  $data['bid']= $this->branch->getValue();
-  $data['pageTitle'] = 'Subscriber Full Profile ';
-  $data['smallTitle'] = 'Subscriber Full Profile';
-  $data['mainPage'] = 'Subscriber Full Profile';
-  $data['subPage'] = 'Subscriber Full Profile';
-  $data['title'] = 'Subscriber Full profile';
+  $data['bid']= $this->branch->getValueBranchByCustomrid($tid);
+  $data['pageTitle'] = 'Full Profile ';
+  $data['smallTitle'] = 'Subscriber Panel';
+  $data['mainPage'] = 'Subscriber Panel';
+  $data['subPage'] = 'Full Profile';
+  $data['title'] = 'Full profile';
   $data['headerCss'] = 'headerCss/dashboardCss';
   $data['footerJs'] = 'footerJs/dashboardJs';
   $data['mainContent'] = 'Subscriber/subscriberfull_profile';
@@ -1549,7 +1610,6 @@ public function subscriberfull_profile(){
 }
 function updateSubscriber(){
    $id= $this->uri->segment(3);
-
    $value['password'] =$this->input->post('password');
   $value['name']= $this->input->post('name');
   $value['father_name'] =$this->input->post('father_name');
@@ -1560,6 +1620,9 @@ function updateSubscriber(){
   $value['address'] = $this->input->post('address');
   $value['state'] = $this->input->post('state');
   $value['pin'] =$this->input->post('pin');
+  $value['pr_address']= $this->input->post('p_address');
+  $value['district'] =$this->input->post('branch');
+  $value['sub_branchid'] =$this->input->post('subbranch');
   $value['pr_address']= $this->input->post('p_address');
   $value['pan'] = $this->input->post('pan_no');
   $value['nom1'] = $this->input->post('nom1');
@@ -1572,35 +1635,50 @@ function updateSubscriber(){
   $value['bank_name'] =$this->input->post('bank_name');
   $value['account_no'] = $this->input->post('account_no');
   $value['branch_name'] = $this->input->post('branch_name');
-  $value['parentID'] = $this->input->post('joinerId');
+ 
   $value['ifsc'] = $this->input->post('ifsc');
   $value['updated'] = date('Y-m-d');
-   $photo_name1 = time().trim($_FILES['image']['name']);  
-			// if($query)
-		// {
-			$this->load->library('upload');
-			//$image_path = realpath(APPPATH . '../assets/images/branch');
-			$asset_name = $this->db->get('upload_asset')->row()->asset_name;
-		//	print_r($asset_name);exit();
-            $image_path = $asset_name.'/images/subscriber';
-			$config['upload_path'] = $image_path;
-			$config['allowed_types'] = 'gif|jpg|jpeg|png|';
-			$config['max_size'] = '5120';
-			$config['file_name'] = $photo_name1;
-		//}
+   $photo_name = time().trim($_FILES['image']['name']);  
+	
+		$old_img = $this->input->post("old_img");
 		if (!empty($_FILES['image']['name'])) {
-			$this->upload->initialize($config);
-			$this->upload->do_upload('image');
-			$value['image'] = $photo_name1;
-			
-		}
+		    $this->load->library('upload');
+		    $rawName ='image';
+		    $photo_name = time().trim($_FILES['image']['name']);
+		    $photo_name = str_replace(' ', '_', $photo_name);
+	       
+		$this->load->model("imageupload");
+		$status=$this->imageupload->imageUploadProfile($rawName,$photo_name);
+	
+		if($status=="success"){
+		    if($custData->sub_branchid != $this->input->post('subbranch') || $custData->district != $this->input->post('branch')){
+			    $this->db->where("cust_usr",$this->session->userdata("id"));
+			    $this->db->delete("purchase_list");
+			     $this->db->where("customer_id",$this->session->userdata("id"));
+			    $this->db->delete("favourite_list");
+			}
+		$value['image'] = $photo_name;
 		$this->db->where('id',$id);
-		$query=$this->db->update('customers',$value);
-	redirect('index.php/subscriberController/subscriberfull_profile/'.$id);
-	}
-	//	}
+		$query=$this->db->update('customers',$value); 
+		redirect('index.php/subscriberController/subscriberfull_profile/'.$id);
+		}else{
+		    echo $status;
+		}
+		}else{
+		    if($custData->sub_branchid != $this->input->post('subbranch') || $custData->district != $this->input->post('branch')){
+			    $this->db->where("cust_usr",$this->session->userdata("id"));
+			    $this->db->delete("purchase_list");
+			     $this->db->where("customer_id",$this->session->userdata("id"));
+			    $this->db->delete("favourite_list");
+			}
+		$this->db->where('id',$id);
+		$query=$this->db->update('customers',$value); 
+		redirect('index.php/subscriberController/subscriberfull_profile/'.$id);
+		}
+	
 
-//}
+	}
+
 
 public function subscriberdemandList(){
   $bid = $this->branch->getValue();
@@ -1737,14 +1815,14 @@ function subscActiveList(){
     $dt = $this->subscriber->getinActiveList();
 	$data['activeList']=$dt;
  	$data['pageTitle'] = 'Subscriber Active List ';
-  $data['smallTitle'] = 'Subscriber Active List';
-  $data['mainPage'] = 'Subscriber Active List';
-  $data['subPage'] = 'Subscriber Active List';
-  $data['title'] = 'Subscriber Active List';
-  $data['headerCss'] = 'headerCss/stockCss';
-  $data['footerJs'] = 'footerJs/stockJs';
-  $data['mainContent'] = 'Subscriber/subscActiveList';
-  $this->load->view("includes/mainContent", $data);
+    $data['smallTitle'] = 'Subscriber Active List';
+    $data['mainPage'] = 'Subscriber Active List';
+    $data['subPage'] = 'Subscriber Active List';
+    $data['title'] = 'Subscriber Active List';
+    $data['headerCss'] = 'headerCss/stockCss';
+    $data['footerJs'] = 'footerJs/stockJs';
+    $data['mainContent'] = 'Subscriber/subscActiveList';
+    $this->load->view("includes/mainContent", $data);
 }
 function perSubscriber(){
     $dt = $this->subscriber->persubscriber();
@@ -1774,115 +1852,146 @@ function tempSubscriber(){
 }
 //////customer activation code start
   public function active_customer(){
-          $unm= $this->uri->segment(3);
-          $this->db->where("username",$unm);
-          $row=$this->db->get("customers")->row();
-         $status= $row->status;
+      $this->load->model("smsmodel");
+            $unm= $this->uri->segment(3);
+            $this->db->where("username",$unm);
+            $row=$this->db->get("customers")->row();
+            $status= $row->status;
          $tstatus=$row->tstatus;
          $pstatus=$row->pstatus;
          if($status==0){
-         if($status==0 && $tstatus==1){
-          $value['status']="1";
-          $this->db->where("cust_id",$row->id);
-          $row1=$this->db->get("register_pv");
-          if($row1->num_rows()>0) {}
-          else{
-               $pvdata['cust_id']=$row->id;
-                $pvdata['pv']=1000.00;
-             $dt1=$this->db->insert("register_pv",$pvdata);
-           if($dt1) {
-           $sender = $this->db->get("sms_setting")->row();
-             $sende_Detail =$sender;
-             $msg = "Congratulation Dear ".$row->name." Your Account has been Activated Successfully and 1000 PV has been added in your Account.";
-             $mobile =	$row->mobile;
-             $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-            sms($mobile,$msg);
-             }
-            }
-               $this->db->where('cid',$row->ao);
-               $ao1=$this->db->get('pv');
-               if($ao1->num_rows()>0){
-                  $custao= $ao1->row();
-                  $balan=array(
-                      'pv'=>$custao->pv+150.00,
-                      );
-                     $this->db->where('cid',$row->ao);
-              $ao=$this->db->update('pv',$balan);
-              $this->db->where('username', $row->ao);
-              $aorow=$this->db->get('customers')->row();
-                $message="Congratulation Dear ".$aorow->name." One person ".$row->name." is added by your advising So you got  150 PV Cashback and Joiner id of this Person is ".$row->username." ";
-                  $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                     sms($aorow->mobile);
-              } }
-              else{
-                  $this->db->where('emp_id',$row->ao);
-              $ao1=$this->db->get('emp_pv');
-              if($ao1->num_rows()>0){
-                  $empao= $ao1->row();
-                  $balan=array(
-                      'pv'=>$empao->pv+150.00,
-                      );
-                     $this->db->where('emp_id',$row->ao);
-              $ao=$this->db->update('emp_pv',$balan);
-                $this->db->where('username',$row->ao);
-              $aorow=$this->db->get('employee')->row();
-                $message="Congratulation Dear ".$aorow->name." One person ".$row->name." is added by your advising So you got 150PV Cashback after Activating Subscriber and Joiner id of this Person is ".$row->username." ";
-                     $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                     sms($aorow->mobile,$message);
-              } } else{
-                  echo "Employee Id Not Found";
-              }    
-              }
-              $this->db->where("username",$unm);
-            $dt=$this->db->update("customers",$value);?>
-           ?><script >alert("Subscriber  Activated Successfully.");</script><?php
-            redirect("subscriberController/subscActiveList/","refresh");
-          }
-            $sender = $this->db->get("sms_setting")->row();
-             $sende_Detail =$sender;
-             $ao=$row->ao;
-            $this->db->where('username',$ao);
-            $cusao=$this->db->get('customers');
-            if($cusao->num_rows()>0) {
-                $cuname=$cusao->row()->name;
-                $mob=$cusao->row()->mobile;
-                $message="Dear Advising Officer ".$cuname." the Registration of your advising Subscriber ".$row->name." has been Activated Succesfully So 150 PV has been added in your Account.";
-                 $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                sms($mob,$message); 
-             }
-                $mm=$row->mobile;
-                $unme=$row->name;
-                 $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
-                   $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                 sms($mm,$msge);
-             }
-            ?><script >alert("Subscriber  Activated Successfully.");</script><?php
-                redirect("subscriberController/customer_Inactive/","refresh");
-            }
-              $this->db->where('username',$ao);
-            $emp=$this->db->get('employee');
-            if($emp->num_rows()>0) {
-                $emp=$emp->row()->name;
-                $mob=$emp->row()->mobile;
-                $message="Dear Advising Officer ".$emp." the Registration of your advising Subscriber ".$row->name." has been Activated Succesfully. So 150 PV has been added in your Account.";
-                 $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                 sms($mob,$message); }
-            $mm=$row->mobile;
-                $unme=$row->name;
-                 $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
-                   $smsdt=$this->db->get("sms")->row();
-             if($smsdt->active==1){
-                 sms($mm,$msge); }
-            ?><script >alert("Subscriber  Activated Successfully.");</script><?php
-                redirect("subscriberController/customer_list/","refresh");
-            }
-         } 
+                     if($status==0 && $tstatus==1){
+                          $value['status']="1";
+                          $this->db->where("cust_id",$row->id);
+                          $row1=$this->db->get("register_pv");
+                          if($row1->num_rows()>0) {}
+                          else{
+                                $pvdata['cust_id']=$row->id;
+                                $pvdata['pv']=1000.00;
+                                $dt1=$this->db->insert("register_pv",$pvdata);
+                            if($dt1) {
+                                $sender = $this->db->get("sms_setting")->row();
+                                $sende_Detail =$sender;
+                                $msg = "Congratulation Dear ".$row->name." Your Account has been Activated Successfully and 1000 PV has been added in your Account.";
+                                $mobile =	$row->mobile;
+                                $smsdt=$this->db->get("sms")->row();
+                                if($smsdt->active==1){
+                                $getv =sms($mobile,$msg);
+                                $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		        $master_id=$max_id->maxid+1;
+                                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
+                             }
+                            }
+                               $this->db->where('cid',$row->ao);
+                               $ao1=$this->db->get('pv');
+                               if($ao1->num_rows()>0){
+                                    $custao= $ao1->row();
+                                    $balan=array(
+                                      'pv'=>$custao->pv+150.00,
+                                      );
+                                     $this->db->where('cid',$row->ao);
+                                    $ao=$this->db->update('pv',$balan);
+                                    $this->db->where('username', $row->ao);
+                                    $aorow=$this->db->get('customers')->row();
+                                    $message="Congratulation Dear ".$aorow->name." One person ".$row->name." is added by your advising So you got  150 PV Cashback and Joiner id of this Person is ".$row->username." ";
+                                    $smsdt=$this->db->get("sms")->row();
+                                    if($smsdt->active==1){
+                                        $getv = sms($aorow->mobile,$message);
+                                        $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		                $master_id=$max_id->maxid+1;
+                                        $this->smsmodel->sentmasterRecord($message,2,$master_id,$getv);
+                              } }
+                              else{
+                                  $this->db->where('emp_id',$row->ao);
+                              $ao1=$this->db->get('emp_pv');
+                              if($ao1->num_rows()>0){
+                                  $empao= $ao1->row();
+                                  $balan=array(
+                                      'pv'=>$empao->pv+150.00,
+                                      );
+                                     $this->db->where('emp_id',$row->ao);
+                              $ao=$this->db->update('emp_pv',$balan);
+                                $this->db->where('username',$row->ao);
+                              $aorow=$this->db->get('employee')->row();
+                                $message="Congratulation Dear ".$aorow->name." One person ".$row->name." is added by your advising So you got 150PV Cashback after Activating Subscriber and Joiner id of this Person is ".$row->username." ";
+                                     $smsdt=$this->db->get("sms")->row();
+                                    if($smsdt->active==1){
+                                        $getv = sms($aorow->mobile,$message);
+                                        $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		                $master_id=$max_id->maxid+1;
+                                        $this->smsmodel->sentmasterRecord($message,2,$master_id,$getv);
+                                        } 
+                                  
+                                  } else{
+                                        echo "Employee Id Not Found";
+                                  }    
+                              }
+                                $this->db->where("username",$unm);
+                                $dt=$this->db->update("customers",$value);?>
+                           ?><script >alert("Subscriber  Activated Successfully.");</script><?php
+                            redirect("subscriberController/subscActiveList/","refresh");
+                          }
+                                $sender = $this->db->get("sms_setting")->row();
+                                $sende_Detail =$sender;
+                                $ao=$row->ao;
+                                $this->db->where('username',$ao);
+                                $cusao=$this->db->get('customers');
+                            if($cusao->num_rows()>0) {
+                                $cuname=$cusao->row()->name;
+                                $mob=$cusao->row()->mobile;
+                                $message="Dear Advising Officer ".$cuname." the Registration of your advising Subscriber ".$row->name." has been Activated Succesfully So 150 PV has been added in your Account.";
+                                 $smsdt=$this->db->get("sms")->row();
+                             if($smsdt->active==1){
+                                $getv =sms($mob,$message); 
+                                $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		        $master_id=$max_id->maxid+1;
+                                $this->smsmodel->sentmasterRecord($message,2,$master_id,$getv);
+                             }
+                                $mm=$row->mobile;
+                                $unme=$row->name;
+                                $firstLevel[0]=$row->id;
+                                $this->smsmodel->sendLevelSms($firstLevel,1);
+                                $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
+                                $smsdt=$this->db->get("sms")->row();
+                             if($smsdt->active==1){
+                                $getv = sms($mm,$msge);
+                                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		        $master_id=$max_id->maxid+1;
+                                $this->smsmodel->sentmasterRecord($msge,2,$master_id,$getv);
+                             }
+                            ?><script >alert("Subscriber  Activated Successfully.");</script><?php
+                                redirect("subscriberController/customer_Inactive/","refresh");
+                            }
+                              $this->db->where('username',$ao);
+                            $emp=$this->db->get('employee');
+                            if($emp->num_rows()>0) {
+                                $emp=$emp->row()->name;
+                                $mob=$emp->row()->mobile;
+                                $message="Dear Advising Officer ".$emp." the Registration of your advising Subscriber ".$row->name." has been Activated Succesfully. So 150 PV has been added in your Account.";
+                                 $smsdt=$this->db->get("sms")->row();
+                             if($smsdt->active==1){
+                                 $getv =sms($mob,$message);
+                                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		        $master_id=$max_id->maxid+1;
+                                $this->smsmodel->sentmasterRecord($message,2,$master_id,$getv);
+                                 
+                             }
+                            
+                            $mm=$row->mobile;
+                              $firstLevel[0]=$row->id;
+                            $this->smsmodel->sendLevelSms($firstLevel,1);
+                                $unme=$row->name;
+                                 $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
+                                   $smsdt=$this->db->get("sms")->row();
+                             if($smsdt->active==1){
+                                 $getv = sms($mm,$msge);
+                                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+                		        $master_id=$max_id->maxid+1;
+                                $this->smsmodel->sentmasterRecord($msge,2,$master_id,$getv);}
+                            ?><script >alert("Subscriber  Activated Successfully.");</script><?php
+                                redirect("subscriberController/customer_list/","refresh");
+                            }
+                     } 
          elseif($status==0 && $pstatus==1){
                  $value['status']="1";
                   $this->db->where("username",$unm);
@@ -1902,11 +2011,16 @@ function tempSubscriber(){
                   $this->db->where('id',$row->parentID);
             $pid=$this->db->get('customers');
                 $mm=$row->mobile;
+                  $firstLevel[0]=$row->id;
+                   $this->smsmodel->sendLevelSms($firstLevel,1);
                 $unme=$row->name;
                  $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
                    $smsdt=$this->db->get("sms")->row();
              if($smsdt->active==1){
-                 sms($mm,$msge);
+                 $get =sms($mm,$msge);
+                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msge,2,$master_id,$getv);
              }
                  ?><script >alert("Subscriber  Activated Successfully.");</script><?php
             redirect("subscriberController/customer_Inactive/","refresh");
@@ -1922,11 +2036,16 @@ function tempSubscriber(){
                  sms($mob,$message);
              }
                 $mm=$row->mobile;
+                 $firstLevel[0]=$row->id;
+                 $this->smsmodel->sendLevelSms($firstLevel,1);
                 $unme=$row->name;
                  $msge="Dear Subscriber ".$unme." your Subscriber ".$row->name." has been Succesfully Added in your tree.";
                    $smsdt=$this->db->get("sms")->row();
              if($smsdt->active==1){
-                 sms($mm,$msge);
+                 $getv =sms($mm,$msge);
+                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msge,2,$master_id,$getv);
              }
                  ?><script >alert("Subscriber Activated Successfully.");</script><?php
             redirect("subscriberController/customer_Inactive/","refresh");
@@ -1956,5 +2075,3 @@ function tempSubscriber(){
 
 
 }
-
-

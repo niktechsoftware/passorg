@@ -30,12 +30,35 @@
 			</thead>
 			<tbody>
 			   <?php //print_r($custdata); 
+			   $min =0; $max=100;
 			   if($custdata->num_rows()>0)
 			   {
+			        if($discountid >0){
+			            $this->db->where("id",$discountid);
+			           $disdetail =  $this->db->get("discount_table_master")->row();
+			           $min=$disdetail->min_value;
+			           $max=$disdetail->max_value;
+			           echo $max;
+			        }
 			       $like=0; $i=1;
+			       $profitper=0;
 			       foreach($custdata->result() as $pro_data)
-    			   {
-    			     //  echo $pro_data->name."<br>";
+    			   { 
+    			      // echo $pro_data->name;
+    			       $this->db->where("branch_id",$this->session->userdata("district"));
+    			       $this->db->where("p_code",$pro_data->id);
+    			      $branchProduct =  $this->db->get("branch_wallet");
+    			       if($branchProduct->num_rows()>0){
+    			           
+    			       $branchP=$branchProduct->row();
+    			    $profit =  $branchP->mrp_price-$branchP->selling_price;
+    			    if($branchP->selling_price>0){
+    			     
+    			     $profitper = (($profit*100)/$branchP->mrp_price);
+    			    }
+    			   // echo $profitper;
+    			      if(($profitper >= $min)&&($profitper <= $max)){
+    			         // echo "profit ".$profitper." max- ".$max;
     			   ?>
     			       <tr>
     			            <td><?php echo $i;?></td>
@@ -43,8 +66,8 @@
                             <td width:"10px" style ='text-transform: capitalize;'><?php echo $pro_data->name;?></td>
                             <td width:"10px" style ='text-transform: capitalize;'><?php echo $pro_data->p_type;?></td>
                             <td width:"10px"><?php echo $pro_data->size;?></td>	
-                             <td style="color:red"><?php echo "<u>".$pro_data->mrp_price."</u>";?></td>
-                            <td  ><mark><b><?php echo $pro_data->selling_price;?></b></mark></td>
+                             <td style="color:red"><?php echo "<u>".$branchP->mrp_price."</u>";?></td>
+                            <td  ><mark><b><?php echo $branchP->selling_price;?></b></mark></td>
                            
                             
                             <td width:"10px"><?php if(strlen($pro_data->file1)>0){?><img class="zoom1" src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pro_data->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } else { ?><img class="zoom1" src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pro_data->file2;?>" style="max-height: 50px; max-width: 100px;"><?php }?></td>
@@ -55,7 +78,7 @@
 							    <img src="<?php echo $this->config->item('asset_url');?>/images/subscriber/heart.gif" id="active<?php echo $i;?>" style="max-height: 50px;">
                                 
 							</td>
-						 <td width:"10px"><?php $prof = ((($pro_data->mrp_price -$pro_data->selling_price)*100)/$pro_data->mrp_price); if($prof>0){echo "<mark1>".number_format((float)$prof, 2, '.', '')."%</mark1>";}else{ echo "0%";}?></td>
+						 <td width:"10px"><?php $prof = ((($branchP->mrp_price -$branchP->selling_price)*100)/$branchP->mrp_price); if($prof>0){echo "<mark1>".number_format((float)$prof, 2, '.', '')."%</mark1>";}else{ echo "0%";}?></td>
                            
                            
                              <script>
@@ -99,7 +122,7 @@
 
                              </script>       
     			       </tr>
-		             <?php $i++; 
+		             <?php $i++; }}
 		            } 
 			   }
 			   ?>

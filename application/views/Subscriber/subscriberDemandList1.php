@@ -17,6 +17,24 @@
 							</div>
 						</div>
 					</div>
+					 <?php if(($this->session->userdata("login_type")==2)){?> 
+              <div class="col-md-12 row"> 
+                     <?php   if( $typepage ==2){?>
+                     <div class="alert alert-danger">Not Available Product List</div>
+                     <?php }else{if( $typepage ==1){?>
+                      <div class="alert alert-info">Available Product List</div>
+                     <?php }}?>
+                    <div class="col-md-6"><a href ="<?php echo base_url(); ?>index.php/subscriberController/shopdemandtransfer/<?php echo $view;?>/1" class ="btn btn-success">
+                                     View   Available Products  <i class="icon-arrow"></i>
+                                        </a>  
+                                    </div>    
+                <div class="col-md-6">       <a href ="<?php echo base_url(); ?>index.php/subscriberController/shopdemandtransfer/<?php echo $view;?>/2" class ="btn btn-danger">
+                                        View Not Available Products  <i class="icon-arrow"></i>
+                                        </a>
+                                </div>
+                </div> 
+                <?php }?>
+					
         <table id="sample-table-2" class="table table-bordered nowrap">
              <thead>
                 <tr  style="background-color:#1ba593; color:white;">
@@ -143,8 +161,8 @@
               
                  $i=1; foreach($stckdt->result() as $data):
              
-             $this->db->where("subbranch_id",$view);
-              $this->db->where_in("p_code",$data->product_code);
+                $this->db->where("subbranch_id",$view);
+                $this->db->where_in("p_code",$data->product_code);
                  $dt= $this->db->get("subbranch_wallet");
                  if($dt->num_rows()>0){
                 
@@ -156,33 +174,21 @@
              }
                  $total=$receive;
                  
-                  if((($receive-$saleq)<2)){
-                 if($dt->num_rows()>0){
-                 $val=$dt->row();
-                  $this->db->where("id",$val->p_code);
-                  $stckdt1= $this->db->get("stock_products");
-                 }else{
+                  if((($receive-$saleq)<1)){
+                
                     $this->db->where("id",$data->product_code);
                   $stckdt1= $this->db->get("stock_products");
-                 }
+                
                   if($stckdt1->num_rows()>0){
                       // print_r( $stckdt1->row());
                     $totalquantity= $stckdt1->row()->quantity;
-                    
-                 $totalquantity1= $receive;
-             
-                    
-                    if(($totalquantity1<=$total)||(($receive-$saleq)<2)){
-                        //  print_r($stckdt1->row());
-                            $remainingquantity=$totalquantity- $total;
-                        $stckdt2=$stckdt1->row();
+                    $remainingquantity=$totalquantity- $total;
+                    $stckdt2=$stckdt1->row();
                   ?>
                   <tr >
                     <td><?php echo $i;?></td>
                      <td><a href="#"><span ><?php echo $stckdt2->company;?></span></a></td>
-                  <td><?php if($totalquantity<=$total){?><span style="color:red;"><?php echo $stckdt2->name;?></span>
-                  <!--<img src="<?php echo base_url();?>assets/images/jar-loading.gif" style="max-height: 40px;">-->
-                  <?php } else{ echo $stckdt2->name;}?>
+                  <td><?php  echo $stckdt2->name; ?>
                  </td>
                   <td><?php echo $stckdt2->hsn;?></td>
                   <td><?php echo $stckdt2->size;?></td>
@@ -215,7 +221,7 @@
                   </td>
                   
                    </tr>
-                    <?php   } } $i++; ?>
+                    <?php    } $i++; ?>
                    
                    <?php  }
                    

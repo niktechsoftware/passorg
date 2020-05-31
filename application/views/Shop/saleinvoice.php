@@ -183,7 +183,7 @@ function myFunction() {
                      <!--  <td><?php echo $dt1->quantity;?></td>
                       <td></td> -->
                             <h6 class="text-uppercase text-primary">Total Amount:
-                                <span><?php echo $saletot->paid;?></span>
+                                <span><?php echo number_format($saletot->paid, 2,'.', '');?></span>
                             </h6>
                             
                              <h6 class="text-uppercase">Payment Mode:<span  class="text-uppercase text-primary">
@@ -208,14 +208,16 @@ function myFunction() {
                                              <th>Size</th>
                                               <th>Product Code</th>
                                             <th>Quantity</th>
-											<th>Unit Price</th>
+										
+												<th>MRP Price</th>
+													<th>Unit Price</th>
                                             <th>Amount</th>
                                           
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                             <?php 
+                                             <?php $save=0;
                             $this->db->where("bill_no",$id);
 							$productdt=$this->db->get("product_sale");
                              
@@ -223,7 +225,9 @@ function myFunction() {
                                     <?php 
                                                       $this->db->where('id',$data->p_code);
                                                       $productdetail1=$this->db->get('stock_products');
-                                                      
+                                                        $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$data->p_code);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
                                                       if($productdetail1->num_rows()>0){
                                                           
                                                       $productdetail=$productdetail1->row();
@@ -241,8 +245,10 @@ function myFunction() {
                                              <td><?php echo $productdetail->size; ?></td>
                                               <td><?php echo $productdetail->hsn; ?></td>
                                             <td><?php echo $data->item_quant; ?></td>
-                                            <td><?php echo $data->pries_per_item; ?></td>
-                                            <td><?php echo $data->sub_total; ?></td>
+                                            <td><?php $save =$save+($data->item_quant*$pprice->mrp_price) ;
+                                            echo $pprice->mrp_price;  ?></td>
+                                            <td><?php   echo $data->pries_per_item; ?></td>
+                                            <td><?php echo number_format($data->sub_total, 2,'.', ''); ?></td>
                                         </tr>
                                         
                                        <?php  $i++; }  endforeach;?>
@@ -251,40 +257,74 @@ function myFunction() {
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                   
+                     <div class="row">
                         <div class="col-sm-12">
                             <table class="table table-responsive invoice-table invoice-total">
                                 <tbody>
                                     <tr>
-                                        <th> Total Amount :</th>
-                                        <td><?php echo $saletot->total;?></td>
+                                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sub Total :</th>
+                                        <td></td>
+                                         <td></td>
+                                        
+                                        <td><?php echo number_format($saletot->total, 2,'.', '');?></td>
+                                           
                                     </tr>
-																		<tr>
-                                        <th> Paid Amount :</th>
-                                        <td><?php echo $saletot->paid;?></td>
+                                     
+									<tr>
+                                        <th> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Paid Amount :</th>
+                                          <td></td>
+                                           <td></td>
+                                        <td><?php echo number_format($saletot->paid, 2,'.', '');?></td>
+                                       
+                                         
                                     </tr>
                                     <tr>
-                                        <th>Taxes :</th>
+                                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Taxes :</th>
+                                         <td></td>
+                                         <td></td>
+                                          
                                         <td>00.00</td>
+                                        
                                     </tr>
-                                    <tr>
-                                        <th>Discount : [ <strong><?php echo $saletot->discount_name;?> ]</strong> </th>
+                                     <tr>
+                                        <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Discount : [ <strong><?php echo $saletot->discount_name;?> ]</strong> </th>
+                                        <td></td>
+                                        <td></td>
                                         <td><?php echo $saletot->discount;?></td>
+                                        
                                     </tr>
                                     <tr class="text-info">
                                         <td>
                                            
-                                            <h5 class="text-primary">Total :</h5>
+                                            <h5 class="text-primary">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total :</h5>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            
+                                            <h5 class="text-primary"><?php echo number_format($saletot->paid, 2,'.', '');?></h5>
+                                        </td>
+                                        
+                                    </tr>
+                                     <tr>
+                                         <th><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MRP Total :  </h3></th>
+                                         <td></td>
+                                        <td><h3><?php $remaintot =$save-$saletot->total;echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".number_format($save, 2,'.', ''); echo " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You Saved =  ".number_format($remaintot, 2,'.', '')."  ";?></h3></td>
+                                  <td></td>
+                                    </tr>
+                                    <tr class="text-info">
+                                        <td>
+                                            
+                                            <h5 class="text-primary"><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Net Total (Rs.):</h3></h5>
                                         </td>
                                         <td>
                                             
-                                            <h5 class="text-primary"><?php echo $saletot->paid;?></h5>
+                                            <h5 class="text-primary"><h3><?php echo number_format($saletot->total, 2,'.', '');?></h3></h5>
                                         </td>
-                                    </tr>
-                                     
-                                     <tr class="text-info">
-                                       
                                         <td>
+                                          
                                             <h2 class="text-primary"  ><font color="blue"> <?php echo $saletot->description;?></font></h2>
                                         </td>
                                     </tr>

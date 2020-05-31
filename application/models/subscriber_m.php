@@ -112,6 +112,9 @@ class Subscriber_m extends CI_Model
     
     public function check_fvlist($id)
     {
+         $this->db->where("id",$id);
+       $custumerData =  $this->db->get("customers")->row();
+       $this->db->where("sub_branchid",$custumerData->sub_branchid);
         $this->db->where('customer_id',$id);
         $fv=$this->db->get('favourite_list');
 
@@ -119,6 +122,10 @@ class Subscriber_m extends CI_Model
     } 
     public function my_Fvlist($id)
     {
+        
+        $this->db->where("id",$id);
+       $custumerData =  $this->db->get("customers")->row();
+       $this->db->where("sub_branchid",$custumerData->sub_branchid);
         $this->db->where('customer_id',$id);
         $fv= $this->db->get('favourite_list');  
         // $this->db->select('*');
@@ -129,6 +136,9 @@ class Subscriber_m extends CI_Model
     
     public function my_Phlist($id)
     {
+         $this->db->where("id",$id);
+       $custumerData =  $this->db->get("customers")->row();
+       $this->db->where("sub_branchid",$custumerData->sub_branchid);
         $this->db->where('customer_id',$id);
         $fv= $this->db->get('favourite_list');
         return $fv;
@@ -158,8 +168,12 @@ class Subscriber_m extends CI_Model
             return $count;
         }    
     } 
-    public function my_bill($customer_id)
-    {
+    public function my_bill($customer_id){
+     $cid =  $this->session->userdata("id");
+        $this->db->where("id",$cid);
+        $cusdata= $this->db->get("customers")->row();
+        
+           $this->db->where('status',0);
         $this->db->where('cust_usr',$customer_id);
         $ph= $this->db->get('purchase_list');
         

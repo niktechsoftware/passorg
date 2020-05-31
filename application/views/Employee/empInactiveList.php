@@ -47,6 +47,7 @@
 					<div class="row">
                         <div class="col-md-12">
                             <div class="col-md-6">
+                                 <?php if($this->session->userdata("login_type") != 4){?>
                                 <select class="form-control" id="empbranch1">
                                     <option>-Select Branch-</option>
                                         <?php 
@@ -61,11 +62,21 @@
                                         <?php }
                                         ?>
                                 </select>
+                                <?php }?>
                             </div>
+                              <?php if($this->session->userdata("login_type") == 4){?>
+                               <div class="col-md-6">
+                            	<select class="form-control" id="empsubbranch" name="empsubbranch">
+                            	    <option >-Select Sub Branch-</option> 
+                            	     <option value="<?php echo $this->session->userdata("id");?>" ><?php echo $this->session->userdata("username");?></option> 
+                            </select>
+                            </div>
+                              <?php }else { ?>
                             <div class="col-md-6">
                             <select class="form-control" id="empsubbranch1" name="empsubbranch1">
                             </select>
                             </div>
+                            <?php }?>
                         </div>
                     </div>
                       <div class="row" style="padding-top:20px;">

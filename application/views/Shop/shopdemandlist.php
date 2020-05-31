@@ -58,21 +58,38 @@
                         </div>
                     </div>
           <div class=" table-responsive">
+            <?php if(($this->session->userdata("login_type")==1)){?> 
+              <div class="col-md-12 row"> 
+                     <?php   if( $typepage ==2){?>
+                     <div class="alert alert-danger">Not Available Product List</div>
+                     <?php }else{if( $typepage ==1){?>
+                      <div class="alert alert-info">Available Product List</div>
+                     <?php }}?>
+                    <div class="col-md-6"><a href ="<?php echo base_url(); ?>index.php/adminController/shopdemandtransfer/<?php echo $shopid;?>/1" class ="btn btn-success">
+                                     View   Available Products  <i class="icon-arrow"></i>
+                                        </a>  
+                                    </div>    
+                <div class="col-md-6">       <a href ="<?php echo base_url(); ?>index.php/adminController/shopdemandtransfer/<?php echo $shopid;?>/2" class ="btn btn-danger">
+                                        View Not Available Products  <i class="icon-arrow"></i>
+                                        </a>
+                                </div>
+                </div> 
+                <?php }?>
             <table id="sample-table-2" class="table table-striped table-bordered ">
               <thead>
                 <tr  style="background-color:#1ba593; color:white;">
-                  <th>S.No.</th>
-                  <th>Com. Name</th>
-                  <th>P.Name</th>
-                  <th>P. Code</th>
-                   <th>Volume</th>
-                     <th>Price</th>
-                  <th>T.Of Pro</th>
-                   <th>Image</th>
-                  <th>N.of Subscriber</th>
-                  <th>Name of Sub</th>
-                 <th>Date Of Demand</th>
-                  <th>RQ</th>
+                    <th>S.No.</th>
+                    <th>Com. Name</th>
+                    <th width="200">P.Name</th>
+                    <th>P. Code</th>
+                    <th>Volume</th>
+                    <th>Price</th>
+                    <th>T.Of Pro</th>
+                    <th>Image</th>
+                    <th>N.of Subscriber</th>
+                    <th>Name of Sub</th>
+                    <th>Date Of Demand</th>
+                    <th>RQ</th>
                   </tr>
               </thead>
               <tbody>
@@ -96,6 +113,10 @@
                 $this->db->where("p_code",$data->product_code);
                  $dt= $this->db->get("subbranch_wallet");
                 
+                $this->db->where("branch_id",$this->session->userdata("district"));
+              $this->db->where("p_code",$data->product_code);
+             $branchPd= $this->db->get("branch_wallet")->row();
+                
              if($dt->num_rows()>0){
                 
                 $receive=  $dt->row()->rec_quantity;
@@ -106,7 +127,7 @@
              }
                   $rtty =0;
                  $total=$receive;
-                 if(($receive-$saleq)<2){
+                 if(($receive-$saleq)<1){
                  if($dt->num_rows()>0){
                   $val=$dt->row();
                   $this->db->where("id",$val->p_code);
@@ -136,13 +157,13 @@
                       
                     <td><?php echo $i;?></td>
                      <td><a href="#"><span ><?php echo $stckdt2->company;?></span></a></td>
-                  <td><?php if($totalquantity<=$total){?><span style="color:red;"><?php echo $stckdt2->name;?></span>
+                  <td width="200"><?php if($totalquantity<=$total){?><span style="color:red;"><?php echo $stckdt2->name;?></span>
                   <!--<img src="<?php echo base_url();?>assets/images/jar-loading.gif" style="max-height: 40px;">-->
                   <?php } else{ echo $stckdt2->name;}?>
                  </td>
                   <td><?php echo $stckdt2->hsn;?></td>
                   <td><?php echo $stckdt2->size;?></td>
-                         <td><?php echo $stckdt2->selling_price;?></td>
+                         <td><?php echo $branchPd->selling_price;?></td>
                    <td><?php echo $stckdt2->p_type;?></td>
                    <td><?php if($stckdt2->file1>0){ ?><img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $stckdt2->file1; ?>"
                                     style="height:50px;width:100px;"><?php } else{ ?> <img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $stckdt2->file2; ?>"

@@ -72,8 +72,9 @@
                   <td><?php echo $row->aadhar_no;?></td>
                   <td><?php $view= $row->district;
                   $this->db->where('id',$view);
-                  $view1=$this->db->get('branch')->row();
-                 echo  $view1->b_name;?></td>
+                  $view1=$this->db->get('branch');
+                  if($view1->num_rows()>0){
+                        echo  $view1->row()->b_name;}?></td>
                   <td><?php echo $row->username;?></td>
 
                   <td><a href="<?php echo base_url();?>employeeController/empfull_profile/<?php echo $row->id;?>"><i class="fa fa-user" style="font-size:28px; color:green;"></i></a>

@@ -130,6 +130,7 @@
             <th>Type</th>
             <th>Qty</th>
             <th>Price</th>
+             <th>MRP Price</th>
             <th>P. Code</th>
             <th>Image 1</th>
             <th>Image 2</th>
@@ -178,6 +179,12 @@
                                 if($sbranchname1->num_rows()>0)
                                 {
                                     $sbranchname=$sbranchname1->row();
+                                    $this->db->where("p_code",$row1->id);
+                                    $this->db->where("branch_id",$sbranchname->id);
+                                    $branchProduct = $this->db->get("branch_wallet");
+                                    if($branchProduct->num_rows()>0){
+                                        
+                                    $branchP=$branchProduct->row();
                                    ?>
                                   <tr>
                                   <td><?php echo $i;?></td>
@@ -191,13 +198,14 @@
                                   <td><?php echo $row1->size;?></td>
                                   <td><?php echo $row1->p_type;?></td>
                                   <td><?php echo $row->rec_quantity;?></td>
-                                  <td><?php echo $row1->selling_price;?></td>
+                                  <td><?php echo $branchP->selling_price;?></td>
+                                   <td><?php echo $branchP->mrp_price;?></td>
                                   <td><?php echo $row1->hsn;?></td>
                                   <td><?php if($row1->file1){ ?><img class="zoom1" src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row1->file1; ?>" style="height:30px;width:50px;"> <?php } else { ?><img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row1->file2; ?>" style="height:30px;width:50px;"><?php } ?></td>
                                   <td><?php if($row1->file2){ ?><img class="zoom1" src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row1->file2; ?>" style="height:30px;width:50px;"> <?php } else { ?><img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row1->file1; ?>" style="height:30px;width:50px;"><?php } ?></td>
                                   <td><?php if($row1->file3){ ?><img  class="zoom1" src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row1->file3; ?>"style="height:30px;width:50px;"> <?php } else { echo "No Image "; } ?></td>
                                   <td><?php echo $row->date;?></td>
-                              <?php $i++; }
+                              <?php $i++; }}
                               } ?>
                               </tr>
                               <?php  

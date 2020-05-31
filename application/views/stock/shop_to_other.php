@@ -22,7 +22,7 @@
                               <select class="form-control" id="selectid" name="branchh" style="height:40px;">
                                 <option value="">Select Branch</option>
                                 <?php foreach($dt as $bdt) { ?>
-                                <option value="<?php echo $bdt->id;?>"><?php echo $bdt->b_name;?></option>
+                                <option value="<?php echo $bdt->username;?>"><?php echo $bdt->b_name;?></option>
                                 <?php } ?>
                                 
                               </select>
@@ -73,7 +73,7 @@
                                 <td style="width:8px;">
                                     <img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $row->file1; ?>" style="height:50px;width:50px;" class="zoom1">
                                 </td>
-                                <td style="width:8px;"><?php echo $row2->rec_quantity;?></td>
+                                <td style="width:8px;"><input style="width:70px;" type="number" name="cquantity" id="cquantity<?php echo $i;?>" value = "<?php echo $row2->rec_quantity-$row2->sale_quantity;?>" readonly></td>
                                 <td style="width:8px;">
                                     <input style="width:70px;" type="number" name="sendquantity" id="sendquantity<?php echo $i;?>">
                                 </td>
@@ -85,19 +85,28 @@
                             <script>
                                
                                 $('#showid<?php echo $i;?>').hide();
-                                $("#adminbutton<?php echo $i;?>").click(function() {
+                              
+                                     $("#adminbutton<?php echo $i;?>").click(function() {
+                                       
+                                       var cquantity = Number($("#cquantity<?php echo $i;?>").val());
+                                     var send_qty = Number($("#sendquantity<?php echo $i;?>").val());
+                                       if(send_qty < cquantity){
                                     if ($("#admin").is(":checked"))
                                     {
                                         var t = 3;
+                                         $("#cquantity<?php echo $i;?>").val(cquantity-send_qty);
                                         var send_qty = $("#sendquantity<?php echo $i;?>").val();
                                         var pcode = $("#pcode<?php echo $i;?>").val();
-                                        // alert(receiver_id);
-                                        alert(send_qty);
-                                        alert(pcode);
+                                         //alert(receiver_id);
+                                        //alert(send_qty);
+                                        //alert(pcode);
                                         if(send_qty>0 && pcode.length>0 )
                                         {
-                                             $.post("<?php echo site_url();?>stockController/transfer_pro",{t:t,send_qty:send_qty,pcode:pcode},function(data){
+                                             $.post("<?php echo site_url();?>stockController/transfer_pro",{t:t,send_qty:send_qty,pcode:pcode,pcode:pcode,cquantity : cquantity},function(data){
                                                 $("#transfer_pro").html(data);
+                                                
+                                                //  alert(data);
+                                                //  $("#transfer_p").load(location.href+" #transfer_p>","");
                                              });
                                         }
                                         else
@@ -105,18 +114,19 @@
                                             alert("Please Enter Correct Data");
                                         }
                                     }
-                                   if ($("#branch").is(":checked"))
+                                     if ($("#branch").is(":checked"))
                                     {
                                         var t = 1;
                                         var receiver_id = $("#selectid").val();
                                         var send_qty = $("#sendquantity<?php echo $i;?>").val();
                                         var pcode = $("#pcode<?php echo $i;?>").val();
+                                        
                                         // // var idd = $("#select_sender").val();
-                                        // alert(receiver_id);
+                                        //alert(receiver_id);
                                        // alert(send_qty);
                                         // alert(pcode);
                                         if(receiver_id.length >0 && send_qty >0 && pcode.length>0 )
-                                        {
+                                        {    $("#cquantity<?php echo $i;?>").val(cquantity-send_qty);
                                              $.post("<?php echo site_url();?>stockController/transfer_pro",{t:t,receiver_id:receiver_id,send_qty:send_qty,pcode:pcode},function(data){
                                                 $("#transfer_pro").html(data);
                                              });
@@ -126,8 +136,25 @@
                                             alert("Please Enter Correct Data");
                                         }
                                     }
+                                       }else{
+                                             alert("Please fill a valid Product quanity");
+                                       }
                                    
                                 });
+                                  $("#selectid").change(function(){
+                                    var t=3;
+                                           
+                                             var receiver_id = $("#selectid").val();
+                                               var send_qty = 0;
+                                            var pcode = 0;
+                                            var cquantity =0;
+                                           //alert(receiver_id);
+                                            $.post("<?php echo site_url();?>stockController/transfer_pro",{t:t,receiver_id:receiver_id,send_qty:send_qty,pcode:pcode, pcode:pcode,cquantity : cquantity},function(data){
+                                                $("#transfer_pro").html(data);
+                                            });
+                                        });
+                                    ////
+                                   
                             </script>
                             <?php $i++; 
                                  } 

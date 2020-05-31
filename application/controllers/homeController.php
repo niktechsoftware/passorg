@@ -285,5 +285,21 @@ class HomeController extends CI_Controller{
 	        $this->db->update("stock_products",$upd);
 	        endforeach;
 	}
-	
+		function updateBranch_price(){
+	   $branch =  $this->db->get("branch")->result();
+	    foreach($branch as $br){
+	        $this->db->where("branch_id",$br->id);
+	       $branchProduct= $this->db->get("branch_wallet");
+	       foreach($branchProduct->result() as $bwp){
+	           $this->db->where("id",$bwp->p_code);
+	          $getp = $this->db->get("stock_products")->row();
+	          $updata['selling_price']=$getp->selling_price1;
+	          $updata['mrp_price']=$getp->mrp_price1;
+	          $this->db->where("branch_id",$br->id);
+	          $this->db->where("p_code",$bwp->p_code);
+	          $this->db->update("branch_wallet",$updata);
+	       }
+	       
+	    }
+	}
 }

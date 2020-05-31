@@ -25,8 +25,14 @@
                 <form action="<?php echo base_url();?>stockController/addproduct_value" method="post"
                     enctype="multipart/form-data" role="form" id="form">
 
-                    <div class="row">
-                        <div class="col-md-12 register-right"></div>
+                    <div class="row" id="rahul">
+                        <div class="col-md-12 register-right">
+                            Update HSN <span style="color:red;"> *</span></strong> </label>
+                                <input type="text" class="form-control text-uppercase" name="phsnu" id="phsnu"
+                                    required="" />
+
+                            
+                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div id="validId"></div>
@@ -35,17 +41,32 @@
                                       
                                  $cat =$this->db->get("category")->result();?>
                             </div>
-                            <div class="form-group">
-                                <label><strong>Product Code<span style="color:red;"> *</span></strong> </label>
-                                <input type="text" class="form-control text-uppercase" id="hsn" name="p_code"
-                                    placeholder="Product Code (HSN)" required="" />
-                                   <input type="hidden" class="form-control text-uppercase" id="hsn1" name="" />
-                                   <input type="hidden" class="form-control text-uppercase" id="p_idd" name="p_idd" />
+                              <div class="form-group" id="branch">
+                                <label><strong>Select Branch<span style="color:red;"> *</span></strong> </label>
+                               <select name="branch" id="branchid" class="form-control" required="required">
+                                   <?php if($this->session->userdata("login_type")==1){?>
+                                    <option value = "">Select Branch </option>
+                                   <?php
+                                      $branchData= $this->db->get("branch");
+                                      if($branchData->num_rows()>0){
+                                         foreach($branchData->result() as $branchRow):
+                                          ?>
+                                          <option value = "<?php echo $branchRow->id;?>"> <?php echo $branchRow->b_name."[ ".$branchRow->username." ]";?> </option>
+                                     <?php endforeach; }
+                                   }else{
+                                      $branchid = $this->session->userdata("id");
+                                      $bname = $this->session->userdata("your_school_name");
+                                      $username =$this->session->userdata("username");?>
+                                        <option value = "<?php echo $branchid;?>"> <?php echo $bname."[ ".$username." ]";?> </option>
+                                 <?php  }
+                                   ?>
+                               </select>
                             </div>
+                            
                             <div class="form-group" id="cate">
                                 <label><strong>Product Category <span style="color:red;"> *</span></strong> </label>
                                 <select name="category" id="cate1" class="form-control">
-                                    <option value="" disabled selected>------ Select Category-------</option>
+                                    <option value="" disabled selected>-Select Category-</option>
                                     <?php foreach($cat as $row):?>
                                     <option value="<?php echo $row->id;?>"><?php echo $row->name;?></option>
                                     <?php endforeach;?>
@@ -54,13 +75,13 @@
                             <div class="form-group" id="com">
                                 <label><strong>Product Company Name <span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="cname" id="cname"
-                                    placeholder="Company Name" required="" />
+                                    required="" />
 
                             </div>
                             <div class="form-group" id="companyname1">
                                 <label><strong>Product Company Name <span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="cname1" readonly
-                                    id="companyname" placeholder="Company Name" required="" />
+                                    id="companyname"  required="" />
 
                             </div>
 
@@ -73,29 +94,25 @@
                             <div class="form-group" id="prnmae">
                                 <label><strong>Product Name <span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="name" id="name"
-                                    placeholder="Product Name" required="" />
+                                    required="" />
                             </div>
 
                             <div class="form-group" id="pna">
                                 <label><strong>Product Name <span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="name1" readonly id="pnname"
-                                    placeholder="Product Name" required="" />
+                                     required="" />
                             </div>
-                            <div class="form-group" id="quantity">
+                           
+                            <div class="form-group" >
                                 <label><strong>Product Quantity</strong> </label>
-                                <input type="text" class="form-control text-uppercase" name="quantity" id="quantity"
-                                    placeholder="Product Quantity" value="0" required="" />
-                            </div>
-                            <div class="form-group" id="onupadtequantity1">
-                                <label><strong>Product Quantity</strong> </label>
-                                <input type="text" class="form-control text-uppercase" readonly name="quantity1"
-                                    id="onupadtequantity" placeholder="Product Quantity" value="0" required="" />
+                                <input type="text" class="form-control text-uppercase" id="quantity" readonly name="quantity"
+                                    id="onupadtequantity"  value="0" required="" />
                             </div>
 
                             <div class="form-group" id="extraqunatity">
                                 <label><strong>Product Extra Qunatity</strong> </label>
                                 <input type="text" class="form-control" id="extraqunatity1"
-                                    placeholder="Product extra Quantity" />
+                                     />
                             </div>
                             <div class="form-group" id="file1">
                                 <label><strong>Product File 1 <span style="color:red;"> *</span></strong> </label>
@@ -111,20 +128,26 @@
                             <div class="form-group" id="billno">
                                 <label><strong>Purchase Invoice NO</strong> </label>
                                 <input type="text" class="form-control" name="invoice_no" id="invoice_no"
-                                    placeholder="Invoice Number">
+                                   >
                             </div>
                             <div class="form-group" id="cgst1">
                                 <label><strong>CGST Amount</strong> </label>
-                                <input type="text" class="form-control" name="cgst" id="cgst" placeholder="CGST Amount">
+                                <input type="text" class="form-control" name="cgst" id="cgst" >
+                            </div>
+                            <div class="form-group" id="sgst1">
+                                <label><strong>SGST Amount</strong> </label>
+                                <input type="text" class="form-control" name="sgst" id="sgst">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                             </div>
                             <div class="form-group">
-                                <label><strong>Product Serial Number</strong> </label>
-                                <input type="text" class="form-control text-uppercase" name="sno" id="sno"
-                                    placeholder="Product Code (SEC)" />
+                                <label><strong>Product Code(HSN)<span style="color:red;"> *</span></strong> </label>
+                                <input type="text" class="form-control text-uppercase" id="hsn" name="p_code"
+                                    required="" />
+                                   <input type="hidden" class="form-control text-uppercase" id="hsn1" name="" />
+                                   <input type="hidden" class="form-control text-uppercase" id="p_idd" name="p_idd" />
                             </div>
                             <div class="form-group" id="sub_category1">
                                 <label><strong>Product Sub Category <span style="color:red;"> *</span></strong> </label>
@@ -142,65 +165,60 @@
                             <div class="form-group" id="hideee">
                                 <label><strong>Product Type</strong> </label>
                                 <input type="text" name="scname" id="scname" class="form-control text-uppercase"
-                                    placeholder="Type Of Product" />
+                                     />
                             </div>
                             <div class="form-group" id="ptp1">
                                 <label><strong>Product Type</strong> </label>
                                 <input type="text" name="scname1" id="ptp" readonly class="form-control text-uppercase"
-                                    placeholder="Type Of Product" />
+                                     />
                             </div>
                             <div class="form-group" id="size1">
                                 <label><strong>Product Size<span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="size" id="size"
-                                    placeholder="Product Size" required="" />
+                                     required="" />
                             </div>
-                            <div class="form-group" id="size21">
-                                <label><strong>Product Size<span style="color:red;"> *</span></strong> </label>
-                                <input type="text" class="form-control text-uppercase" readonly name="size1" id="size2"
-                                    placeholder="Product Size" required="" />
+                           
+                           
+                              <div class="form-group" id="pricep">
+                                <label><strong>Purchase Price<span style="color:red;"> *</span></strong> </label>
+                                <input type="text" class="form-control text-uppercase"  name="pprice" id="pprice"
+                                     required="" />
                             </div>
-                            <div class="form-group" id="price1">
+                            <div class="form-group" id="prices">
                                 <label><strong>Our Price<span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="price" id="price"
-                                    placeholder="Product Price" required="" />
+                                     required="" />
                             </div>
-                            <div class="form-group" id="price1">
+                            <div class="form-group" id="pricem">
                                 <label><strong>MRP Price<span style="color:red;"> *</span></strong> </label>
                                 <input type="text" class="form-control text-uppercase" name="mrpprice" id="mrpprice"
-                                    placeholder="MRP Product Price" required="" />
+                                     required="" />
                             </div>
-                            <!--<div class="form-group" id="price21">-->
-                            <!--  <label><strong>Product Price<span style="color:red;"> *</span></strong> </label>-->
-                            <!--  <input type="text" class="form-control text-uppercase" readonly name="price1" id="price2"-->
-                            <!--    placeholder="Product Price" required="" />-->
-                            <!--</div>-->
+                        
 
                             <div class="form-group" id="file4">
                                 <label><strong>Offer Image</strong> </label>
-                                <input type="file" class="form-control" name="file3" placeholder="Offer Image">
+                                <input type="file" class="form-control" name="file3" >
                             </div>
 
                             <div class="form-group" id="Purchase_total">
                                 <label><strong>Total Purchase Amount</strong> </label>
                                 <input type="text" class="form-control" name="totamount" id="total_amount" readonly
-                                    placeholder="Purchase Total Amount" required="" />
+                                     required="" />
                             </div>
 
-                            <div class="form-group" id="sgst1">
-                                <label><strong>SGST Amount</strong> </label>
-                                <input type="text" class="form-control" name="sgst" id="sgst" placeholder="SGST Amount">
-                            </div>
+                            
                             <!--<div class="form-group">-->
                             <!--  <input type="submit" class="btnRegister"  value="Register"/>-->
                             <!--</div>-->
-                            <div class="form-group" id="productadd" style="margin-top:50px;">
+                            <div class="form-group" style="margin-top:50px;">
 
                                 <button type="submit" class=" form-control btn-primary" id="productadd">Add
                                     Product</button>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class=" form-control btn-danger" id="updatequantity">Update
-                                    product & Qunatity</button>
+                                <a href="#" class=" form-control btn-success" id="updatequantity">Update
+                                    product & Qunatity</a>
                             </div>
                             <input type="hidden" class="form-control" name="total_amount" id="total_amount1"
                                 placeholder="Purchase Total Amount" required="" />
@@ -217,7 +235,6 @@
 </div>
 </div>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 jQuery(document).ready(function() {
 
@@ -227,78 +244,104 @@ jQuery(document).ready(function() {
     $("#sub_categoryname").hide();
     $("#extraqunatity").hide();
     $("#updatequantity").hide();
-    $("#onupadtequantity1").hide();
+   
     $("#companyname1").hide();
     $("#ptp1").hide();
     $("#pna").hide();
     $("#size21").hide();
 
-    $("#hsn").change(function() {
-
+    $("#hsn").keyup(function() {
+           
 
         var cat = $("#hsn").val();
-        //alert(cat);
-        $.post("<?php echo site_url("stockController/checkp_code") ?>", {
-            cat: cat
-        }, function(data) {
-            //alert(data);
+        var branchid=$("#branchid").val();
+       
+        
+        $.ajax({	"url": "<?php echo site_url("stockController/checkp_code") ?>",
+						"method": 'POST',
+						"data": { cat: cat , branchid : branchid},
+						beforeSend: function(data) {
+							$("#rahul").prop('disabled', true);
+							
+						},
+						success: function(data) {
+						     $("#rahul").show()
+						    $("#rahul").prop('disabled', false);
+						   
+						  //alert(d.indicator);
             var d = jQuery.parseJSON(data);
            // alert(data);
+          // alert(d.indicator);
             $("#validId").show();
-
             $("#validId").html(d.msg);
             $("#hsn1").val(d.hsn);
+            $("#phsnu").val(d.hsn);
             $("#cname").val(d.cname);
             $("#p_idd").val(d.idd);
             $("#companyname").val(d.cname);
             $("#name").val(d.name);
             $("#pnname").val(d.name);
             $("#quantity").val(d.quantity);
-            $("#onupadtequantity").val(d.quantity);
+        
             $("#sno").val(d.sno);
             $("#scname").val(d.scname);
             $("#ptp").val(d.scname);
             $("#categoryname1").val(d.cat);
             $("#sub_categoryname1").val(d.subcat);
             $("#size").val(d.size);
-            $("#size2").val(d.size);
+            $("#pprice").val(d.pprice);
             $("#price").val(d.price);
              $("#mrpprice").val(d.mrpprice);
             $("#price2").val(d.price);
-            if (d.quantity >= 0) {
+            if (d.quantity >= -100) {
                 $("#extraqunatity").show();
-                $("#cate").hide();
-                $("#quantity").hide();
-                $("#sub_category1").hide();
-                $("#categoryname").show();
-                $("#sub_categoryname").show();
-                $("#file1").hide();
-                $("#onupadtequantity1").show();
-                $("#companyname1").show();
-                 $("#categoryname1").show();
-                  $("#sub_categoryname1").show();
-                $("#file2").hide();
-                $("#com").hide();
-                $("#ptp1").show();
-                $("#file3").hide();
-                $("#pna").show();
-                $("#hideee").hide();
-                $("#size1").hide();
-
-                $("#size21").show();
-
-                $("#prnmae").hide()
-                $("#file4").hide();
+               
+            }
+            if(d.indicator=='false'){
+              
+                $("#productadd").show();
+               
+                $("#updatequantity").hide();
+            }else{
+          
                 $("#productadd").hide();
                 $("#updatequantity").show();
-
             }
-
-
-        });
+             
+						},
+						error: function(data) {
+							$("#rahul").html(data)
+						}
+					})
+        
+       
 
     });
 
+    $("#branchid").change(function(){
+         $("#onupadtequantity").hide();
+         $("#hsn1").val("");
+          $("#hsn").val("");
+            $("#cname").val("");
+            $("#p_idd").val("");
+            $("#companyname").val("");
+            $("#name").val("");
+            $("#pnname").val("");
+            $("#quantity").val("");
+  
+            $("#sno").val("");
+            $("#scname").val("");
+            $("#ptp").val("");
+            $("#categoryname1").val("");
+            $("#sub_categoryname1").val("");
+            $("#size").val("");
+            $("#price").val("");
+             $("#mrpprice").val("");
+            $("#price2").val("");
+          
+                $("#extraqunatity").hide();
+           
+    });
 
     $("#invoice_no").keyup(function() {
 
@@ -322,24 +365,17 @@ jQuery(document).ready(function() {
 
     });
 
-    $("#extraqunatity1").change(function() {
-        var oldQt = Number($("#quantity").val());
-        var newQt = Number($("#extraqunatity1").val());
-        var add = oldQt + newQt;
-        $("#quantity").val(add);
-
-    });
-
-
+   
 
     $("#updatequantity").click(function() {
 
         var hsn1 = $("#hsn").val();
-     
+        var branchid=$("#branchid").val();
         var hsn = $("#hsn1").val();
         var idd2 = $('#p_idd').val();
         var price = $("#price").val();
-        var sec = $("#sno").val();
+        var pprice = $("#pprice").val();
+         var phsnu = $("#phsnu").val();
         var Qt = Number($("#quantity").val());
         var Qt1 = Number($("#extraqunatity1").val());
         var invoice_no = $('#invoice_no').val();
@@ -347,39 +383,38 @@ jQuery(document).ready(function() {
         var total_amount = $('#total_amount').val();
         var mrpprice = $('#mrpprice').val();
         var sgst = $('#sgst').val();
+        alert(hsn1);
         // alert(hsn + Qt);
-        if(sec.toUpperCase() == hsn1.toUpperCase())
-        {
-            if (Qt1 != 0 || price != 0 || sec != " ") {
+      
+            if (Qt1 != 0 || price != 0 || hsn != " ") {
             $.post("<?php echo site_url('stockController/updatequantity')?>", {
                 hsn: hsn,
                 hsn1: hsn1,
                 price: price,
                 idd2: idd2,
-                sec: sec,
+                phsnu : phsnu,
+                pprice: pprice,
                 Qt: Qt,
                 Qt1: Qt1,
                 invoice_no: invoice_no,
                 cgst: cgst,
                 total_amount: total_amount,
                 sgst: sgst,
-                mrpprice : mrpprice
+                mrpprice : mrpprice,
+                branchid : branchid
+                
             }, function(data) {
-                // alert(data);
-                $("#updatequantity").html(data);
-                alert("Updated Successfully");
-                window.location.reload();
+                 alert(data);
+                //$("#updatequantity").html(data);
+                //alert("Updated Successfully");
+                //window.location.reload();
             });
-            } else {
-                alert('Sorry!Please Update Somthing');
-                return false;
-    
-            }
+           
         }
         else
         {
-            alert(hsn1+" "+sec);
-            alert("Enter Same Sec And Hsn");
+           
+            alert("Please Contact Admin");
         }
     });
 
@@ -397,23 +432,30 @@ $("#cate1").change(function() {
 
 });
 
-$("#total_amount").mouseover(function() {
-    var totamount = Number($("#total_amount1").val());
-    var quantity = Number($("#quantity").val());
-    var exquantity = $("#extraqunatity1").val();
-    var price = Number($("#price").val());
-    if (exquantity == "") {
-        var totp = quantity * price;
-    } else {
-        var exquantity1 = Number($("#extraqunatity1").val());
-        var totp = exquantity1 * price;
+ $("#extraqunatity1").keyup(function() {
 
-    }
+        var exquantity = Number($("#extraqunatity1").val());
+        var price = Number($("#pprice").val());
+        //	alert(cat);
+        var totprice = exquantity*price;
+            $("#total_amount").val(totprice);
+            $("#total_amount1").val(totprice);
 
-    var totalamt = totp + totamount;
-    //alert(totalamt);
-    $("#total_amount").val(totalamt);
+      
 
-});
-});
+    });
+    $("#pprice").keyup(function() {
+
+        var exquantity = Number($("#extraqunatity1").val());
+        var price = Number($("#pprice").val());
+        //	alert(cat);
+        var totprice = exquantity*price;
+            $("#total_amount").val(totprice);
+            $("#total_amount1").val(totprice);
+
+       
+
+    });
+
+ });
 </script>

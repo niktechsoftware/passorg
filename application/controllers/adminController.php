@@ -7,6 +7,7 @@ class AdminController extends CI_Controller{
 		$this->is_login();
 		//$this->load->model("teacherModel");
 		$this->load->model("admin");
+		$this->load->model("smsmodel");
 	
 	}
 
@@ -27,8 +28,40 @@ class AdminController extends CI_Controller{
 		}
 	}
 	
-	
-	
+	function approveAskford(){
+	    $invoice =  $this->uri->segment(3);
+	    $this->db->where("invoice_no",$invoice);
+           $getstatus = $this->db->get("askforproduct");
+           if($getstatus->num_rows()>0){
+               $value = $getstatus->row();
+               if($value->status==0){
+                   $this->db->where("invoice_no",$invoice);
+                  $getv =  $this->db->get("askforproducttable");
+                  foreach($getv->result() as $gv):
+                    //echo $value->user_id;
+                      $this->db->where("p_code",$gv->p_code);
+                      $this->db->where("branch_id",$value->user_id);
+                      $checkbranchs = $this->db->get("branch_wallet");
+                      if($checkbranchs->num_rows()>0){
+                          $data['rec_quantity']=$checkbranchs->row()->rec_quantity+$gv->quantity;
+                          $this->db->where("id",$checkbranchs->row()->id);
+                          $this->db->update("branch_wallet",$data);
+                      }else{
+                           $data['rec_quantity']=$gv->quantity;
+                            $data['p_code']=$gv->p_code;
+                             $data['branch_id']=$value->user_id;
+                             $this->db->insert("branch_wallet",$data);
+                      }
+                      endforeach;
+                     $upstatus['status']=1;
+                     $this->db->where("invoice_no",$invoice);
+                     $this->db->update("askforproduct",$upstatus);
+                      
+               }
+           }
+         redirect("branchController/reportAskfor"); 
+	}
+
 	function adminProfile(){
 		$data['pageTitle'] = 'Admin Section';
 		$data['smallTitle'] = 'Admin Profile';
@@ -78,10 +111,78 @@ class AdminController extends CI_Controller{
 	   }
 	}
 	
+	function avaiDemand(){
+	     $type =  $this->uri->segment("3");
+	     $typepage = $this->uri->segment("4");
+	     $data['type'] =$type;
+	      $data['typepage'] =$typepage;
+	     if($type=1){
+	      $getallb =     $this->db->get("branch");
+	       if($getallb->num_rows()>0){
+	          $i=1; foreach ($getallb->result() as $d):
+	                $datasub[$i] = $d->id;
+	              $i++; endforeach;
+	    $data['branchid']   =$datasub;
+	    $data['branchname']   ="Admin Over All Demand List";
+	    $data['pageTitle'] = 'Admin Overall Demand List';
+		$data['smallTitle'] = 'Admin Demand List';
+		$data['mainPage'] = 'Admin Demand';
+		$data['subPage'] = 'Admin Demand List';
+		$data['title'] = 'Admin Demand List';
+		$data['headerCss'] = 'headerCss/stockCss';
+		$data['footerJs'] = 'footerJs/stockJs';
+		$data['mainContent'] = 'Admin/overalldlAdminavi';
+		$this->load->view("includes/mainContent", $data);   
+	       }   
+	     }
+	}
+		function shopdemandtransfer(){
+	      $branchid =  $this->uri->segment("3");
+	     $typepage = $this->uri->segment("4");
+	           $this->db->where("id",$branchid);
+	      $sranchf =  $this->db->get("sub_branch");
+	       if($sranchf->num_rows()>0){
+	         $data['typepage']=$typepage;
+	           $data['shopid'] =$sranchf->row()->id;
+        $data['shopname'] =$sranchf->row()->bname;
+	         
+	    $data['branchname']   ="Admin Over All Demand List";
+	    $data['pageTitle'] = 'Admin Overall Demand List';
+		$data['smallTitle'] = 'Admin Demand List';
+		$data['mainPage'] = 'Admin Demand';
+		$data['subPage'] = 'Admin Demand List';
+		$data['title'] = 'Admin Demand List';
+		$data['headerCss'] = 'headerCss/stockCss';
+		$data['footerJs'] = 'footerJs/stockJs';
+		$data['mainContent'] = 'Shop/shopdemandtransfer';
+		$this->load->view("includes/mainContent", $data);   
+	}}
+	function branchdemandtransfer(){
+	      $branchid =  $this->uri->segment("3");
+	     $typepage = $this->uri->segment("4");
+	      $this->db->where("id",$branchid);
+	        $branchf =  $this->db->get("branch");
+	        if($branchf->num_rows()>0){
+	          $branchid = $branchf->row()->id;
+	     $data['typepage']=$typepage;
+	       $data['branchid']   =$branchid;
+	          $data['branchname']   =$branchf->row()->b_name;
+	    $data['branchname']   ="Admin Over All Demand List";
+	    $data['pageTitle'] = 'Admin Overall Demand List';
+		$data['smallTitle'] = 'Admin Demand List';
+		$data['mainPage'] = 'Admin Demand';
+		$data['subPage'] = 'Admin Demand List';
+		$data['title'] = 'Admin Demand List';
+		$data['headerCss'] = 'headerCss/stockCss';
+		$data['footerJs'] = 'footerJs/stockJs';
+		$data['mainContent'] = 'Branch/branchdemandavi';
+		$this->load->view("includes/mainContent", $data);   
+	}}
 	
 	function getaddemand(){
 	   $type =  $this->input->post("type");
 	   $username =  $this->input->post("username");
+	   $data['type'] =$type;
 	   if($type==1){
 	    
 	     
@@ -89,7 +190,7 @@ class AdminController extends CI_Controller{
 	        $branchf =  $this->db->get("branch");
 	        if($branchf->num_rows()>0){
 	          $branchid = $branchf->row()->id;
-	         
+	      
 	       $data['branchname']   =$branchf->row()->b_name;
 	       $data['branchid']   =$branchid;
 	    $data['pageTitle'] = 'Branch Overall Demand List';
@@ -109,7 +210,7 @@ class AdminController extends CI_Controller{
 	            $this->db->where("username",$username);
 	      $sranchf =  $this->db->get("sub_branch");
 	       if($sranchf->num_rows()>0){
-	         
+	         $data['typepage']=0;
 	           $data['shopid'] =$sranchf->row()->id;
         $data['shopname'] =$sranchf->row()->bname;
         $data['pageTitle'] = 'Shop Overall Demand List';
@@ -314,7 +415,10 @@ class AdminController extends CI_Controller{
                 // $msg= "Dear ".$chk->row()->name." you are assigned to show a plan at ".$insert->row()->timing." in ".$insert->row()->place." with the sponsor ".$sub_dddt->name.". Call 980787667 for more details. Have a nice day.";
                 $msg= "Dear ".$chk->row()->name." you are assigned to show a plan at ".$mt_dt->timing." in ".$mt_dt->place." on ".$mt_dt->date." with the sponsor ".$sub_dddt->name.". Call 980787667 for more details. Have a nice day.";
                 
-                sms($mble,$msg);
+               $getv= sms($mble,$msg);
+                $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
             }
         }
       redirect(base_url().'index.php/adminController/create_meeting/5','refresh');
@@ -952,12 +1056,18 @@ class AdminController extends CI_Controller{
            $msg = " Dear " . $delivery->name. " Please take the order of  . " . $cust->name. " [ ". $cust->username." ] " . " Please Check Your Dashboard For Further Deatil, Please visit passystem.in .Thank You .";
 
               $mobileno=$delivery->mobile;            
-          sms($mobileno,$msg);
+         $getv= sms($mobileno,$msg);
+           $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
           
           $msg = " Dear ". $cust->name. " Please Check You  order status From Own Dashboard and Call this Number".$mobileno ." to Delivery Incharge for Further Details visit passystem.in ";
 
               $mobile=$cust->mobile;            
-          sms($mobile,$msg);
+          $getv =sms($mobile,$msg);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
           
        }
 			  function assignagaindelivery()
@@ -989,13 +1099,17 @@ class AdminController extends CI_Controller{
 							$msg = " Dear ". $delivery->name . " Please take the order of . " . $cust->name. " [ ". $cust->username." ] " ." Please Check Your Dashboard For Further Deatil, Please visit passystem.in.Thank You .";
 	 
 								 $mobileno=$delivery->mobile;            
-						 sms($mobileno,$msg);
-						 
+					$getv=	 sms($mobileno,$msg);
+						 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 						 $msg = " Dear " . $cust->name. " Your  order status  have been change Please check from Own Dashboard and Call this Number".$mobileno ." to Change  Delivery Incharge for Further Detail, Please visit passystem.in ";
 	 
 								 $mobile=$cust->mobile;            
-						 sms($mobile,$msg);
-				 
+					$getv=	 sms($mobile,$msg);
+				 	 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 			 }
 			 
        public function admincash()
@@ -1059,8 +1173,10 @@ class AdminController extends CI_Controller{
         $msg = "Dear ".$cust_unm." Thanks For Shopping With passystem.in . Your CashBack Amount  Rs  ".$totropee." /- is Under Process. Thank You .";
          $mobileno =	$dt->mobile;
          
-         sms($mobileno,$msg);
-       
+        $getv= sms($mobileno,$msg);
+       	 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
     //   $i=1;
     //   $this->load->model("registration1");
     //   $this->registration1->commision($i,$cid,$amnt);
@@ -1326,7 +1442,10 @@ alert('somthing wrong!please try after sometime');
 					 $msg = "Dear Sir Thanks for Shopping With passystem.in . Your CashBack Amount is Rs - ".$totropee." /- Thank You .";
 					 $mobileno = $dt->mobile;
 			
-					sms($mobileno,$msg);
+				$getv=	sms($mobileno,$msg);
+					 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 					
 				 $i=1;
 				 if($parentdt->num_rows()>0){
@@ -1651,7 +1770,11 @@ function complainSolution(){
 	     $this->db->where('username',$dd->sub_ID);
 	    $subd = $this->db->get('customers')->row();
 	    $msg = "Dear ".$subd->name." your complain [".$cId."] solution is : ".$solution;
-	    sms($subd->mobile,$msg); ?>
+	    $getv=sms($subd->mobile,$msg); 
+	    	 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
+                ?>
 		<!--<script>alert("Your Solution Succesfully submited");</script>-->
 		<?php redirect('adminController/complain/0');
 

@@ -31,9 +31,8 @@
                    <div class="col-md-6">
                     <div class="col-md-10">
                            
-                           <img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $row->image;?>" style="width:100px;height:90px;">
+                           <img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $row->image;?>" style="width:150px;height:160px;">
                           <input type="file" name="image" />
-                          <span style="color:brown;">Image should be lessthan 50 kb</span>
                           </div>
                       </div>
                       <div class="col-md-6">
@@ -166,6 +165,66 @@
                     </div>               
                   </div>   
               </div>
+              
+              <div class="row"> 
+           <div class="col-md-12 space20">
+                   <div class="col-md-6">
+                    <div class="col-md-4">
+                         	 Branch Name<span class="symbol required"></span></div>
+                           <div class="col-md-8">
+                          	<?php 
+                          
+                    		$id =$row->id;
+                    		$this->db->where("id",$id);
+                    		$empd= $this->db->get("customers")->row();
+                    			  
+                    			   $this->db->where("id",$empd->district);
+                    			   $subbranch = $this->db->get("branch")->row();;
+                    			  $branchlist= $this->db->get("branch");
+                    			     ?>
+                                        <select class="form-control" name="branch" id="branch" required="required">
+                                            <option value="">-Select Branch Name-</option>
+                                           <?php foreach($branchlist->result() as $bl):?>
+                                            <option value="<?php echo $bl->id;?>" <?php if($bl->id==$subbranch->id){echo "selected ='selected'";}?> ><?php echo $bl->b_name; ?></option>
+                                           <?php endforeach;?>
+                                        </select>
+                       
+                          </div>
+                      </div>
+                      <div class="col-md-6">
+                         <div class="col-md-4">
+                        	Sub Branch Name
+                        </div>
+                      <div class="col-md-8">
+											<?php 	
+                    	
+                    		$this->db->where("id",$id);
+                    		$empd= $this->db->get("customers")->row();
+                    		$this->db->where("id",$empd->sub_branchid);
+                    		$sbdetails=$this->db->get("sub_branch")->row();
+                    		?>
+                    	
+                    			<select class="form-control" id="subbranch" name="subbranch" required="required">
+                    			       <option value="<?php echo $sbdetails->id;?>"><?php echo $sbdetails->bname; ?></option>
+                                </select>
+                    
+                        </div>
+                    </div>               
+                  </div>   
+              </div>
+               <script>
+                            
+                             $('#branch').change(function(){
+                                  var branch= $('#branch').val();
+                                  //alert(branch);
+                                  $.post("<?php echo site_url("employeeController/subBranch") ?>", {
+                                    branch: branch
+                                        }, function(data) {
+                                          $("#subbranch").html(data);
+                                         // alert("data");
+                                        });
+                              });
+                        </script>
 							<div class="row"> 
 					 <div class="col-md-12 space20">
             			 <div class="col-md-6">

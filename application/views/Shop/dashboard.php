@@ -14,7 +14,7 @@
                <a href="#">
 	                <div class="padding-20 core-content">
 	                <!--	<h3 class="title block no-margin">Fee Reports</h3>-->
-	                <h3 class="title block no-margin">Total Collection</h3>
+	                <h3 class="title block no-margin">En ACTIVE Subscriber</h3>
 	                
 	                	<br/>
 	                	<?php    $id= $this->session->userdata('username');
@@ -72,7 +72,7 @@
                 </div>
                 <a href="#">
                 <div class="padding-20 core-content">
-                    <h4 class="title block no-margin">Today's Collection </h4>
+                    <h4 class="title block no-margin">Active subscriber </h4>
                     <br/>
                      <?php    $id= $this->session->userdata('username');
                                 $date=date("y-m-d");

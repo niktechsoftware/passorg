@@ -161,6 +161,7 @@ function myFunction() {
                         <div class="col-md-4 col-sm-6">
                             <h6 class="m-b-20">Invoice Number : <span><?php echo $custusr->invoice_no;?></span></h6>
                              <?php 
+                             $save = 0;
                              $this->db->select_sum('quantity');
                              $this->db->select_sum('subtotal');
                              $this->db->where('order_id',$custusr->id);
@@ -245,6 +246,7 @@ function myFunction() {
                                             <th>volume</th>
                                             <th>Quantity</th>
                                             <th>Rate</th>
+                                            
                                             <th>Amount</th>
                                         </tr>
                                     </thead>
@@ -258,6 +260,11 @@ function myFunction() {
                                   $this->db->where('id',$data->p_code);
                                                 $this->db->or_where('sec',$data->p_code);
                                          $productdetail1=$this->db->get('stock_products');
+                                         
+                                           $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$data->p_code);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
+                                                         
                                          if($productdetail1->num_rows()>0){
                                   $productdetail=$productdetail1->row();
                                   ?>
@@ -272,8 +279,9 @@ function myFunction() {
                                             </td>
                                             <td><?= $productdetail->size; ?></td>
                                             <td><?php echo $data->quantity; ?></td>
-                                            <td><?php echo $productdetail->selling_price; ?></td>
-                                            <td><?php echo $data->subtotal; ?></td>
+                                            <td><?php $save =$save+($data->quantity*$pprice->mrp_price) ;
+                                            echo $pprice->selling_price; ?></td>
+                                            <td><?php echo number_format($data->subtotal, 2,'.', ''); ?></td>
                                         </tr>
                                         
                                        <?php  $i++; } endforeach;?>
@@ -288,24 +296,42 @@ function myFunction() {
                                 <tbody>
                                     <tr>
                                         <th>Sub Total :</th>
-                                        <td><?php echo $dt1->subtotal;?></td>
+                                        <td></td>
+                                        
+                                        
+                                        <td><?php echo number_format($dt1->subtotal, 2,'.', '');?></td>
+                                            <td></td>
                                     </tr>
                                     <tr>
                                         <th>Taxes :</th>
+                                         <td></td>
+                                        
+                                          
                                         <td>00.00</td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                          <th>Discount : [ <strong><?php echo $delivery->discount_name;?> ]</strong> </th>
+                                          <td></td>
+                                        
+                                         
                                         <td><?php echo $delivery->discount;?></td>
+                                        <td></td>
+                                    </tr>
+                                     <tr>
+                                         <th><h3>MRP Total :  </h3></th>
+                                        <td><h3><?php $remaintot =$save-$dt1->subtotal;echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".number_format($save, 2,'.', ''); echo " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You Saved =  ".number_format($remaintot, 2,'.', '')."  ";?></h3></td>
+                                  
                                     </tr>
                                     <tr class="text-info">
                                         <td>
                                             
-                                            <h5 class="text-primary">Total :</h5>
+                                            <h5 class="text-primary"><h3>Net Total (Rs.):</h3></h5>
                                         </td>
                                         <td>
                                             
-                                            <h5 class="text-primary"><?php echo $dt1->subtotal;?></h5>
+                                            <h5 class="text-primary"><h3><?php echo number_format($dt1->subtotal, 2,'.', '');?></h3></h5>
                                         </td>
                                         <td>
                                           

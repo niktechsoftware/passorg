@@ -42,7 +42,7 @@
 							<table class="table">
 								<thead>
 									<tr>
-									    <th>Subcriber Registration</th>
+									    <th>Subscriber Registration</th>
 										<th>Branch Registraion</th>
 										<th>Shop Registration</th>
 										<th>D.I. Registration</th>

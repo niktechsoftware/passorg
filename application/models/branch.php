@@ -12,8 +12,19 @@ class branch extends CI_Model{
 		}
 	}
 	
-	function insert($data){
-		$d = $this->db->insert("branch",$data);
+	function insert($data,$adminStockList){
+		 $this->db->insert("branch",$data);
+	    $d =$this->db->insert_id();
+	    foreach($adminStockList->result() as $ap):
+	        $bdata['p_code']=$ap->id;
+	        $bdata['branch_id']=$d;
+	        $bdata['sale_quantity']=0;
+	        $bdata['rec_quantity']=0;
+	        $bdata['mrp_price']=$ap->mrp_price1;
+	        $bdata['selling_price']=$ap->selling_price1	;
+	        $bdata['purchase_price']=$ap->mrp_price1;
+	        $this->db->insert("branch_wallet",$bdata);
+	        endforeach;
 		return $d;
 	}
 	
@@ -44,6 +55,14 @@ class branch extends CI_Model{
                 return $branch;
 	    }
 	}
+		function getValueBranchByCustomrid($tid){
+		   
+        	  $this->db->where("id",$tid);
+        	 $cv = $this->db->get("customers")->row();
+        	 $this->db->where("id",$cv->district);
+        	 $branch =$this->db->get("branch");
+	      return $branch ;
+	  }
 	function getbranch(){
 		$branch = $this->db->get('branch')->result();
 		return $branch;

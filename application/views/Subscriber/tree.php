@@ -25,14 +25,23 @@
                             <tbody>
                                 <tr>
                                     <td colspan="<?= sizeof($allChildDetails); ?>" style="text-align:center;">
-                                    <img src="<?= base_url(); ?>assets/tree/userlogo.png" width="50px" height="50px"><br/>
+                                   
                                         <?php
                                         if($secondParenDetail != null):
-                                            echo '<a href="'.base_url().'tree?find='.$parenDetail->id.'">';
+                                            if($secondParenDetail->image){?>
+                                            	<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $secondParenDetail->image;?>" class="img-circle" width="50px" height="50px" alt="">
+                                            <?php }else{?>
+                                                     <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">  
+                                           <?php  }
+                                           
+                                            echo '<a href="'.base_url().'subscriberController/tree?find='.$secondParenDetail->username.'">';
                                                 echo $secondParenDetail->name . '<br/>';
                                                 echo $secondParenDetail->username;
                                             echo '</a>';
                                         else:
+                                            ?>
+                                             <img src="<?= base_url(); ?>assets/tree/userlogo.png" width="50px" height="50px"><br/>
+                                            <?php 
                                             echo 'No Name <br/>';
                                             echo 'No Username';
                                         endif;
@@ -47,14 +56,22 @@
                                 </tr>
                                 <tr>
                                     <td colspan="<?= sizeof($allChildDetails); ?>" style="text-align:center;">
-                                    <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px"><br/>
+                                  
                                         <?php
                                         if($parenDetail != null):
-                                            echo '<a href="'.base_url().'subscriberController/tree?find='.$parenDetail->id.'">';
+                                            if($parenDetail->image){?>
+                                            	<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $parenDetail->image;?>" class="img-circle" width="50px" height="50px" alt="">
+                                            <?php }else{?>
+                                                     <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">  
+                                           <?php  }
+                                            echo '<a href="'.base_url().'subscriberController/tree?find='.$parenDetail->username.'">';
                                                 echo $parenDetail->name . '<br/>';
                                                 echo $parenDetail->username;
                                             echo '</a>';
                                         else:
+                                               ?>
+                                             <img src="<?= base_url(); ?>assets/tree/userlogo.png" width="50px" height="50px"><br/>
+                                            <?php 
                                             echo 'No Name <br/>';
                                             echo 'No Username';
                                         endif;
@@ -68,13 +85,21 @@
                                 </tr>
                                 <tr>
                                     <td colspan="<?= sizeof($allChildDetails); ?>" style="text-align:center;">
-                                    <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px"><br/>
                                         
                                         <?php
+                                        
                                         if($customerResult != null):
+                                            if($customerResult->image){ ?>
+                                            	<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $customerResult->image;?>" class="img-circle" width="50px" height="50px" alt="">
+                                            <?php }else{?>
+                                              <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">  
+                                            <?php }
                                             echo $customerResult->name . '<br/>';
                                             echo $customerResult->username;
                                             else:
+                                                   ?>
+                                             <img src="<?= base_url(); ?>assets/tree/userlogo.png" width="50px" height="50px"><br/>
+                                            <?php 
                                             echo 'No Name <br/>';
                                             echo 'No Username';
                                         endif;
@@ -90,10 +115,17 @@
                                             
                                             ?>
                                         <td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $i ;?> <br>
-                                        <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">
+                                       
                                                         
-                                        <br><?php if($child->parentID) { ?><a href="<?php echo base_url();?>subscriberController/tree?find=<?php echo $child->id; ?>"><?php echo $child->name ;?>  <br/> <?php echo $child->username; ?></a>
-                                        <?php } else { ?> <a href="#"></a> <?php echo $child->name ;?>  <br/> <?php echo $child->username; ?></a><?php } ?></td>
+                                        <br><?php if($child->parentID) { if($child->image){?>
+                                        	<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $child->image;?>" class="img-circle" width="50px" height="50px" alt="">
+                                        <?php }else{?>
+                                         <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">
+                                        <?php }?>
+                                        <a href="<?php echo base_url();?>subscriberController/tree?find=<?php echo $child->username; ?>"><?php echo $child->name ;?>  <br/> <?php echo $child->username; ?></a>
+                                        <?php } else { ?> 
+                                         <img src="<?php echo $this->config->item('asset_url');?>/images/userlogo.png" width="50px" height="50px">
+                                        <a href="#"></a> <?php echo $child->name ;?>  <br/> <?php echo $child->username; ?></a><?php } ?></td>
                                             
                                 <?php   $i++;  endforeach;
                                     

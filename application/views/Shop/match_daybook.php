@@ -82,7 +82,10 @@
               <tr style="background-color:#1ba593; color:white;">
                     <th>S.No</th>
                     <th>Order Num</th>
+                    
                     <th>Order Amount</th>
+                     <th>OTP</th>
+                      <th>Lock</th>
                     <th>D.I Name</th>
                     <th>Sub.U.N</th>
                     <th>Order Date</th>
@@ -106,6 +109,8 @@
                 <input type ="hidden" id= "order<?php echo $i;?>"  name ="order<?php echo $i;?>" value = "<?php echo $od_data->order_no;?>" class ="form control"/>
                 </td>
                 <td><?php echo $od_data->total_amount; ?></td>
+                 <td><?php echo $od_data->otp; ?></td>
+                  <td><?php echo $od_data->lock_id; ?></td>
                 <?php $this->db->where('id',$od_data->del_boy_id);
                         $del =$this->db->get('employee');
                       

@@ -195,16 +195,10 @@
                 <div class="col-md-1 col-sm-1">
                
                     	<?php 
-                    	  
-                       
                     	if(strlen($this->session->userdata('photo')) > 1):?>
-				    		<?php if($this->session->userdata('login_type') == 'student'): ?>
-				        		<img src="<?php echo $this->config->item('asset_url'); ?> /images/stuImage/<?php echo $this->session->userdata('photo');?>" class="img-circle" style="margin-top:30px; width:100px;" alt="">
-				        	<?php else: ?>
-				        		<img src="<?php echo $this->config->item('asset_url'); ?> /images/empImage/<?php echo $this->session->userdata('logo');?>" class="img-circle" style="margin-top:30px; width:100px;" alt="">
-				        	<?php endif;?>
-				        <?php else:?>
-				        	<img src="<?php echo $this->config->item('asset_url'); ?> /images/anonymous.jpg" class="img-circle" style="margin-top:30px; width:100px;" alt="">
+				    		<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $this->session->userdata('photo');?>" class="img-circle" style="margin-top:30px; width:100px;" alt="">
+				       <?php else:?>
+				        	<img src="<?php echo $this->config->item('asset_url'); ?>/images/anonymous.jpg" class="img-circle" style="margin-top:30px; width:100px;" alt="">
 				        <?php endif;?>
 
 
@@ -224,38 +218,39 @@
 
 <div class="main-wrapper">
 <!-- start: TOPBAR -->
-<header style="height:25px;" class="topbar navbar navbar-inverse navbar-fixed-top inner">
+<header  class="topbar navbar navbar-inverse navbar-fixed-top inner">
     <!-- start: TOPBAR CONTAINER -->
     <div class="container">
         <div class="row">
-            <div class="col-md-1">
-                <a class="sb-toggle-left hidden-md hidden-lg" href="#main-navbar">
-                    <i class="fa fa-bars fa-2x"></i>
+             <div class="col-md-12 col-xs-12">
+                  <div class="col-md-3 col-xs-2" style="margin-top:10px" > 
+                    <a class="sb-toggle-left hidden-md hidden-lg" href="#main-navbar">
+                        <i class="fa fa-bars fa-2x"></i>
+                    </a>&nbsp;
+                     
+              
+            </div>
+            <div class="col-md-6 col-xs-7">
+                  <div class="navbar-header">
+                <!-- start: LOGO -->
+                <a class="navbar-brand" style="margin-left:-60px;" href="#">
+                   <strong style="font-size:15px;"> <?php echo $this->session->userdata('your_school_name'); ?></strong>
                 </a>
+            
+            <!-- end: LOGO -->
+                </div>
             </div>
-            <div class="col-md-2">
-                <?php if($this->session->userdata('login_type')==2){ ?>
-                <a class="button_blink" href="#" style="">Active</a>
-                <?php } ?>
-            </div>
-            <div class="col-md-5">
-               <center> <a class="" style="font-size: 20px;" href="<?php echo base_url(); ?>index.php/login/">
-                    <?php echo $this->session->userdata('your_school_name') ?>
-                </a></center>
-            </div>
-            <div class="col-md-4">
-            <ul class="nav navbar-right">
+            <div class="col-md-3 col-xs-3" style="margin-top:10px">
+            <div class="topbar-tools">
+            <ul class="nav navbar-right" style="margin-left:-30px;">
                 <!-- start: USER DROPDOWN -->
                 <li class="dropdown current-user">
                     <a data-toggle="dropdown" data-hover="dropdown" class="dropdown-toggle" data-close-others="true" href="#">
-                    	<?php if(strlen($this->session->userdata('photo')) > 1):?>
-				    		<?php if($this->session->userdata('login_type') == 'student'): ?>
-				        		<img src="<?php echo $this->config->item('asset_url'); ?>/images/stuImage/<?php echo $this->session->userdata('photo');?>" class="img-circle" width="30" alt="">
-				        	<?php else: ?>
-				        		<img src="<?php echo $this->config->item('asset_url'); ?>/images/empImage/<?php echo $this->session->userdata('photo');?>" class="img-circle" width="30" alt="">
-				        	<?php endif;?>
-				        <?php else:?>
-				        	<img src="<?php echo base_url()?>assets/images/anonymous.jpg" class="img-circle" width="30" alt="">
+                    	<?php 
+                    	if(strlen($this->session->userdata('photo')) > 1):?>
+				    		<img src="<?php echo $this->config->item('asset_url'); ?>/images/subscriber/<?php echo $this->session->userdata('photo');?>" class="img-circle" style="margin-top:00px; width:15px;" alt="">
+				       <?php else:?>
+				        	<img src="<?php echo $this->config->item('asset_url'); ?>/images/anonymous.jpg" class="img-circle" style="margin-top:00px; width:15px;" alt="">
 				        <?php endif;?>
                         <span class="username hidden-xs"><?php echo $this->session->userdata("name")?></span>
                         <i class="fa fa-caret-down "></i>
@@ -275,7 +270,7 @@
 				                    My Profile
 				                </a>
 								<?php elseif($this->session->userdata('login_type') == '5'):?>
-                            <a href="<?php echo base_url()?>subscriberController/subscriberfull_profile">
+                            <a href="<?php echo base_url()?>subscriberController/subscriberfull_profile/<?php echo $this->session->userdata("id");?>">
 				                    My Profile
 				                </a>
 		                    <?php else:?>
@@ -298,28 +293,18 @@
                         </li>
                     </ul>
                 </li>
-                <!-- end: USER DROPDOWN -->
-                <!--<li class="right-menu-toggle">-->
-                <!--    <a href="#" class="sb-toggle-right">-->
-                <!--        <i class="fa fa-globe toggle-icon"></i> <i class="fa fa-caret-right"></i> <span class="notifications-count badge badge-default hide"> <?php  echo $totalNoti;?></span>-->
-                <!--    </a>-->
-                <!--</li>-->
+               <!-- <li class="right-menu-toggle">
+                    <a href="#" class="sb-toggle-right">
+                        <i class="fa fa-globe toggle-icon"></i> <i class="fa fa-caret-right"></i> <span class="notifications-count badge badge-default hide"> <?php  echo "4";?></span>
+                    </a>
+                </li>-->
             </ul>
             </div>
-        </div>
-        <div class="navbar-header">
-            
-            <!-- start: LOGO -->
-            
-            
-            <!-- end: LOGO -->
+             </div>
         </div>
         
-        <div class="topbar-tools">
-            <!-- start: TOP NAVIGATION MENU -->
-            
-            <!-- end: TOP NAVIGATION MENU -->
-        </div>
+        
+       
     </div>
     <!-- end: TOPBAR CONTAINER -->
 </header>

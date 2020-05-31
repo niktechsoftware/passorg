@@ -75,7 +75,7 @@
 								                  <th>Aadhaar Number</th>
 								                  <th>District</th>
 								                  <th>Username</th>
-								                 <th>Inctivate</th>
+								                 <th>Inactivate</th>
 								                  <th>Activity</th>
 									</tr>
 								</thead>

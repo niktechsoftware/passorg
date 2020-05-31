@@ -69,7 +69,7 @@
                 <tr style="background-color:#1ba593; color:white;">
                   <th>S. No.</th>
                    <th>Company</th>
-                  <th>Product  Name</th>
+                  <th width="200">Product  Name</th>
                   <th>Category</th>
                   <th>Sub Category</th>
                    <th>Code</th>
@@ -81,7 +81,7 @@
               </thead>
               <tbody>
                 <?php 
-              
+              $this->db->where("sub_branchid",$this->session->userdata("id"));
                      $this->db->where("customer_id",$username);
                  $stckdt= $this->db->get("favourite_list");
                  if($stckdt->num_rows()>0){
@@ -89,10 +89,12 @@
                   foreach($stckdt->result() as $data):
                 //echo $data->product_code;
                 $this->db->where("subbranch_id",$this->session->userdata("id"));
-                   $this->db->where_in("p_code",$data->product_code);
+                   $this->db->where("p_code",$data->product_code);
                  $dt= $this->db->get("subbranch_wallet");
                 
-              
+              $this->db->where("branch_id",$this->session->userdata("district"));
+              $this->db->where("p_code",$data->product_code);
+             $branchPd= $this->db->get("branch_wallet")->row();
                 
                  if($dt->num_rows()>0){
                 
@@ -104,7 +106,7 @@
              }
                  $total=$receive;
                  
-                 if((($receive-$saleq)<2)||($dt->num_rows()>0)){
+                 if((($receive-$saleq)<1)||($dt->num_rows()>0)){
                  if($dt->num_rows()>0){
                   $val=$dt->row();
                   $this->db->where("id",$val->p_code);
@@ -120,7 +122,7 @@
                  $totalquantity1= $receive;
              
                     
-                    if((($receive-$saleq)<2)){
+                    if((($receive-$saleq)<1)){
                         //  print_r($stckdt1->row());
                             $remainingquantity=$totalquantity- $total;
                         $stckdt2=$stckdt1->row();
@@ -130,7 +132,7 @@
                   <td><?php echo $i;?></td>
                  
                   <td><?php echo $stckdt2->company;?></td>
-                  <td><?php echo $stckdt2->name;?></td>
+                  <td  width="200" ><?php echo $stckdt2->name;?></td>
                  <?php  if($stckdt2->sub_category==0) { ?>
                   <td>Not Selected</td>
                   <td>Not Selected</td>
@@ -143,21 +145,21 @@
                        $cate=$this->db->get('category')->row();
                       if($cate){$cate1=$cate->name;} ?>
                    
-                  <td><?php echo $cate1;?></td>
-                     <td><?php echo $subcate1;?></td><?php } ?>
- <td><?php echo $stckdt2->hsn;?></td>
-                  <td><?php echo $stckdt2->size;?></td>
+                        <td><?php echo $cate1;?></td>
+                        <td><?php echo $subcate1;?></td><?php } ?>
+                        <td><?php echo $stckdt2->hsn;?></td>
+                        <td><?php echo $stckdt2->size;?></td>
                 
-                  <td> <?php  if($stckdt2->file1>0){?> <img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $stckdt2->file1; ?>"
+                        <td> <?php  if($stckdt2->file1>0){?> <img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $stckdt2->file1; ?>"
                                                 style="height:50px;width:100px;"><?php } else{ ?><img src="<?php echo $this->config->item('asset_url'). '/productimg/' . $stckdt2->file2; ?>"
                                                 style="height:50px;width:100px;"> <?php } ?>
                       </td> 
                       
                       <td>
-                          <?php echo $stckdt2->selling_price;?>
+                          <?php echo $branchPd->selling_price;?>
                           
                       </td></tr>
-                <?php  }} }$i++;
+                <?php  $i++; }} };
                 endforeach;}
                    ?>
               </tbody>

@@ -1,4 +1,3 @@
-
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
@@ -97,18 +96,7 @@
                                       $this->db->where('status',1);
                                       $dt= $this->db->get("customers");
                                   }
-                                //   elseif($this->session->userdata("login_type")==4)
-                                //   {
-                                //       $this->db->where('sub_branchid',$this->session->userdata("id"));
-                                //       $dt= $this->db->get("customers");
-                                    //   echo $this->session->userdata("id");
-                                    //   exit();
-                                //   }
-                                  
-                                // $this->db->where('district',$this->session->userdata('id'));
-                                //   $this->db->where('status',1); 
-                                // $dt= $this->db->get("customers");
-                                // print_r($dt);exit();
+                               
                                 if($dt->num_rows()>0){
                                    $i=1;
                                   foreach($dt->result() as $row) { ?>
@@ -158,6 +146,7 @@
                                       //alert(v);
                                       $("#active<?php echo $i;?>").click(function(){
                                            var username = $("#idd<?php echo $i;?>").val();
+                                           
                                            $.post("<?php echo site_url();?>subscriberController/active_inactive", { username : username }, function(data){
                                                    $("#active<?php echo $i;?>").hide();
                                                     $("#inactive<?php echo $i;?>").show();

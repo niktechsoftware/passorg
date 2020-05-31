@@ -69,7 +69,7 @@
                 <tr style="background-color:#1ba593; color:white;">
                   <th>S.No.</th>
                   <th>Subscriber Name</th>
-                  <th>Sub Branch Name</th>
+                 
                   <th>Mobile Number</th>
                   <th>Address</th>
                  <th>view Demand List</th>
@@ -85,22 +85,22 @@
                          $this->db->where('sub_branchid',$subid);
                          $this->db->where('district',$sub1);
                          $custdetail=$this->db->get('customers');
-                        //  print_r($subid);
-                         // print_r($sub1);
+                    
                          if($custdetail->num_rows()>0){
 
                           $i=1;
-
+ $i=1;
                        foreach($custdetail->result() as $custdetail1):
                           //   print_r($custdetail1);
                             // exit();
                       $this->db->distinct(); 
                       $this->db->select('customer_id');
                       $this->db->select('product_code');
+                      $this->db->where("sub_branchid",$this->session->userdata("id"));
                       $this->db->where('customer_id',$custdetail1->id);
                       $stckdt=$this->db->get("favourite_list");
                      if($stckdt->num_rows()>0){
-                    $i=1;
+                   
                  $gh=0; foreach($stckdt->result() as $data):
                 //echo $data->product_code;
                 
@@ -120,13 +120,19 @@
              }
                  $total=$receive;
                  
-                 if((($receive-$saleq)<2)){
+                 if((($receive-$saleq)<1)){
                   $gh++;;
                  } 
                  
                  endforeach; } 
                  
-                if($gh>0){  ?>
+                if($gh>0){ 
+                $this->db->where("sub_branchid",$this->session->userdata("id"));
+                $this->db->where("customer_id",$custdetail1->id);
+                 $stckdt1= $this->db->get("favourite_list");
+                 if($stckdt1->num_rows()>0){
+                     
+                ?>
                 <tr class="text-uppercase">
                   <td><?php echo $i;?></td>
                   <?php //if($row >0){ }else{}
@@ -137,12 +143,12 @@
                      
                      <span style="color:#01a9ac;"><?php echo $custdetail1->name. " [ ". $custdetail1->username . " ] ";?></span> 
                           </td>
-                  <td><?php echo $custdetail1->name;?></td>
+                 
                   <td><?php  echo $custdetail1->mobile;?></td>
                   <td><?php echo $custdetail1->address;?></td> 
                     <td><a href="<?php echo base_url();?>shopController/showsbfavlist/<?php echo $custdetail1->id;?>" class="btn btn-info">View Demand List</a></td> 
                 </tr>
-                <?php  $i++;}
+                <?php   } $i++;}
                 endforeach;
                       }
                       

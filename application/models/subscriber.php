@@ -7,6 +7,53 @@
 		$dt= $this->db->get("sub_branch");
 		return $dt;
 	}
+	
+	function getmobilefromuser($user){
+	    $this->db->where("username",$user);
+	    $bvv = $this->db->get("branch");
+	    if($bvv->num_rows()>0){
+	        return $bvv->row()->mobile;
+	    }else{
+	         $this->db->where("username",$user);
+	    $svv = $this->db->get("sub_branch");
+	     if($svv->num_rows()>0){
+	        return $svv->row()->mob_no;
+	    }else{
+	       $this->db->where("admin_username",$user);
+	    $svv = $this->db->get("general_settings");
+	     if($svv->num_rows()>0){
+	        return $svv->row()->mobile_number;
+	    } else{
+	         return "8382829593";
+	    }
+	    }
+	    }
+	}
+	function getlogintypefromuser($user){
+	    $this->db->where("username",$user);
+	    $bvv = $this->db->get("branch");
+	    if($bvv->num_rows()>0){
+	        $table ="branch";
+	        return $table;
+	    }else{
+	         $this->db->where("username",$user);
+	    $svv = $this->db->get("sub_branch");
+	     if($svv->num_rows()>0){
+	         $table ="sub_branch";
+	        return $table;
+	    }else{
+	       $this->db->where("admin_username",$user);
+	    $svv = $this->db->get("general_settings");
+	     if($svv->num_rows()>0){
+	            $table ="muskan";
+	      return $table;
+	    } else{
+	         return false;
+	    }
+	    }
+	    }
+	}
+	
 	function getActiveListAd(){
 	    $this->db->where('sub_branchid',$this->session->userdata("id"));
 		$this->db->where('status',1);

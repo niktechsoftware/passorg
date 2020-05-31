@@ -89,8 +89,14 @@
                 </div>
                <div class="col-sm-5" id="subb">
                  
-                    <input type="submit" class="btn btn-success" name ="Get Demand"  />
+                   
                   </div>
+                </div>
+                <div class="col-sm-12 form-group">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-3"><input type="submit" class="btn btn-success" value ="Get Demand"  /></div>
+                     
                 </div>
               
               

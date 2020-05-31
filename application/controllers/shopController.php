@@ -7,6 +7,7 @@ class shopController extends CI_Controller{
 			$this->load->model('shop');
 			$this->load->model('branch');
 			$this->load->model('subscriber');
+			$this->load->model("smsmodel");
 	}
 	
 	function is_login(){
@@ -47,68 +48,105 @@ class shopController extends CI_Controller{
 	      
 	}
 	
-		function sborder(){
-		   $ub =  $this->uri->segment(3);
-		   if($ub=='a'){
-		        $subbid =array();
-	      $getallb = $this->db->get("branch");
-	     $f=0; foreach($getallb->result() as $bid):
-	          $subbidb[$f]=$bid->id;
-	        $f++;  
-	        endforeach;
-	         $this->db->where_in("district",$subbidb);
-	     $bres =  $this->db->get("sub_branch");
-	        foreach($bres->result() as $bd):
-	            
-	       
-	     $f++; endforeach;
-	     $data['shopid']=$subbid;
-	      $msg="By Branch";
-	        }else{ 
-	            if($ub=='b')
-	            {
-		        $subbid =array();
-	      $this->db->where("district",$this->session->userdata('id'));
-	     $bres =  $this->db->get("sub_branch");
-	     $f=0; foreach($bres->result() as $bd):
-	       $this->db->where("id",$bd->id);
-	          $subde =   $this->db->get("sub_branch")->row();
-	          $this->db->where("reciver_usernm",$subde->username);
-	          $this->db->where("status",0);
-	          $this->db->where("sender_usernm",$this->session->userdata("username"));
-	        $checkold =   $this->db->get("product_trans_detail");
-	        if($checkold->num_rows()>0){
-	            
-	        }else{
-	          $subbid[$f]=$bd->id;
-	        }
-	         
-	     $f++; endforeach;
-	      $data['branchid'] = $this->session->userdata('id');
-	     $data['shopid']=$subbid;
-	      $msg="of Shop";
-	     
-		   }else{
-		      
-		  $data['shopid']=  $this->session->userdata("id");
-		       
-		   $msg="By Subscriber";
-		   }}
-		   $data['msg']=$msg;
-		   $data['ub']=$ub;
-		  
-		  $data['shopname']=  $this->session->userdata("your_school_name");
-		$data['pageTitle'] = 'Over All Demand '.$msg;
-		$data['smallTitle'] = 'All Demand '.$msg;
-		$data['mainPage'] = 'All Demand '.$msg;
-		$data['subPage'] = 'All Demand '.$msg;
-		$data['title'] = 'All Demand '.$msg;
-		$data['headerCss'] = 'headerCss/stockCss';
-		$data['footerJs'] = 'footerJs/stockJs';
-		$data['mainContent'] = 'Shop/sborder';
-		$this->load->view("includes/mainContent", $data);
-	
-	}
+	function sborder(){
+    	$ub = $this->uri->segment(3);
+    	$blockSubBranch=array();
+    	$branchID = array();
+    	$subBranchID = array();
+    	if($ub=='a'){
+    	  
+    		$getallb = $this->db->get("branch");
+    		
+    		foreach($getallb->result() as $bid):
+    		    array_push($branchID, $bid->id);
+    		endforeach;
+    		
+    		$data['branchid'] = $branchID;
+    		$this->db->where_in("district",$branchID);
+    		$subBranchData = $this->db->get("sub_branch");
+    		        
+    		foreach($subBranchData->result() as $subBranchRow):
+    			
+    	    	$this->db->where("reciver_usernm",$subBranchRow->username);
+    	    	$this->db->where("status",0);
+    	    	$this->db->where("invoice_number !=","");
+    	    	$this->db->where("sender_usernm", $this->session->userdata("username"));
+    		    $checkold = $this->db->get("product_trans_detail");
+    		        
+    	        if($checkold->num_rows() < 1){
+    				 array_push($subBranchID, $subBranchRow->id);
+    	        }else{
+    	             array_push($blockSubBranch, $subBranchRow->id);
+    	        }	 
+    		endforeach;
+    		$data['blockSubBranch']=$blockSubBranch;
+    		$data['subBranchID']=$subBranchID;
+    		$msg="By Branch";
+    	}
+    	else { 
+    		if($ub=='b'){
+    			$subbid =array();
+    			if($this->session->userdata("login_type")==1){
+    				$getallb = $this->db->get("branch");
+    		
+            		foreach($getallb->result() as $bid):
+            		    array_push($branchID, $bid->id);
+            		endforeach;
+            		
+            		$data['branchid'] = $branchID;
+            		$this->db->where_in("district",$branchID);
+            		$subBranchData = $this->db->get("sub_branch");
+    			    }
+    			
+    			else {
+    				$data['branchid'] = $this->session->userdata('id');
+    				$this->db->where("district",$this->session->userdata('id'));
+    				$subBranchData =  $this->db->get("sub_branch"); 
+    			}
+    		      
+    			$f=0; 
+    			foreach($subBranchData->result() as $subBranchRow):
+    			
+    	    	$this->db->where("reciver_usernm",$subBranchRow->username);
+    	    	$this->db->where("status",0);
+    	    	$this->db->where("invoice_number !=","");
+    	    	$this->db->where("sender_usernm", $this->session->userdata("username"));
+    		    $checkold = $this->db->get("product_trans_detail");
+    		    
+        			  if($checkold->num_rows() < 1){
+        				 array_push($subBranchID, $subBranchRow->id);
+        	        }else{
+        	             array_push($blockSubBranch, $subBranchRow->id);
+        	        }	 
+        		endforeach;
+        		$data['blockSubBranch']=$blockSubBranch;
+        		$data['subBranchID']=$subBranchID;
+        	
+    			$msg="of Shop";
+    		     
+    		}
+    		else {
+    			$subid=array();
+    			$subid[0]=$this->session->userdata("id");
+    			$data['subBranchID']= $subid;
+    			$msg="By Subscriber";
+    		}
+    	}
+    
+    	$data['msg']=$msg;
+    	$data['ub']=$ub;
+    	$data['shopname']=  $this->session->userdata("your_school_name");
+    	$data['pageTitle'] = 'Over All Demand '.$msg;
+    	$data['smallTitle'] = 'All Demand '.$msg;
+    	$data['mainPage'] = 'All Demand '.$msg;
+    	$data['subPage'] = 'All Demand '.$msg;
+    	$data['title'] = 'All Demand '.$msg;
+    	$data['headerCss'] = 'headerCss/stockCss';
+    	$data['footerJs'] = 'footerJs/stockJs';
+    	$data['mainContent'] = 'Shop/sborder';
+    	$this->load->view("includes/mainContent", $data);
+    
+    }
 	
 	function avaofb(){
 	     $subbid =array();
@@ -176,72 +214,125 @@ class shopController extends CI_Controller{
 	}
 	
 	function availableOrderList(){
-	   $vo =  $this->uri->segment(3);
-	  $type =  $this->uri->segment(4);
-	 $subid=$this->session->userdata('id'); 
-	  $data1['type']=$type;
-	  if($type=='a'){
+	    $uriDemandOrAvialable =  $this->uri->segment(3);
+	    $type =  $this->uri->segment(4);
+	    $subid=$this->session->userdata('id'); 
+	    
+	    $data['type']=$type;
+	    $blockSubBranch=array();
+    	$branchID = array();
+    	$subBranchID = array();
+    	
+	    if($type=='a'){
+	        if($uriDemandOrAvialable==1){
+	            $msg="Available Demand By Branch";
+	        }else{
+	            $msg="Demand By Branch";
+	        }
+	        $getallb = $this->db->get("branch");
+    		if($getallb->num_rows()>0){
+    		foreach($getallb->result() as $bid):
+    		    array_push($branchID, $bid->id);
+    		endforeach;
+    		
+    		$data['branchid'] = $branchID;
+    		$this->db->where_in("district",$branchID);
+    		$subBranchData = $this->db->get("sub_branch");
+    		        
+    		foreach($subBranchData->result() as $subBranchRow):
+    			
+    	    	$this->db->where("reciver_usernm",$subBranchRow->username);
+    	    	$this->db->where("status",0);
+    	    	$this->db->where("invoice_number !=","");
+    	    	$this->db->where("sender_usernm", $this->session->userdata("username"));
+    		    $checkold = $this->db->get("product_trans_detail");
+    		        
+    	        if($checkold->num_rows() < 1){
+    				 array_push($subBranchID, $subBranchRow->id);
+    	        }else{
+    	             array_push($blockSubBranch, $subBranchRow->id);
+    	        }	 
+    		endforeach;
+    		$data['blockSubBranch']=$blockSubBranch;
+    		$data['subBranchID']=$subBranchID;
 	     
-	    if($vo==1){
-	        $msg="Available Demand By Branch";
-	    }else{
-	        $msg="Demand By Branch";
-	    }
-	    $branch = $this->db->get("branch");
-	    $bad=array();
-	   $i=0; 
-	   if($branch->num_rows()>0){
-	   foreach($branch->result() as $br):
-	        $bad[$i] = $br->id;
-	        endforeach;
-	   $data1['bid']=$bad;
-	    $data1['pageTitle'] =  $msg.'';
-		$data1['smallTitle'] = $msg;
-		$data1['mainPage'] = $msg.'';
-		$data1['subPage'] = $msg;
-		$data1['title'] = $msg;
-		$data1['headerCss'] = 'headerCss/sublistCss';
-		$data1['footerJs'] = 'footerJs/sublistJs';
-		$data1['mainContent'] = 'Shop/avilableOrderbyspList';
-		$this->load->view("includes/mainContent", $data1);
+	    $data['pageTitle'] =  $msg.'';
+		$data['smallTitle'] = $msg;
+		$data['mainPage'] = $msg.'';
+		$data['subPage'] = $msg;
+		$data['title'] = $msg;
+		$data['headerCss'] = 'headerCss/sublistCss';
+		$data['footerJs'] = 'footerJs/sublistJs';
+		$data['mainContent'] = 'Shop/avilableOrderbyspList';
+		$this->load->view("includes/mainContent", $data);
 	   }else{
 	       echo "no Branch";
 	   }
 	      
-	  }else{ if($type=='b'){
-	     
-	    $this->session->userdata("id");
-	    if($vo==1){
-	        $msg="Available Demand By Shop";
-	    }else{
-	        $msg="Demand By Shop";
-	    }
-	    
-	   $data1['bid']=$this->session->userdata('id');
-	    $data1['pageTitle'] =  $msg.'';
-		$data1['smallTitle'] = $msg;
-		$data1['mainPage'] = $msg.'';
-		$data1['subPage'] = $msg;
-		$data1['title'] = $msg;
-		$data1['headerCss'] = 'headerCss/sublistCss';
-		$data1['footerJs'] = 'footerJs/sublistJs';
-		$data1['mainContent'] = 'Shop/avilableOrderbyspList';
-		$this->load->view("includes/mainContent", $data1);
+	  }else{ 
+	      if($type=='b'){
+	          if($uriDemandOrAvialable==1){
+        	        $msg="Available Demand By Shop";
+        	    }else{
+        	        $msg="Demand By Shop";
+        	    }
+        	   $subbid =array();
+    			if($this->session->userdata("login_type")==1){
+    				$getallb = $this->db->get("branch");
+            		foreach($getallb->result() as $bid):
+            		    array_push($branchID, $bid->id);
+            		endforeach;
+            		
+            		$data['branchid'] = $branchID;
+            		$this->db->where_in("district",$branchID);
+            		$subBranchData = $this->db->get("sub_branch");
+    			    }
+    			
+    			else {
+    				$data['branchid'] = $this->session->userdata('id');
+    				$this->db->where("district",$this->session->userdata('id'));
+    				$subBranchData =  $this->db->get("sub_branch"); 
+    			}
+    		      
+    			$f=0; 
+    			foreach($subBranchData->result() as $subBranchRow):
+    			
+    	    	$this->db->where("reciver_usernm",$subBranchRow->username);
+    	    	$this->db->where("status",0);
+    	    	$this->db->where("invoice_number !=","");
+    	    	$this->db->where("sender_usernm", $this->session->userdata("username"));
+    		    $checkold = $this->db->get("product_trans_detail");
+    		    
+        			  if($checkold->num_rows() < 1){
+        				 array_push($subBranchID, $subBranchRow->id);
+        	        }else{
+        	             array_push($blockSubBranch, $subBranchRow->id);
+        	        }	 
+        		endforeach;
+        		$data['blockSubBranch']=$blockSubBranch;
+        		$data['subBranchID']=$subBranchID;
+	  
+	  
+	    $data['pageTitle'] =  $msg.'';
+		$data['smallTitle'] = $msg;
+		$data['mainPage'] = $msg.'';
+		$data['subPage'] = $msg;
+		$data['title'] = $msg;
+		$data['headerCss'] = 'headerCss/sublistCss';
+		$data['footerJs'] = 'footerJs/sublistJs';
+		$data['mainContent'] = 'Shop/avilableOrderbyspList';
+		$this->load->view("includes/mainContent", $data);
 	     
 	  }
 	  else{
-	      $subid=$this->session->userdata('id'); 
-	      
-	      if($vo!=3){
 	    
+	      $subid=$this->session->userdata('id'); 
+	      if($uriDemandOrAvialable!=3){
 	     $avaible = array();
                            $product = array();
                             $notavai = array();
                             $this->db->where('status',0);
-                          
                                 $this->db->where('sub_branchid',$subid);
-                          
-                       
                         $dt= $this->db->get("order_serial");
                         // print_r($dt);
                         if($dt->num_rows()>0){
@@ -255,14 +346,14 @@ class shopController extends CI_Controller{
                                    $aqu =0;
                                             
                                             
-                                                         $this->db->select("rec_quantity");
-                                                        $this->db->select("sale_quantity");
+                                                         $this->db->select_sum("rec_quantity");
+                                                        $this->db->select_sum("sale_quantity");
                                                          $this->db->where("subbranch_id",$subid);
                                                   
                                            $this->db->where("p_code",$gt->p_code);
                                            $pdetails =  $this->db->get("subbranch_wallet");
                                            if($pdetails->num_rows()>0){
-                                               $aqu = $pdetails->row()->rec_quantity-$pdetails->row()->sale_quantity;
+                                               $aqu = ($pdetails->row()->rec_quantity-$pdetails->row()->sale_quantity)-1;
                                            }
                                            else{
                                                $aqu=0;
@@ -288,11 +379,11 @@ class shopController extends CI_Controller{
                         }else{
                             
                         }
-                     if($vo ==1)  {
+                     if($uriDemandOrAvialable ==1)  {
                          $msg = "Available Order List";
                           $data1['avaible']  =$avaible; 
        
-                     }else{  if($vo ==2){
+                     }else{  if($uriDemandOrAvialable ==2){
                           $msg = "Demand Order List By Sub";
                         
         $data1['product']  =$product; 
@@ -334,12 +425,13 @@ class shopController extends CI_Controller{
 		$data1['mainContent'] = 'Shop/avilableOrderList';
 		$this->load->view("includes/mainContent", $data1);
 	}
-	  }
+	  }  
 	      
 	  }
 	  
-	   function findlessproductb(){
+	   function findlessproductba(){
 	     $sid =   $this->input->post("sid");
+	     //echo $sid;
 	     ?>
 	       <div class="row">
 			<div class="col-md-12 space20">
@@ -378,12 +470,9 @@ class shopController extends CI_Controller{
                   <th>P.Name</th>
                   <th>P. Code</th>
                    <th>Volume</th>
-                     <th>Price</th>
-                
+                    <th>Price</th>
                   <th>Req.</th>
-                  
                  <th>Order Number</th>
-                 
                   </tr>
               </thead>
               <tbody>
@@ -393,8 +482,17 @@ class shopController extends CI_Controller{
                  $subid =  $sid;
                  $shopid=$sid;
                  $ordernum=array();
-               
-                          $this->db->where("sub_branchid",$shopid);
+                             $this->db->where("status",1);
+                          $this->db->where("district",$shopid);
+                          $gsf = $this->db->get("sub_branch")->result();
+                         $t=0; 
+                        
+                         foreach($gsf as $rt):
+                              $dth[$t]=$rt->id;
+                              //echo $rt->id;
+                            $t++;  endforeach;
+                            
+                            $this->db->where_in("sub_branchid",$dth);
                           $this->db->where("status",0);
                  $osd = $this->db->get("order_serial");
                  if($osd->num_rows()>0){
@@ -404,63 +502,226 @@ class shopController extends CI_Controller{
                         $this->db->distinct();
                         $this->db->select('p_code');
                         $this->db->where_in("order_no",$ordernum);
-                       $stckdt =  $this->db->get("order_detail");
-                       
-                 
-                
-                 
-                 if($stckdt->num_rows()>0){
-               $j=1;  foreach($stckdt->result() as $data):
-                 
-                         $this->db->where("subbranch_id",$subid);
-                          $this->db->where("p_code",$data->p_code);
-                 $dt= $this->db->get("subbranch_wallet");
-                  
-             if($dt->num_rows()>0){
-                
-                      $receive=  $dt->row()->rec_quantity;
-                $saleq = $dt->row()->sale_quantity;
-                
-             }else{
-                 $receive=0;
-                 $saleq=0;
+                        $stckdt =  $this->db->get("order_detail");
+                        if($stckdt->num_rows()>0){
+                        $j=1;  
+                            foreach($stckdt->result() as $data):
+                               
+                                $this->db->select_sum("rec_quantity");
+                                $this->db->select_sum("sale_quantity");
+                                $this->db->where_in("subbranch_id",$subid);
+                                $this->db->where("p_code",$data->p_code);
+                                $dt= $this->db->get("subbranch_wallet");
+                                     if($dt->num_rows()>0){
+                                            $receive=  $dt->row()->rec_quantity;
+                                            $saleq = $dt->row()->sale_quantity;
+                                        
+                                     }else{
+                                         $receive=0;
+                                         $saleq=0;
+                                     }
+                                      $rtty =0;
+                                     $total=$receive;
+                                     $this->db->select_sum("quantity");
+                                     $this->db->where("p_code",$data->p_code);
+                                     $this->db->where_in("order_no",$ordernum);
+                                        $totquan =  $this->db->get("order_detail")->row();
+                                     $branchqu = ($receive-$saleq)-1;
+                                     
+                                     if(($branchqu) < $totquan->quantity){
+                                         $demandqu = $totquan->quantity - $branchqu;
+                                         
+                                         	if(($this->session->userdata("login_type")==1) && ($this->input->post("type")==1)){
+                                         	     $this->db->where("id",$data->p_code);
+                                              $stp =  $this->db->get("stock_products");
+                                              if($stp->num_rows()>0){
+                                              $receiveb = $stp->row()->quantity;
+                                              $saleqb=0;
+                                             	}else{
+                                             	  $receiveb=0;
+                                             	  $saleqb=0;
+                                             	 
+                                             	} 
+                                         	    
+                                         	     $this->db->where("p_code",$data->p_code);
+                                                                $this->db->where("branch_id",$sid);
+                                                                $bqw =  $this->db->get("branch_wallet");
+                                                                if($bqw->num_rows()>0){
+                                                                $receivebranch=  $bqw->row()->rec_quantity-1;
+                                                                $saleqbranch = $bqw->row()->sale_quantity;
+                                                                }else{
+                                                                    $receivebranch=0;
+                                                                    $saleqbranch=0;
+                                                                }
+                                                               $demandqu=$demandqu- ($receivebranch-$saleqbranch);
+                                         	    
+                                         	    
+                                         	}else{
+                                             	     if(($this->session->userdata("login_type")==1) && ($this->input->post("type")==2)){
+                                                              $this->db->where("id",$data->p_code);
+                                                              $stp =  $this->db->get("stock_products");
+                                                              if($stp->num_rows()>0){
+                                                              $receiveba = $stp->row()->quantity;
+                                                              $saleqba=0;
+                                                             	}else{
+                                                             	  $receiveba=0;
+                                                             	  $saleqba=0;
+                                                             	}
+                                                              $receiveb=$receiveb+$receiveba;
+                                                             $saleqb=$saleqb + $saleqba ;	
+                                                         }else{
+                                             	    
+                                                    $this->db->where("p_code",$data->p_code);
+                                                    $this->db->where("branch_id",$sid);
+                                                    $bqw =  $this->db->get("branch_wallet");
+                                                     if($bqw->num_rows()>0){
+                                                        $receiveb=  $bqw->row()->rec_quantity;
+                                                        $saleqb = $bqw->row()->sale_quantity;
+                                                         }else{
+                                                             $receiveb=0;
+                                                             $saleqb=0;
+                                                         }
+                                                        
+                                             	}}
+                                             	if($demandqu>0){
+                                                if((($receiveb-$saleqb)-1) < $demandqu){
+                                                    $orgd = $demandqu-(($receiveb-$saleqb)-1);
+                                                    
+                                                   // echo $data->p_code;
+                                                    
+                                                  $this->db->where("id",$data->p_code);
+                                                  $stckdt1= $this->db->get("stock_products");
+                                                 $stckdt2=$stckdt1->row();
+                                                  ?>
+                                                  <tr>
+                                                    <td><?php echo $j;?></td>
+                                                     <td><a href="#"><span ><?php echo $stckdt2->company;?></span></a></td>
+                                                  <td>
+                                                 <?php 
+                                                  echo $stckdt2->name;
+                                                  ?>
+                                                 </td>
+                                                  <td><?php echo $stckdt2->hsn;?></td>
+                                                  <td><?php echo $stckdt2->size;?></td>
+                                                         <td><?php echo $stckdt2->selling_price;?></td>
+                                                  <td><a href="#"><span style="color:#01a9ac;font-size:20px;font-weight:1px;"><?php echo $orgd; ?></span></a>
+                                
+                                                  <!-- 
+                                                   <span style="color:#01a9ac;"><?php echo $row1->name. " [ ". $row1->username . " ] ";?></span> -->
+                                                   </td>
+                                                 
+                                                   <td>
+                                                  <?php   
+                                                    $this->db->where("p_code",$data->p_code);
+                                                    $this->db->where_in("order_no",$ordernum);
+                                                    $onrdername  =  $this->db->get("order_detail");
+                                                   foreach($onrdername->result() as $odname):
+                                                   
+                                                   echo $odname->order_no."<br>";
+                                                   endforeach;
+                                                   ?> </td>
+                                                   </tr>
+                                                    <?php  $j++; }}} endforeach; }  
+                                                   }?>
+                                              </tbody>
+                                            </table>
+                                              <script>
+                                	TableExport.init();
+                                </script>
+                                          </div>
+                                	    <?php
+                                	     
+                                	    
              }
-             
-           
-                  $rtty =0;
-                 $total=$receive;
-                 $this->db->select_sum("quantity");
-                 $this->db->where("p_code",$data->p_code);
-                 $this->db->where_in("order_no",$ordernum);
-                    $totquan =  $this->db->get("order_detail")->row();
-                 $branchqu = $receive-$saleq;
-                 
-                 if(($branchqu) < $totquan->quantity){
-                     $demandqu = $totquan->quantity - $branchqu;
-                     
-                     $this->db->where("p_code",$data->p_code);
-                     $this->db->where("branch_id",$this->session->userdata("id"));
-                    $bqw =  $this->db->get("branch_wallet");
-                     if($bqw->num_rows()>0){
-                
-                      $receiveb=  $bqw->row()->rec_quantity;
-                $saleqb = $bqw->row()->sale_quantity;
-                
-             }else{
-                 $receiveb=0;
-                 $saleqb=0;
-             }
-                if(($receiveb-$saleqb) < $demandqu){
-                    
-                    $orgd = $demandqu-($receiveb-$saleqb);
-                
-                  $this->db->where("id",$data->p_code);
-                  $stckdt1= $this->db->get("stock_products");
-                 $stckdt2=$stckdt1->row();
-                 
-                  ?>
-                  <tr >
-                      
+                                	
+	  
+	   function findlessproductb(){
+	     $sid =   $this->input->post("sid");
+	     $type = $this->input->post("type");
+	       $shopid =array();
+	     if($type==1){
+	        	$this->db->where_in("district",$sid);
+    		$subBranchData = $this->db->get("sub_branch");
+    		if($subBranchData->num_rows()>0) {    
+    		    foreach($subBranchData->result() as $subBranchRow):
+    				 array_push($shopid, $subBranchRow->id);
+    				 endforeach;
+    				 	 $usernamefinal="sb";
+    		}
+	     }else{
+	        	 $usernamefinal="b";
+               $shopid[0]=$sid;
+	     }
+	      
+               $this->load->model("stock");
+               $finalData = $this->stock->getDemandAvailable($shopid,$this->input->post("type"));
+               
+           /*   echo "<pre>";
+              print_r($finalData);
+              echo "</pre>";*/
+	     ?>
+	       <div class="row">
+			<div class="col-md-12 space20">
+				<div class="btn-group pull-right">
+					<button data-toggle="dropdown" class="btn btn-green dropdown-toggle">
+						Export <i class="fa fa-angle-down"></i>
+					</button>
+					<ul class="dropdown-menu dropdown-light pull-right">
+						<li>
+							<a href="#" class="export-excel" data-table="#sample-table-2" >
+								Export to Excel
+							</a>
+						</li>
+
+						<li>
+							<a href="#" class="export-csv" data-table="#sample-table-2" >
+								Save as CSV
+							</a>
+						</li>
+						<li>
+							<a href="#" class="export-doc" data-table="#sample-table-2" data-ignoreColumn ="3,4">
+								Export to Word
+							</a>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+		</div>
+	      <div class=" table-responsive">
+            <table id="sample-table-2" class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Com. Name</th>
+                  <th>P.Name</th>
+                  <th>P. Code</th>
+                   <th>Volume</th>
+                    <th>Price</th>
+                  <th>Req.</th>
+                 <th>Order Number</th>
+                  </tr>
+              </thead>
+              <tbody><?php
+              if(!empty($finalData)){
+                $j=1;
+                foreach($finalData as $key=>$val):
+                   if($finalData[$key]>0){
+                    $this->db->where("id",$key);
+                    $stckdt1= $this->db->get("stock_products");
+                    $stckdt2=$stckdt1->row(); 
+                     if($usernamefinal=="sb"){
+                                                          $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$key);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
+                                                      }else{
+                                                          
+                                                            $this->db->where("branch_id",$this->session->userdata("id"));
+                                                          $this->db->where("p_code",$key);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
+                                                      }
+                                                      ?>
+                  <tr>
                     <td><?php echo $j;?></td>
                      <td><a href="#"><span ><?php echo $stckdt2->company;?></span></a></td>
                   <td>
@@ -470,11 +731,8 @@ class shopController extends CI_Controller{
                  </td>
                   <td><?php echo $stckdt2->hsn;?></td>
                   <td><?php echo $stckdt2->size;?></td>
-                         <td><?php echo $stckdt2->selling_price;?></td>
-              
-                  
-                   
-                  <td><a href="#"><span style="color:#01a9ac;font-size:20px;font-weight:1px;"><?php echo $orgd; ?></span></a>
+                         <td><?php echo $pprice->selling_price;?></td>
+                  <td><a href="#"><span style="color:#01a9ac;font-size:20px;font-weight:1px;"><?php echo $finalData[$key]; ?></span></a>
 
                   <!-- 
                    <span style="color:#01a9ac;"><?php echo $row1->name. " [ ". $row1->username . " ] ";?></span> -->
@@ -482,26 +740,24 @@ class shopController extends CI_Controller{
                  
                    <td>
                   <?php   
-                    $this->db->where("p_code",$data->p_code);
-                    $this->db->where_in("order_no",$ordernum);
-                    $onrdername  =  $this->db->get("order_detail");
-                   foreach($onrdername->result() as $odname):
+                   $distinctsubranch =	$this->db->query("select distinct(sub_branchid)  from order_serial join order_detail on order_detail.order_no=order_serial.order_no where order_detail.p_code='$key' and order_serial.status=0");
+                	
                    
-                   echo $odname->order_no."<br>";
+                   foreach($distinctsubranch->result() as $shop):
+                       $this->db->where("id",$shop->sub_branchid);
+                      $sbdata = $this->db->get("sub_branch")->row();
+                       $prequiredQuantity = $this->db->query("select sum(order_detail.quantity) AS quantity from order_detail join order_serial on order_detail.order_no=order_serial.order_no where order_serial.sub_branchid='$shop->sub_branchid' and order_serial.status=0 and p_code='$key'")->row();
+                	      
+                   echo $sbdata->username."[".$prequiredQuantity->quantity."]<br>" ;
                    endforeach;
                    ?> </td>
-                  
-                  
                    </tr>
-                    <?php  $j++; }} endforeach; }  
-                   
+                    <?php  $j++; } endforeach;   
                    }?>
               </tbody>
-              
             </table>
               <script>
 	TableExport.init();
-	
 </script>
           </div>
 	    <?php
@@ -525,7 +781,7 @@ class shopController extends CI_Controller{
                                             $this->db->where("subbranch_id",$subid);
                                            $pdetails =  $this->db->get("subbranch_wallet");
                                            if($pdetails->num_rows()>0){
-                                               $aqu = $pdetails->row()->rec_quantity-$pdetails->row()->sale_quantity;
+                                               $aqu = ($pdetails->row()->rec_quantity-$pdetails->row()->sale_quantity)-1;
                                                //echo $pdetails->row()->rec_quantity;
                                            }
                                            else{
@@ -644,7 +900,11 @@ class shopController extends CI_Controller{
                 $this->db->where("id",$checkv1->row()->cust_id);
                 $getcd =  $this->db->get("customers")->row();
                 $msg = "Dear ".$getcd->name." your order no ".$oid." has been accepted by the shop and we will confirmed you when your order will be shiped successfully.Thanks From PASS Team";
-                sms($getcd->mobile,$msg);
+                $getv=sms($getcd->mobile,$msg);
+                
+                 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
               echo '<button class="btn btn-success" >Confirmed<button>';
         }
 	   }else{
@@ -919,8 +1179,11 @@ function matchStatus()
       	$msg = "Dear Sir Thanks For Shopping With  Us. Your Shopping Amount is Rs - ".$osd->total_amount." /- Thank You.";
       	$mobileno = $data->mobile;
       	
-      	sms($mobileno,$msg);
-      	
+      	$getv = sms($mobileno,$msg);
+      	$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
+                
       	$totamt= $osd->total_amount;
       	$prcntamt= 2;
       	$prcnt=$totamt * $prcntamt;
@@ -943,8 +1206,10 @@ function matchStatus()
       	$msg = "Dear Sir Thanks For Shopping With  Us. Your CashBack Amount is Rs - ".$totprcnt." /- Thank .";
       	$mobileno =$data->mobile;
       	
-      	sms($mobileno,$msg);
-      	
+      	$getv=sms($mobileno,$msg);
+      	$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
       	//$id=$dt->parentID;
       	////$this->db->where("id",$id);
       	//  $parentdt=$this->db->get("customers")->row();
@@ -1038,8 +1303,10 @@ function matchStatus()
         $msg = "Dear ". $dt->name ." Thanks for Shopping With passystem.in . Your CashBack Amount is Rs - ".$totropee." /- Thank You .";
         $mobileno = $dt->mobile;
    
-       sms($mobileno,$msg);
-       
+       $getv=sms($mobileno,$msg);
+       $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
       $i=1;
      
       $this->shop->commision($i,$cid,$amnt,$orderno);
@@ -1111,34 +1378,60 @@ public function shopshowdemandlist()
       }
    
       public function transferproductlist(){
-	    $uri =$this->uri->segment(3);
-	    if($uri==3){
-	     $data['invoice']=$uri;
-      	$data['pageTitle'] = 'Total transfer Product List ';
-		$data['smallTitle'] = 'Total transfer Product List';
-		$data['mainPage'] = 'Total transfer Product List';
-		$data['subPage'] = 'Total transfer Product List';
-		$data['title'] = 'Total transfer Product List';
+          $uriv = $this->uri->segment(3);
+          if($uriv==2){
+              $matchv = "sender_usernm";
+          }else{
+               $matchv = "reciver_usernm";
+          }
+          if($this->session->userdata("login_type") == 1){
+            $reciever= "muskan";
+          }else{
+              $reciever= $this->session->userdata("username");
+          }
+          $brwproduct=0;
+          if((strlen($this->input->post("sdate"))>0) || (strlen($this->input->post("edate"))>0) || (strlen($this->input->post("invoice"))>0)){
+               
+                  $this->db->where($matchv,$reciever);
+                  if((strlen($this->input->post("sdate"))>0) && (strlen($this->input->post("edate"))>0)){
+                      $this->db->where("DATE(date) >=",$this->input->post("sdate"));
+                       $this->db->where("DATE(date) <=",$this->input->post("edate"));
+                       
+                      
+                  }else{
+                      if(strlen($this->input->post("edate"))>0){
+                          $this->db->where("DATE(date)",$this->input->post("edate"));
+                      }else{
+                          if(strlen($this->input->post("invoice"))>0){
+                               $this->db->where("invoice_number",$this->input->post("invoice"));
+                          }
+                      }
+                  }
+                  if($this->input->post("selectType")==1){
+                      $this->db->where("status",1);
+                  }else{
+                      if($this->input->post("selectType")==0){
+                          $this->db->where("status",0);
+                      }
+                  }
+                  $brwproduct=$this->db->get('product_trans_detail');
+          }else{
+              
+                  $this->db->where($matchv,$reciever);
+                  $brwproduct=$this->db->get('product_trans_detail');
+          }
+          $data['match']=$matchv;
+        $data['brwproduct']=$brwproduct;
+      	$data['pageTitle'] = 'Product Transfer';
+		$data['smallTitle'] = 'Receive Product List';
+		$data['mainPage'] = 'Product List';
+		$data['subPage'] = ' Product List';
+		$data['title'] = 'Receive Product List';
 		$data['headerCss'] = 'headerCss/stockCss';
 		$data['footerJs'] = 'footerJs/stockJs';
 		$data['mainContent'] = 'Shop/transferproductlist';
 		$this->load->view("includes/mainContent", $data);
-	    }
-	    else{
-	         $data['invoice']=$uri;
-      	$data['pageTitle'] = 'Today transfer Product List ';
-		$data['smallTitle'] = 'Today transfer Product List';
-		$data['mainPage'] = 'Today transfer Product List';
-		$data['subPage'] = 'Today transfer Product List';
-		$data['title'] = 'Today transfer Product List';
-		$data['headerCss'] = 'headerCss/stockCss';
-		$data['footerJs'] = 'footerJs/stockJs';
-		$data['mainContent'] = 'Shop/transferproductlist';
-		$this->load->view("includes/mainContent", $data);
-	    }
-	        
-	    
-
+	   
       }
         public function recieveproductlist(){
 	   $data['invoice']=$this->uri->segment(3);
@@ -1234,8 +1527,10 @@ public function shopshowdemandlist()
         $msg = "Dear ".$dt->username." Thanks For Shopping With passystem.in . Your CashBack Amount  Rs  ".$totropee." /- is Under Process. Thank You .";
          $mobileno =	$dt->mobile;
          
-         sms($mobileno,$msg);
-       
+        $getv= sms($mobileno,$msg);
+       $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
     //   $i=1;
     //   $this->load->model("registration1");
     //   $this->registration1->commision($i,$cid,$amnt);
@@ -1447,15 +1742,19 @@ public function shopshowdemandlist()
           $sende_Detail =$sender;
 
           //  $msg = " Dear " . $delivery->name. " Please take the order of  . " . $cust->name. " [ ". $cust->username." ] " . " Please Check Your Dashboard For Further Deatil, Please visit passystem.in .Thank You .";
-              $msg = " Dear " . $delivery->name. " Please collect order number  ".$ordernu." from  " .$sub_branch->bname. " [ " .$sub_branch->address." ]   And deliver to " . $cust->name. " [ ". $cust->username." ]  " . " Please check your dashboard for any further deatil, And visit https://www.passystem.in/passoft/login";
+              $msg1 = " Dear " . $delivery->name. " Please collect order number  ".$ordernu." from  " .$sub_branch->bname. " [ " .$sub_branch->address." ]   And deliver to " . $cust->name. " [ ". $cust->username." ]  " . " Please check your dashboard for any further deatil, And visit https://www.passystem.in/passoft/login";
               $mobileno=$delivery->mobile;            
-              sms($mobileno,$msg);
-          
+             $getv= sms($mobileno,$msg1);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg1,2,$master_id,$getv);
               $msg = " Dear  ". $cust->name. "  Your order deliver soon for any further details call to order Delivery Incharge mobile Number  ".$mobileno . "  [ ". $delivery->name." ]  and  Please Check You order status in Subscriber Dashboard https://www.passystem.in/passoft/login . PAS System";
 
               $mobile=$cust->mobile;            
-               sms($mobile,$msg);
-          
+              $getv= sms($mobile,$msg);
+                $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
        }
     
     public function assignagaindelivery()
@@ -1486,16 +1785,20 @@ public function shopshowdemandlist()
         $sender = $this->db->get("sms_setting")->row();
           $sende_Detail =$sender;
 
-           $msg = " Dear ". $delivery->name . " Please take the order of . " . $cust->name. " [ ". $cust->username." ] " ." Please Check Your Dashboard For Further Deatil, Please visit passystem.in.Thank You .";
+           $msg1 = " Dear ". $delivery->name . " Please take the order of . " . $cust->name. " [ ". $cust->username." ] " ." Please Check Your Dashboard For Further Deatil, Please visit passystem.in.Thank You .";
 
               $mobileno=$delivery->mobile;            
-          sms($mobileno,$msg);
-          
+          $getv=sms($mobileno,$msg1);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg1,2,$master_id,$getv);
           $msg = " Dear " . $cust->name. " Your  order status  have been change Please check from Own Dashboard and Call this Number".$mobileno ." to Change  Delivery Incharge for Further Detail, Please visit passystem.in ";
 
               $mobile=$cust->mobile;            
-          sms($mobile,$msg);
-      
+         $getv= sms($mobile,$msg);
+      $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
     }
     
     
@@ -1552,8 +1855,10 @@ public function shopshowdemandlist()
           //  $msg = " Dear " . $delivery->name. " Please take the order of  . " . $cust->name. " [ ". $cust->username." ] " . " Please Check Your Dashboard For Further Deatil, Please visit passystem.in .Thank You .";
               $msg = " Dear " . $delivery->name. " Please collect Invoice number  ".$ordernu." collect from  " .$pdata->sender_usernm."   And deliver to " . $pdata->reciver_usernm.  " Please check your dashboard for any further deatil, And visit https://www.passystem.in/passoft/login";
               $mobileno=$delivery->mobile;            
-              sms($mobileno,$msg);
-          
+              $getv =sms($mobileno,$msg);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
              
           
        }
@@ -1613,8 +1918,10 @@ public function shopshowdemandlist()
           //  $msg = " Dear " . $delivery->name. " Please take the order of  . " . $cust->name. " [ ". $cust->username." ] " . " Please Check Your Dashboard For Further Deatil, Please visit passystem.in .Thank You .";
               $msg = " Dear " . $delivery->name. " Please collect Invoice number  ".$ordernu." collect from  " .$pdata->sender_usernm."   And deliver to " . $pdata->reciver_usernm.  " Please check your dashboard for any further deatil, And visit https://www.passystem.in/passoft/login";
               $mobileno=$delivery->mobile;            
-              sms($mobileno,$msg);
-          
+           $getv=   sms($mobileno,$msg);
+          $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
              
           
        }
@@ -1668,8 +1975,10 @@ public function shopshowdemandlist()
         $msg = "Dear ".$dt->name." Thanks For Shopping With passystem.in . Your CashBack Amount Rs  ".$totropee." is Under Process. Thank You .";
          $mobileno =	$dt->mobile;
          
-         sms($mobileno,$msg);
-       
+        $getv= sms($mobileno,$msg);
+       $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
         redirect('shopController/sborder','refresh');        
                  
              }
@@ -1774,9 +2083,12 @@ public function invoice(){
 				//redirect(base_url().'index.php');
 					
 			}
-			$msg = "Dear ". $name . " Your Shop Registration in PASS is Successfully Registered. Your Shop Name is " .$sbname . " and Your Username is ".$susername."and Password is ".$pass.".Please Wait For Activation.Best Regards from  Pass Admin";
+			$msg = "Dear ". $name . " Your Shop Registration in PASS is Successfully Registered. Your Shop Name is " .$sbname . " and Your Username is ".$susername."and Password is ".$pass.".Please Wait For Activation.Best Regards from  Pass Admin.https://passystem.in/";
 			$mobile = $this->input->post('mob_no');
-			sms($mobile,$msg);
+			$getv =sms($mobile,$msg);
+			$max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
 			//echo $msg;
 			?>
 			<script>
@@ -1861,6 +2173,13 @@ public function invoice(){
 		}
 		function UpdateSubBranch(){
 			$subBranchid = $this->uri->segment(3);
+			
+			
+			//$value['ownername']= $this->input->post('ownername');
+			$value['bname'] = $this->input->post('bname');
+			$value['mob_no'] = $this->input->post('mob_no');
+			
+			
 			$value['ownername']= $this->input->post('ownername');
 			$value['address'] = $this->input->post('address');
 			$value['city'] = $this->input->post('city');
@@ -2261,8 +2580,10 @@ public function invoice(){
                       $msg = "Dear Sir Thanks For Shopping With  Us. Your Shopping Amount is Rs - ".$this->input->post("tt")." /- Thank You .";
                       $mobileno =	$data->mobile;
                       
-                    sms($mobileno,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
-                      
+                    $getv=sms($mobileno,$msg);
+                      $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
                      $totamt= $this->input->post("tt");
                      $prcntamt= 2;
                      $prcnt=$totamt * $prcntamt;
@@ -2287,8 +2608,10 @@ public function invoice(){
                      $msg = "Dear Sir Thanks For Shopping With  Us. Your CashBack Amount is Rs - ".$totprcnt." /- Thank You .";
                       $mobileno =$data->mobile;
                       
-                     sms($mobileno,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
-                
+                    $getv= sms($mobileno,$msg);
+                    $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
                        //$id=$dt->parentID;
                      ////$this->db->where("id",$id);
                      //  $parentdt=$this->db->get("customers")->row();

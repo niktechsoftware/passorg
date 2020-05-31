@@ -47,7 +47,7 @@
                             <div class="col-md-4">
                                  Branch Name<span class="symbol required"></div>
                                  <div class="col-md-8">
-                                 <input type="text"  class="form-control"  name="b_name" minlength="6" maxlength="30" style="text-transform:uppercase" required="required" value="<?php echo $row->b_name;?>" readonly="readonly"/>
+                                 <input type="text"  class="form-control"  name="b_name" minlength="6" maxlength="30" style="text-transform:uppercase" required="required" value="<?php echo $row->b_name;?>" <?php if($this->session->userdata("login_type")==1){?><?php }else{?>readonly="readonly" <?php }?>/>
                                 </div>
                         </div>
                         <div class="col-md-6">
@@ -55,7 +55,7 @@
                                 Owner Name<span class="symbol required">
                             </div>
                             <div class="col-md-8">
-                                <input type="text"  class="form-control"  name="name"  minlength="6" maxlength="30" style="text-transform:uppercase" required="required" value="<?php echo $row->name;?>" readonly="readonly"/>
+                                <input type="text"  class="form-control"  name="name"  minlength="6" maxlength="30" style="text-transform:uppercase" required="required" value="<?php echo $row->name;?>" <?php if($this->session->userdata("login_type")==1){?><?php }else{?> readonly="readonly" <?php }?>/>
                                 </div>
                         </div>               
                     </div>   
@@ -66,7 +66,7 @@
                             <div class="col-md-4">
                                  Mobile Number<span class="symbol required"></div>
                                  <div class="col-md-8">
-                                 <input type="text"  class="form-control" name="mob_no" pattern="^[6-9]\d{9}$"  required="required" value="<?php echo $row->mobile;?>" readonly="readonly"/>
+                                 <input type="text"  class="form-control" name="mob_no" pattern="^[6-9]\d{9}$"  required="required" value="<?php echo $row->mobile;?>" <?php if($this->session->userdata("login_type")==1){?><?php }else{?> readonly="readonly" <?php }?> />
                                 </div>
                         </div>
                         <div class="col-md-6">
@@ -74,7 +74,7 @@
                                  Aadhaar Number<span class="symbol required">
                             </div>
                             <div class="col-md-8">
-                                <input type="text" data-type="adhaar-number" class="form-control" name="aadhar" minlength="14" maxlength="14" required ="required" value="<?php echo $row->aadhar;?>" readonly="readonly"/>
+                                <input type="text" data-type="adhaar-number" class="form-control" name="aadhar" minlength="14" maxlength="14" required ="required" value="<?php echo $row->aadhar;?>" <?php if($this->session->userdata("login_type")==1){?><?php }else{?> readonly="readonly" <?php }?> />
                             </div>
                         </div>               
                     </div>   
@@ -102,7 +102,7 @@
                      <div class="col-md-12 space20">
                         <div class="col-md-6">
                              <div class="col-md-4">
-                                 Username<span class="symbol required">
+                                 User ID<span class="symbol required">
                             </div>
                             <div class="col-md-8">
                                 <input type="text" class="form-control" name="username" value="<?php echo $row->username;?>" readonly=""/>

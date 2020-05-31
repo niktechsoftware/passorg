@@ -7,18 +7,39 @@ $url="http://mysms.sms7.biz/rest/services/sendSMS/sendGroupSms?AUTH_KEY=4eaf1b2a
 	curl_setopt($ch,CURLOPT_URL,$url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 	$output=curl_exec($ch);
+	$rt=json_decode($output,true);
+    //echo $rt['response'];
+	$dat =  $rt['response'];
 	curl_close($ch);
+return $dat;
+}
+
+function mysmsHindi($number,$msg){
+ $url = "http://mysms.sms7.biz/rest/services/sendSMS/sendGroupSms?AUTH_KEY=4eaf1b2ae65013df3fe85988f23f8f&message=".urlencode($msg)."&senderId=PASYSM&routeId=1&mobileNos=".$number."&smsContentType=Unicode";
+ 	$ch = curl_init();
+	curl_setopt($ch,CURLOPT_URL,$url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	$output=curl_exec($ch);
+	$rt=json_decode($output,true);
+	$dat =  $rt['response'];
+	curl_close($ch);
+return $dat;;
 }
 function checkBalSms()
 { 
-$url = "http://216.245.209.132/getBalance?userName=pass&password=Kanpur@123";
+$url  = "http://mysms.sms7.biz/getBalance?userName=pass&password=Pass@123";
 
 $ch = curl_init();
 curl_setopt($ch,CURLOPT_URL,$url);
 curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 $output=curl_exec($ch);
+
+	$rt=json_decode($output,true);
+
+	$dat =  $rt[0]['routeBalance'];
+
 curl_close($ch);
-return $output;
+return $dat;
 }
 
 

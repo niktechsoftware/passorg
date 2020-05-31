@@ -1,11 +1,11 @@
-
+ 
 <div class="container">
 	<div class="row">
 		<div class="col-md-12">
 			<!-- start: EXPORT DATA TABLE PANEL  -->
 			<div class="panel panel-white">
 			<div class="panel-heading panel-red">
-					<h4 class="panel-title"> <span class="text-bold">Registered Active Branch List</span></h4>
+					<h4 class="panel-title"> <span class="text-bold">Pending delivered Invoices  List</span></h4>
 					<div class="panel-tools">
 						<div class="dropdown">
 							<a data-toggle="dropdown" class="btn btn-xs dropdown-toggle btn-transparent-grey">
@@ -40,8 +40,8 @@
 				<div class="panel-body">
 				    			<div class="alert btn-purple">
 				    			    <button data-dismiss="alert" class="close"></button>
-<h4 class="media-heading text-center">Welcome to Registered Active List </h4>
-<p>Now you can Inactive a Branch By clicking given inactive Button in consern row.<br>
+<h4 class="media-heading text-center">Welcome to Pending Invoices to delivered Area </h4>
+<p><br>
 </p> </div>
 				    
 					<div class="row">
@@ -111,30 +111,34 @@
 							 <thead>
                                   <tr >
                                     <th>SNO</th>
-                                    <th>Order Number</th>
+                                    <th>Invoice Number</th>
                                     <th>Subscriber Name</th>
                                      <th>Subscriber Mobile</th>
                                     <th>Total Quantity</th>
                                     <th>Total Amount</th>
                                     <th>Order Date</th>
-                                    <th>Invoice Detail</th>
-                                     <th>Order status</th>
-                                   <!--  <th>Activity</th> -->
+                                     <th>Sender Username</th>
+                                    <th>Pay Mode</th>
+                                    <th>Paid amount</th>
+                                    <th>Trans. number</th>
+                                    <th>Otp</th>
+                                     <th>Status</th>
+                                  
                                   </tr>
                                 </thead>
 								<tbody>
 								<script src="<?php echo base_url(); ?>assets/plugins/jQuery/jquery-2.1.1.min.js"></script>
 							
-                  <?php
-                     if($view->num_rows()>0){
+                  <?php $i=1;
+                     if($oinvoice){
                   ?>
-                  <?php  $i=1;
-                  foreach($view->result() as $row):
+                  <?php  
+                  foreach($oinvoice->result() as $row):
                   //print_r($row);exit();?>
                   <tr class="text-uppercase text-center">
                     <td><?php echo $i;?></td>
-                      <td><a href="#" class="btn btn-danger"><?php echo $row->order_no;?></a></td>
-                      <?php 
+                       <td><?php if($row->status==1){?><a href="<?php echo base_url();?>employeeController/new_invoice/<?php echo $row->order_no;?>" class="btn btn-primary"><?php echo $row->invoice_no;?></a><?php }else{?><a href="#" class="btn btn-primary"><?php echo $row->invoice_no;?></a><?php }?></td>
+                    <?php 
                              $this->db->select_sum('quantity');
                              $this->db->select_sum('subtotal');
                              $this->db->where('order_no',$row->order_no);
@@ -150,23 +154,171 @@
                       <td><?php echo $dt1->quantity;?></td>
                       <td><?php echo $dt1->subtotal;?></td>
                       <td><?php echo $row->order_date;?></td>
-                     <td><?php if($row->status==1){?><a href="<?php echo base_url();?>employeeController/new_invoice/<?php echo $row->order_no;?>" class="btn btn-primary"><?php echo $row->invoice_no;?></a><?php }else{?><a href="#" class="btn btn-primary"><?php echo $row->invoice_no;?></a><?php }?></td>
-                     <td><?php if($row->order_status ==1) { ?><button type="submit" class="btn btn-danger" >Order Delivered </button><?php } else { ?>
-                        <input type="hidden" id="orderno1<?php echo $i; ?>" value="<?php echo  $row->order_no;?>">
-                     <button type="submit" class="btn btn-warning" id="product<?php echo $i;?>">Not Deliver </button><div id="deliverydata<?php echo $i;?>"></div><?php }?></td> 
+                    <td><?php echo $row->sub_branchid;?></td>
+                    	<?php 
+												    $pmode = $this->db->get('pay_mode');
+												    ?>
+                    	<td width:"10px"><select id="p_mode<?php echo $i; ?>">
+													    <option value="select">Select</option>
+													    <option value="balance">From Balance</option>
+													    <?php foreach($pmode->result() as $pt) { ?>
+													    <option value="<?php echo $pt->id;?>"><?php echo $pt->pay_mode;?></option>
+													    <?php } ?>
+													</select></td>
+							<td width:"10px"><input style="width:70px;" type="text" name="paidamt<?php echo $i;?>" id= "paidamt<?php echo $i;?>"required/></td>
+													<td width:"10px"><input style="width:70px;" type="text" name="trans<?php echo $i;?>" id= "trans<?php echo $i;?>" required/></td>
+													<td width:"10px"><input style="width:70px;" type="text" name="otp<?php echo $i;?>" id= "otp<?php echo $i;?>" required/></td>
+												
+													<input type="hidden" id="invoice_no<?php echo $i;?>" value="<?php echo $row->invoice_no;?>">
+													<input type="hidden" id="usernm<?php echo $i;?>" value="<?php echo $this->session->userdata("username");?>">
+												
+													<!--<td width:"10px"><input type="button" value="Receive"></td>-->
+													<td width:"10px">
+													    <input type="button" class="btn btn-success" name="ver<?php echo $i; ?>" id="ver<?php echo $i;?>" value="Confirm"/>
+													    <input type="button" class="btn btn-danger" id="versd<?php echo $i; ?>" value="Wrong otp" />
+													</td>
+              </tr>  							
+               
+              <script>
+                  
+                       $('#ver<?php echo $i;?>').hide();
+                        $('#versd<?php echo $i;?>').hide();
+                 $('#otp<?php echo $i;?>').keyup(function(){
+              var invoice=$('#invoice_no<?php echo $i;?>').val();
+              var otp =$('#otp<?php echo $i;?>').val();
+              
+              $.post("<?php echo site_url('allFormController/confirmotp')?>", {invoice:invoice , otp : otp}, function(data){
+                //  alert(data);
+                  if(data=="1"){
+                      $('#versd<?php echo $i;?>').hide();
+                    $('#ver<?php echo $i;?>').show();
+                  }else{
+                       $('#versd<?php echo $i;?>').show();
+                       $('#ver<?php echo $i;?>').hide();
+                  }
+                    });
+                    });
+                    $('#ver<?php echo $i;?>').click(function(){
+                    var invoice=$('#invoice_no<?php echo $i;?>').val();
+                        var paidamount =$('#paidamt<?php echo $i;?>').val();
+                        var totalamount =$('#ordamt<?php echo $i;?>').val();
+                         var mode =$('#p_mode<?php echo $i;?>').val();
+                        var transid =$('#trans<?php echo $i;?>').val();
+                       
+              $.post("<?php echo site_url('allFormController/confirmotpmatch')?>", {invoice:invoice , paidamount : paidamount, totalamount : totalamount, mode : mode, transid : transid }, function(data){
+                alert(data);
+                $('#ver<?php echo $i;?>').val(data);
+              });
+                    });
+                    </script>  
+                  <?php  $i++;
+                endforeach;
+                   } ?>
+                   
+                   
+                   
+                   
+                   <!-- -->
+                     <?php
+                     if($pinvoice){
+                         
+                  ?>
+                  <?php  
+                  foreach($pinvoice->result() as $row):
+                      //echo $row->id;
+                  //print_r($row);exit();?>
+                  <tr class="text-uppercase text-center">
+                    <td><?php echo $i;?></td>
+                      <td><a href="<?php echo base_url();?>deliveryBoyController/invoice/<?php echo $row->invoice_no;?>" class="btn btn-danger"><?php echo $row->invoice_no;?></a></td>
+                      <?php 
+                             $this->db->where('invoice_number',$row->invoice_no);
+                                         $chk = $this->db->get('product_trans_detail');
+                                         	$tt=0; ?>
+                      <td><?php echo $row->reciver_usernm;
+                     /* $this->db->where("username",$row->reciver_usernm);
+                     $bname = $this->db->get("branch")->row();*/
+                      ?></td>
+                         <td><?php echo $this->subscriber->getmobilefromuser($row->reciver_usernm);?></td>   
+                     <?php 
+                      $this->db->where('invoice_number',$row->invoice_no);
+													$this->db->select_sum('quantity');
+													$qty= $this->db->get('product_trans_detail')->row();
+													?>
+													<td width:"10px"><a class="btn btn-info" href="<?php echo base_url();?>shopController/recieveproductlist"><?php echo $qty->quantity; ?></a></td>
+                      <?php foreach($chk->result() as $ro):
+													      $this->db->where("id",$ro->p_code);
+													     $ps =  $this->db->get("stock_products")->row();
+													    $this->db->where("branch_id",$this->session->userdata("district"));
+													    $this->db->where("p_code",$ro->p_code);
+													    $bw =$this->db->get("branch_wallet")->row();
+													      $tt = $tt + $ro->quantity*$bw->selling_price;
+													      endforeach;
+    												    ?>
+					<td width:"10px"><input style="width:70px;" type="text" value="<?php echo $tt;?>" name="ordamt<?php echo $i;?>" id= "ordamt<?php echo $i;?>" readonly/></td>
+                      
+                      <td><?php echo $row->date;?></td>
+                     <td width:"10px"><?php echo $row->reciver_usernm;?></td>
+													<?php 
+												    $pmode = $this->db->get('pay_mode');
+												    ?>
+												
+													<td width:"10px"><select id="p_mode<?php echo $i; ?>">
+													    <option value="select">Select</option>
+													    <option value="balance">From Balance</option>
+													    <?php foreach($pmode->result() as $pt) { ?>
+													    <option value="<?php echo $pt->id;?>"><?php echo $pt->pay_mode;?></option>
+													    <?php } ?>
+													</select></td>
+													<td width:"10px"><input style="width:70px;" type="text" name="paidamt<?php echo $i;?>" id= "paidamt<?php echo $i;?>"required/></td>
+													<td width:"10px"><input style="width:70px;" type="text" name="trans<?php echo $i;?>" id= "trans<?php echo $i;?>" required/></td>
+													<td width:"10px"><input style="width:70px;" type="text" name="otp<?php echo $i;?>" id= "otp<?php echo $i;?>" required/></td>
+												
+													<input type="hidden" id="invoice_no<?php echo $i;?>" value="<?php echo $row->invoice_no;?>">
+													<input type="hidden" id="usernm<?php echo $i;?>" value="<?php echo $this->session->userdata("username");?>">
+												
+													<!--<td width:"10px"><input type="button" value="Receive"></td>-->
+													<td width:"10px">
+													    <input type="button" class="btn btn-success" name="ver<?php echo $i; ?>" id="ver<?php echo $i;?>" value="Confirm"/>
+													    <input type="button" class="btn btn-danger" id="versd<?php echo $i; ?>" value="Wrong otp" />
+													</td>
               </tr>  
-              <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+             
                   <script>
-                  $(document).ready(function() {
-                 $('#product<?php echo $i;?>').click(function(){
-              var orderno=$('#orderno1<?php echo $i;?>').val();
-                //alert(orderno);
-              $.post("<?php echo site_url('wallet/deliverstatus')?>", {orderno:orderno}, function(data){
-                   $('#product<?php echo $i;?>').hide();
-                 $('#deliverydata<?php echo $i;?>').html(data);
-                      })
+                  
+                       $('#ver<?php echo $i;?>').hide();
+                        $('#versd<?php echo $i;?>').hide();
+                 $('#otp<?php echo $i;?>').keyup(function(){
+              var invoice=$('#invoice_no<?php echo $i;?>').val();
+              var otp =$('#otp<?php echo $i;?>').val();
+              
+              $.post("<?php echo site_url('allFormController/confirmotp')?>", {invoice:invoice , otp : otp}, function(data){
+                //  alert(data);
+                  if(data=="1"){
+                      $('#versd<?php echo $i;?>').hide();
+                    $('#ver<?php echo $i;?>').show();
+                  }else{
+                       $('#versd<?php echo $i;?>').show();
+                       $('#ver<?php echo $i;?>').hide();
+                  }
                     });
                     });
+                    $('#ver<?php echo $i;?>').click(function(){
+                    var invoice=$('#invoice_no<?php echo $i;?>').val();
+                        var paidamount =$('#paidamt<?php echo $i;?>').val();
+                        if(paidamount.length > 0){
+                        var totalamount =$('#ordamt<?php echo $i;?>').val();
+                         var mode =$('#p_mode<?php echo $i;?>').val();
+                        var transid =$('#trans<?php echo $i;?>').val();
+                       
+              $.post("<?php echo site_url('allFormController/confirmotpmatch')?>", {invoice:invoice , paidamount : paidamount, totalamount : totalamount, mode : mode, transid : transid }, function(data){
+                alert(data);
+                $('#ver<?php echo $i;?>').val(data);
+              });
+                        }else{
+                            alert("plaese fill paid amount");
+                        }
+                    });
+                    
                     </script>  
                   <?php  $i++;
                 endforeach;

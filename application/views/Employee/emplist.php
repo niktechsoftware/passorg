@@ -24,12 +24,13 @@
 								<thead>
 									<tr style="background-color:#1ba593; color:white;">
 										 <th>S.No.</th>
-                                    <th>Owner Name</th>
-                                    <th>Branch Name</th>
-                                    <th>Mobile Name</th>
+                                    <th>Employee Name</th>
+                                    <th>Post Name</th>
+                                     <th>Sub Post</th>
+                                    <th>Mobile Number</th>
                                     <th>Aadhar Number</th>
                                     <th>District</th>
-                                    <th>Username</th>
+                                    <th>User ID</th>
                                     <th>Inctivate</th>
                                     <th>Activity</th>
 									</tr>
@@ -49,7 +50,17 @@
                   <input type="hidden" name="table" value = "employee" id="tablename<?php echo $i;?>"/>
                    <input type="hidden" name="currentstatus" value = "<?php echo $row->status?>" id="currentstatus<?php echo $i;?>"/>
                   </td>
-                  <td><?php echo $row->father_name;?></td>
+                  <td><?php 
+                  $this->db->where("id",$row->emp_type);
+                 $emp_type = $this->db->get("emp_type")->row();
+                  
+                  echo $emp_type->type;?></td>
+                  <td><?php if($row->emp_subtype>0){
+                  $this->db->where("id",$row->emp_subtype);
+                   $this->db->where("emp_type",$row->emp_type);
+                 $semp_type = $this->db->get("emp_sub_type")->row();
+                  
+                  echo $semp_type->sub_type; }?></td>
                   <td><?php echo $row->mobile;?></td>
                   <td><?php echo $row->aadhar_no;?></td>
                   <td><?php $view= $row->district;

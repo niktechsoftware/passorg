@@ -59,6 +59,9 @@
                                             <?php
                                         endforeach;}?>
                                         <!--<option value="all">-ALL-</option>-->
+                                      <?php  if($this->session->userdata("login_type")== 1){
+                                         ?>  <option  value="admin" >Admin</option>
+                                   <?php   }?>
                                 </select>
                             </div>
                             <div class="col-md-6">

@@ -106,8 +106,8 @@
                                          $("#cquantity<?php echo $i;?>").val(cquantity-send_qty);
                                         var send_qty = $("#sendquantity<?php echo $i;?>").val();
                                         var pcode = $("#pcode<?php echo $i;?>").val();
-                                        // alert(receiver_id);
-                                       // alert(send_qty);
+                                         //alert(receiver_id);
+                                        //alert(send_qty);
                                         //alert(pcode);
                                         if(send_qty>0 && pcode.length>0 )
                                         {
@@ -158,7 +158,7 @@
                                                var send_qty = 0;
                                             var pcode = 0;
                                             var cquantity =0;
-                                           // alert(cquantity);
+                                           //alert(receiver_id);
                                             $.post("<?php echo site_url();?>stockController/transfer_pro",{t:t,receiver_id:receiver_id,send_qty:send_qty,pcode:pcode, pcode:pcode,cquantity : cquantity},function(data){
                                                 $("#transfer_pro").html(data);
                                             });

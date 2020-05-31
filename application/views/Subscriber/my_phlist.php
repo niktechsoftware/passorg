@@ -47,65 +47,7 @@
 				    
 					<div class="row">
 
-						<!--<div class="col-md-12 space20">-->
-						<!--	<div class="btn-group pull-right">-->
-						<!--		<button data-toggle="dropdown" class="btn btn-green dropdown-toggle">-->
-						<!--			Export <i class="fa fa-angle-down"></i>-->
-						<!--		</button>-->
-								
-						<!--		<ul class="dropdown-menu dropdown-light pull-right">-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-pdf" data-table="#sample-table-2" >-->
-						<!--					Save as PDF-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-png" data-table="#sample-table-2">-->
-						<!--					Save as PNG-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-csv" data-table="#sample-table-2" >-->
-						<!--					Save as CSV-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-txt" data-table="#sample-table-2" >-->
-						<!--					Save as TXT-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-xml" data-table="#sample-table-2" >-->
-						<!--					Save as XML-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-sql" data-table="#sample-table-2" >-->
-						<!--				Save as SQL-->
-						<!--				</a>-->
-									
-									
-						<!--				<a href="#" class="export-json" data-table="#sample-table-2" >-->
-						<!--					Save as JSON-->
-						<!--				</a>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-excel" data-table="#sample-table-2" >-->
-						<!--					Export to Excel-->
-						<!--				</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-doc" data-table="#sample-table-2" >-->
-						<!--				Export to Word-->
-						<!--			</a>-->
-						<!--			</li>-->
-						<!--			<li>-->
-						<!--				<a href="#" class="export-powerpoint" data-table="#sample-table-2">-->
-						<!--					Export to PowerPoint-->
-						<!--				</a>-->
-						<!--			</li>-->
-								
-						<!--	</div>-->
-						<!--</div>-->
+					
 						<div class="col-md-12 space20">
 							<a href="<?php echo base_url();?>subscriberController/my_bill" style="float:right;"><img
 							src="<?php echo $this->config->item('asset_url');?>/images/subscriber/cart.gif"
@@ -149,75 +91,80 @@
 										foreach($p_data->result() as $pdata)
 										{
 											if($data->product_code==$pdata->id && $data->customer_id == $id)
-											{?>
-												<tr class="text-uppercase text-center">
-													<td><?php echo $i; ?></td>
-														<td><?php echo $pdata->hsn; ?></td>
-													<td><?php echo $pdata->company; ?></td>
-													<td><?php echo $pdata->name; ?></td>
-													<td><?php if(strlen($pdata->file1)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } elseif(strlen($pdata->file2)>0) { ?><img class="zoom1" src="<?php echo base_url();?>assets/productimg/<?php echo $pdata->file2;?>" style="max-height: 50px; max-width: 100px;"><?php } else { echo "N/A"; } ?></td>
-													<td><?php echo $pdata->size; ?></td>
-													<td><?php echo $pdata->p_type; ?></td>
-													<td><?php echo $pdata->selling_price; ?></td>
-													<input type="hidden" value="<?php echo $data->product_code;?>" id="cartadd<?php  echo $i;?>" />
-													<td><?php 
-															$this->db->where('p_code',$data->product_code);
-															$this->db->where('subbranch_id',$data->sub_branchid);
-															$sb_wallet1=$this->db->get('subbranch_wallet');
-															//$sb_wallet= $sb_wallet2->row();
-															if($sb_wallet1->num_rows()>0)
-															{ $sb_wallet=$sb_wallet1->row();
-															$quanity = $sb_wallet->rec_quantity-$sb_wallet->sale_quantity;
-																if($quanity > 1)
-																	  { 
-																	      $this->db->where('pt_code',$sb_wallet->p_code);
-																	      $this->db->where('cust_usr',$id);
-																	      $ppdata= $this->db->get('purchase_list')->num_rows();
-																		  if($ppdata>0) { ?>
-																		<input  type="button"  class="btn btn-primary" value ='Added to Cart' />
-																		<?php }
-																		else { ?> 
-																			<input  type="button" id="add<?php  echo $i;?>" class="btn btn-success " value ='Add to Cart' />
-																		<input  type="button" id="added<?php  echo $i;?>" class="btn btn-primary" value ='Added to Cart' />
-																		<?php }  ?>
-																		
-																		
-																<?php }
-																else
-																{ ?>
-																	<a href ="#" class="btn btn-danger">Not Available</a>
-																<?php	}
-															}
-															else
-															{ ?>
-																<a href ="#" class="btn btn-danger">Not Available</a>
-															<?php	}
-													?>
-													</td>
-													<td><?php if(strlen($pdata->file3)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file3;?>" style="max-height: 50px; max-width: 100px;"> <?php } else { echo "N/A"; ?><?php }?></td>
-													<!--<td></td>
-													<td></td> -->
-													<script>
-														$(document).ready(function(){	
-															$("#add<?php  echo $i;?>").show();
-															$("#added<?php  echo $i;?>").hide();
-
-																$("#add<?php echo $i;?>").click(function(){
-																	var id = $("#cartadd<?php  echo $i;?>").val();
-																	//alert(id);
-																	$("#add<?php echo $i;?>").hide();
-																	$("#added<?php echo $i;?>").show();
-																	//alert(id);
-																	$.post("<?php echo site_url('subscriberController/addtocart_data');?>", { id : id }, function(data){
-																		$("#cardvalue").html(data);
-																	});
-																	
-																});
-														});
-													</script>
-												</tr><?php $i++;
-											}
-										} 
+											{
+												$this->db->where("branch_id",$this->session->userdata("district"));
+            									$this->db->where("p_code",$pdata->id);
+            									$branchprice=	$this->db->get("branch_wallet");
+            									if($branchprice->num_rows()>0){
+        											?>
+        												<tr class="text-uppercase text-center">
+        													<td><?php echo $i; ?></td>
+        														<td><?php echo $pdata->hsn; ?></td>
+        													<td><?php echo $pdata->company; ?></td>
+        													<td><?php echo $pdata->name; ?></td>
+        													<td><?php if(strlen($pdata->file1)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file1;?>" style="max-height: 50px; max-width: 100px;"> <?php } elseif(strlen($pdata->file2)>0) { ?><img class="zoom1" src="<?php echo base_url();?>assets/productimg/<?php echo $pdata->file2;?>" style="max-height: 50px; max-width: 100px;"><?php } else { echo "N/A"; } ?></td>
+        													<td><?php echo $pdata->size; ?></td>
+        													<td><?php echo $pdata->p_type; ?></td>
+        													<td><?php echo $branchprice->row()->selling_price; ?></td>
+        													<input type="hidden" value="<?php echo $data->product_code;?>" id="cartadd<?php  echo $i;?>" />
+        													<td><?php 
+        															$this->db->where('p_code',$data->product_code);
+        															$this->db->where('subbranch_id',$data->sub_branchid);
+        															$sb_wallet1=$this->db->get('subbranch_wallet');
+        															//$sb_wallet= $sb_wallet2->row();
+        															if($sb_wallet1->num_rows()>0)
+        															{ $sb_wallet=$sb_wallet1->row();
+        															$quanity = $sb_wallet->rec_quantity-$sb_wallet->sale_quantity;
+        																if($quanity >= 1)
+        																	  { 
+        																	      $this->db->where('pt_code',$sb_wallet->p_code);
+        																	      $this->db->where('cust_usr',$id);
+        																	      $ppdata= $this->db->get('purchase_list')->num_rows();
+        																		  if($ppdata>0) { ?>
+        																		<input  type="button"  class="btn btn-primary" value ='Added to Cart' />
+        																		<?php }
+        																		else { ?> 
+        																			<input  type="button" id="add<?php  echo $i;?>" class="btn btn-success " value ='Add to Cart' />
+        																		<input  type="button" id="added<?php  echo $i;?>" class="btn btn-primary" value ='Added to Cart' />
+        																		<?php }  ?>
+        																		
+        																		
+        																<?php }
+        																else
+        																{ ?>
+        																	<a href ="#" class="btn btn-danger">Not Available</a>
+        																<?php	}
+        															}
+        															else
+        															{ ?>
+        																<a href ="#" class="btn btn-danger">Not Available</a>
+        															<?php	}
+        													?>
+        													</td>
+        													<td><?php if(strlen($pdata->file3)>0){?><img class="zoom1"  src="<?php echo $this->config->item('asset_url');?>/productimg/<?php echo $pdata->file3;?>" style="max-height: 50px; max-width: 100px;"> <?php } else { echo "N/A"; ?><?php }?></td>
+        													<!--<td></td>
+        													<td></td> -->
+        													<script>
+        														$(document).ready(function(){	
+        															$("#add<?php  echo $i;?>").show();
+        															$("#added<?php  echo $i;?>").hide();
+        
+        																$("#add<?php echo $i;?>").click(function(){
+        																	var id = $("#cartadd<?php  echo $i;?>").val();
+        																	//alert(id);
+        																	$("#add<?php echo $i;?>").hide();
+        																	$("#added<?php echo $i;?>").show();
+        																	//alert(id);
+        																	$.post("<?php echo site_url('subscriberController/addtocart_data');?>", { id : id }, function(data){
+        																		$("#cardvalue").html(data);
+        																	});
+        																	
+        																});
+        														});
+        													</script>
+        												</tr><?php $i++;
+        											}
+										} }
 									}
 								}?>
                                 </tbody>   

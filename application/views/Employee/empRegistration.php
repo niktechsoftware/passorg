@@ -173,7 +173,25 @@
                    				 Branch Name<span class="symbol required"></span>
                     		</div>
                 			<div class="col-md-8">
-                    			<?php if($branch->num_rows()>0){
+                    			<?php 
+                    			if($this->session->userdata("login_type")==4){
+                    			   $id = $this->session->userdata("district");
+                    			   $this->db->where("id",$id);
+                    			   $subbranch = $this->db->get("branch")->row();;
+                    			     ?>
+                                        <select class="form-control" name="branch" id="branch12" required="required">
+                                            <option value="">-Select Branch Name-</option>
+                                           
+                                            <option value="<?php echo $id;?>"><?php echo $subbranch->b_name; ?></option>
+                                           
+                                        </select>
+                                    <?php
+                    			}
+                    			
+                    		if($this->session->userdata("login_type")==2 ||$this->session->userdata("login_type")==1){
+                    			    
+                    			
+                    			if($branch->num_rows()>0){
                             $bname= $branch->result();
                                     ?>
                                         <select class="form-control" name="branch" id="branch" required="required">
@@ -188,17 +206,27 @@
                                                 <?php }?>
                                         </select>
                                     <?php
-                                }?>
+                                }}?>
                     		</div>
                			</div> 
                      <div class="col-md-6">
                     		 <div class="col-md-4">
                    				Sub Branch Name
                     		</div>
+                    		<?php 	if($this->session->userdata("login_type")==4){
+                    		$id =$this->session->userdata('id');
+                    		?>
+                    			<div class="col-md-8">
+                    			<select class="form-control" id="subbranch" name="subbranch" >
+                    			       <option value="<?php echo $id;?>"><?php echo $this->session->userdata("your_school_name"); ?></option>
+                                </select>
+                    		</div>
+                    		<?php }else{?>
                 			<div class="col-md-8">
                     			<select class="form-control" id="subbranch" name="subbranch" >
                                 </select>
                     		</div>
+                    		<?php }?>
                			</div> 
                    		              
                		</div>	 

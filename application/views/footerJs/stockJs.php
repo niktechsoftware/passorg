@@ -155,7 +155,7 @@
                         "method": 'POST',
                         "data": {classid : classid},
                         beforeSend: function(data) {
-                           $("#subjectBox").html("<center><img src='<?php echo base_url(); ?>assets/images/loading.gif' /></center>")
+                           $("#subjectBox").html("<center><img src='<?php echo base_url(); ?>assets/loading.gif' /></center>")
                         },
                         success: function(data) {
                             $("#subjectBox").html(data);
@@ -295,15 +295,34 @@
 				
 			$('#empbranch').change(function(){
 				var branch = $('#empbranch').val();
-				//alert(branch);
-				$.post("<?php echo site_url("employeeController/subBranch") ?>",{branch : branch}, function(data){
-						$("#empsubbranch").html(data);
+						if(branch=="admin" ){
+						   var  empsubbranch =0;
+						    branch =0;;
+							$.post("<?php echo site_url("employeeController/deliveryboy") ?>",{empsubbranch : empsubbranch ,  branch : branch}, function(data){
+						$("#deliveryBoy").html(data);
+						 $("#empsubbranch").hide();
 						});
+						}else{
+						    empsubbranch =0;
+						    	$.post("<?php echo site_url("employeeController/deliveryboy") ?>",{empsubbranch : empsubbranch , branch : branch}, function(data){
+						$("#deliveryBoy").html(data);
+						$("#empsubbranch").show();
+						});
+						    
+						 $.post("<?php echo site_url("employeeController/subBranch") ?>",{branch : branch}, function(data){
+						      $("#empsubbranch").show();
+						  $("#empsubbranch").html(data);
+						 
+						 });
+						}
+						
+					
 			});
 			$('#empsubbranch').change(function(){
+			    	var branch = $('#empbranch').val();
 				var empsubbranch = $('#empsubbranch').val();
 				//alert(empsubbranch);
-				$.post("<?php echo site_url("employeeController/deliveryboy") ?>",{empsubbranch : empsubbranch}, function(data){
+				$.post("<?php echo site_url("employeeController/deliveryboy") ?>",{empsubbranch : empsubbranch ,branch : branch}, function(data){
 						$("#deliveryBoy").html(data);
 						});
 			});

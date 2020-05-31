@@ -27,7 +27,7 @@ class websiteController extends CI_Controller{
 				"category" => $this->input->post("category"),
 				"subject" => $this->input->Post("sub"),
 				"message" => $this->input->Post("msg"),
-				"date" => date("y-m-d H:i:s"),
+				"date" => date("Y-m-d H:i:s"),
 			//	"time" =>date("h:i:s"),
 				"school_code"=>$this->session->userdata("school_code")
 		);

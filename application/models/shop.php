@@ -82,7 +82,7 @@ class shop extends CI_Model{
   }
   else
   { ?>
-	<option value="0">None</option>
+	<option value="">None</option>
 <?php  }
  return $query;
 
@@ -165,7 +165,10 @@ class shop extends CI_Model{
     $sender = $this->db->get("sms_setting")->row();
     $sende_Detail =$sender;
     $msg = "Dear Sir Your CashBack  is  - ".$totprcnt." Pv /- Thank You .login for more details https://www.passystem.in/.";
-        sms($mobile,$msg);
+       $getv= sms($mobile,$msg);
+        $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
         $i++;
     $this->commision($i,$pusernm,$totamt,$orderno);
     endforeach;

@@ -6,6 +6,8 @@
 		$this->load->model("employee");
 		$this->load->model("branch");
 		$this->load->model("shop");
+		$this->load->model("subscriber");
+		$this->load->model("smsmodel");
 	}
 		function is_login(){
 		$is_login = $this->session->userdata('is_login');
@@ -159,7 +161,7 @@
 		foreach($cc as $dd){
 			 if($dd)
 			 { 
-			     sms($dd,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
+			     //sms($dd,$msg,$sende_Detail->uname,$sende_Detail->password,$sende_Detail->sender_id);
 			      }
 			 else
 			 { echo "not"; }
@@ -309,47 +311,57 @@ function saveEmp(){
 	$value['created_date'] = date('Y-m-d');
 	$value['district'] = $this->input->post('branch');
 	$value['sub_branchid'] = $this->input->post('subbranch');
+	//  adi/co/ma/
+	if($this->input->post('branch')<1){
+	    $beforeString ="A";
+	}else{
+	    $beforeString ="B".$this->input->post('branch');
+	}
+	
+	if($this->input->post('subbranch')>0){
+	    $beforeString=$beforeString."S".$this->input->post('subbranch');
+	}
 	if($empid==1){
-		$username1='PSUDR'.$username;
+		$username1=$beforeString.'DR'.$username;
 		$value['username'] = $username1;
 	}else if($empid==2){
-		$username1='PSUM'.$username;
+		$username1=$beforeString.'M'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empid==3){
-		$username1='PSUSM'.$username;
+		$username1=$beforeString.'SM'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empid==4){
-		$username1='PSUCM'.$username;
+		$username1=$beforeString.'CM'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empid==5){
-		$username1='PSUDI'.$username;
+		$username1=$beforeString.'DI'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empid==6){
-		$username1='PSUCI'.$username;
+		$username1=$beforeString.'CI'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empid==8){
-		$username1='PSUVI'.$username;
+		$username1=$beforeString.'VI'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empsubid==1){
-		$username1='PSUAOS'.$username;
+		$username1=$beforeString.'SAO'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empsubid==2){
-		$username1='PSUAOE'.$username;
+		$username1=$beforeString.'EAO'.$username;
 		$value['username'] = $username1;
 	}
 	else if($empsubid==3){
-		$username1 = 'PSUAOC'.$username;
+		$username1 = $beforeString.'CAO'.$username;
 		$value['username'] =$username1;
 	}
 	else {
-		$username1='PSUAOST'.$username;
+		$username1=$beforeString.'SABAO'.$username;
 		$value['username'] = $username1;
 	}
 $query =$this->employee->saveEmp($value); 
@@ -357,8 +369,10 @@ if($query)
 {
    $msg = "Dear ". $name . " Your Employee Registration in PASS is Successfully Registered. Your Username is ".$username1."and Password is ".$passw.".Please Wait For Activation.Best Regards from  Pass Admin";
 	$mobile = $this->input->post('mobile');
-		sms($mobile,$msg); ?>
-		
+	$getv=	sms($mobile,$msg); 
+		 $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);?>
 		<script>
 		    window.location.href="<?php echo base_url();?>employeeController/empRegistration/5";
 		</script>
@@ -421,12 +435,20 @@ function empActiveList(){
 }
 function emplist(){
 	 $subbranch = $this->input->post('empsubbranch');
+	  
 	 $data['view'] = $this->employee->empSubbranch($subbranch);
+	 $this->load->view('Employee/emplist',$data);
+}
+function emplist6(){
+    $branch = $this->input->post('branch');
+	 $subbranch = $this->input->post('empsubbranch');
+	 $data['view'] = $this->employee->empSubbranchna($subbranch,$branch);
 	 $this->load->view('Employee/emplist',$data);
 }
 function deliveryboy(){
 	$subbranch = $this->input->post('empsubbranch');
-	 $data['view'] = $this->employee->empSubbranch1($subbranch);
+	$branch = $this->input->post('branch');
+	 $data['view'] = $this->employee->empSubbranch1($subbranch,$branch);
 	 $this->load->view('Employee/deliveryBoy',$data);
 }
 function empInactiveList(){
@@ -537,9 +559,61 @@ function deliveryInchargeList(){
 	$data['mainContent'] = 'Employee/deliveryInchargeList';
 	$this->load->view("includes/mainContent", $data);
 }
+
+function deliveryOrderListc(){
+     $id=$this->session->userdata('id');
+        $this->db->where("status",1);
+         $this->db->where("del_boy",$id);
+           $pin= $this->db->get("assignproduct");
+           if($pin->num_rows()>0){
+                $data['pinvoice']=$pin;
+               
+           }else{
+                $data['pinvoice']=0;
+           }
+           $this->db->where("order_status",1);
+           $this->db->where("detail_delivery",1);
+            $this->db->where('del_boy_id',$id);
+          $dt1= $this->db->get("order_serial");
+          
+          if($dt1->num_rows()>0){
+                $data['oinvoice']=$dt1;
+           }else{
+                $data['oinvoice']=0;
+           }
+      
+    $data['pageTitle'] = 'Delivery Order List';
+	$data['smallTitle'] = 'Delivery Order List';
+	$data['mainPage'] = 'Delivery Order List';
+	$data['subPage'] = 'Delivery Order List';
+	$data['title'] = 'Delivery Order List';
+	$data['headerCss'] = 'headerCss/branchListCss';
+	$data['footerJs'] = 'footerJs/employeeListJs';
+	$data['mainContent'] = 'Employee/deliveryOrderListpaid';
+	$this->load->view("includes/mainContent", $data);
+}
     function deliveryOrderList(){
         $id=$this->session->userdata('id');
-        $data['view'] =$this->employee->deliveryOrder($id);
+        $this->db->where("status",0);
+         $this->db->where("del_boy",$id);
+           $pin= $this->db->get("assignproduct");
+           if($pin->num_rows()>0){
+                $data['pinvoice']=$pin;
+               
+           }else{
+                $data['pinvoice']=0;
+           }
+           $this->db->where("order_status",1);
+           $this->db->where("detail_delivery",0);
+            $this->db->where('del_boy_id',$id);
+          $dt1= $this->db->get("order_serial");
+          
+          if($dt1->num_rows()>0){
+                $data['oinvoice']=$dt1;
+           }else{
+                $data['oinvoice']=0;
+           }
+      
     $data['pageTitle'] = 'Delivery Order List';
 	$data['smallTitle'] = 'Delivery Order List';
 	$data['mainPage'] = 'Delivery Order List';
@@ -550,6 +624,8 @@ function deliveryInchargeList(){
 	$data['mainContent'] = 'Employee/deliveryOrderList';
 	$this->load->view("includes/mainContent", $data);
 }
+
+
 function deliverypayment(){
       $id=$this->session->userdata('id');
         $data['view'] =$this->employee->deliveryOrder($id);

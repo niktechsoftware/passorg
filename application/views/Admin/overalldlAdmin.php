@@ -61,6 +61,16 @@
                             </div>
                         </div>
                     </div>
+                <div class="col-md-12 row"> 
+                    <div class="col-md-6"><a href ="<?php echo base_url(); ?>index.php/adminController/avaiDemand/<?php echo $type;?>/1" class ="btn btn-success">
+                                     View   Available Products  <i class="icon-arrow"></i>
+                                        </a>  
+                                    </div>    
+                <div class="col-md-6">       <a href ="<?php echo base_url(); ?>index.php/adminController/avaiDemand/<?php echo $type;?>/2" class ="btn btn-danger">
+                                        View Not Available Products  <i class="icon-arrow"></i>
+                                        </a>
+                                </div>
+                </div>    
            <div class="dt-responsive table-responsive">
             <table id="sample-table-2" class="table table-striped table-bordered nowrap">
               <thead>
@@ -120,6 +130,7 @@
                  $saleq=0;
              }
                  $total=6;
+                 
                  
                  if((($receive-$saleq)<2)){
                  if($dt->num_rows()>0){

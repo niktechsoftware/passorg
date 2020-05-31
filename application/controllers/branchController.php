@@ -6,6 +6,7 @@ class branchController extends CI_Controller{
 		$this->load->model("branch");
 		$this->load->model("admin");
 		$this->load->model("employee");
+		$this->load->model("smsmodel");
 	}
 	function is_login(){
 		$is_login = $this->session->userdata('is_login');
@@ -21,30 +22,160 @@ class branchController extends CI_Controller{
 			
 		}
 	}
+	/*function hg(){
+	     $this->load->model("subscriber");
+	     $mobile =  $this->subscriber->getmobilefromuser("PSH3S2");
+	     echo $mobile;
+	}*/
+	function reportAskfor(){
+	    if($this->session->userdata("login_type")==1){
+	      $data['productlist']=$this->db->get("askforproduct"); 
+	    }else{
+	   $uid =  $this->session->userdata("id");
+	   $data['uid']=$uid;
+	   $this->db->where("user_id",$uid);
+	   $data['productlist']=$this->db->get("askforproduct");
+	    }
+	    $data['pageTitle'] = 'Stock Section';
+			$data['smallTitle'] = 'Progeny Alteratiom Of Subsctibing System';
+			$data['mainPage'] = 'Stock Section';
+			$data['subPage'] = 'Stock Section';
+			$data['title'] = 'Stock Section in PASS';
+			$data['headerCss'] = 'headerCss/stockCss';
+			$data['footerJs'] = 'footerJs/stockJs';
+			$data['mainContent'] = 'Branch/reportAskfor';
+			$this->load->view("includes/mainContent", $data);
+	}
+	function deletereportAskford(){
+	    $invoice =  $this->uri->segment(3);
+	     $id =  $this->uri->segment(4);
+	      $this->db->where("invoice_no",$invoice);
+           $getstatus = $this->db->get("askforproduct")->row()->status;
+           if($getstatus==0){
+	     $this->db->where("id",$id);
+	     $this->db->delete("askforproducttable");
+           }else{
+               ?><script>alert("Please Ask For Admin");</script>
+          <?php }
+          redirect("branchController/reportAskford/".$invoice); 
+          
+	}
+	function delreportAskford(){
+	     $invoice =  $this->uri->segment(3);
+	     $this->db->where("invoice_no",$invoice);
+	      $this->db->where("status",0);
+	      $checkv = $this->db->get("askforproduct");
+	      if($checkv->num_rows()>0){
+    	       $this->db->where("invoice_no",$invoice);
+    	       $this->db->delete("askforproducttable");
+    	      $this->db->where("invoice_no",$invoice);
+    	      $this->db->delete("askforproduct");
+	      }else{
+	          ?><script>alert("Please Ask For Admin");</script>  
+	     <?php }
+	       redirect("branchController/reportAskfor"); 
+	}
+		function reportAskford(){
+	   $invoice =  $this->uri->segment(3);
+	   $data['invoice_no']=$invoice;
+	   $this->db->where("invoice_no",$invoice);
+	   $data['productlist']=$this->db->get("askforproducttable");
+	   $this->db->where("invoice_no",$invoice);
+	   $data['userid']=$this->db->get("askforproduct")->row()->user_id;
+	    $data['pageTitle'] = 'Stock Section';
+			$data['smallTitle'] = 'Progeny Alteratiom Of Subsctibing System';
+			$data['mainPage'] = 'Stock Section';
+			$data['subPage'] = 'Stock Section';
+			$data['title'] = 'Stock Section in PASS';
+			$data['headerCss'] = 'headerCss/stockCss';
+			$data['footerJs'] = 'footerJs/stockJs';
+			$data['mainContent'] = 'Branch/reportAskford';
+			$this->load->view("includes/mainContent", $data);
+	}
+	
+	function askForProduct(){
+	     $data['pageTitle'] = 'Stock Section';
+			$data['smallTitle'] = 'Progeny Alteratiom Of Subsctibing System';
+			$data['mainPage'] = 'Stock Section';
+			$data['subPage'] = 'Stock Section';
+			$data['title'] = 'Stock Section in PASS';
+			$data['headerCss'] = 'headerCss/stockCss';
+			$data['footerJs'] = 'footerJs/stockJs';
+			$data['mainContent'] = 'Branch/askforAddProduct';
+			$this->load->view("includes/mainContent", $data);
+	}
+	
+	
+	
 	
 	function tranferbyav(){
-	   
+	  $subuser=$this->input->post("username");
+	    $this->load->model("subscriber");
         $shopid = $this->input->post('shopid');
-        $this->db->where("id",$shopid);
+         $htype = $this->input->post('htype');
+       
+         if(($this->session->userdata("login_type")==1)&&($htype==1)){
+              $this->db->where("id",$shopid);
+        $subuser = $this->db->get("branch")->row();
+        }else{
+            $this->db->where("id",$shopid);
         $subuser = $this->db->get("sub_branch")->row();
+        }
+        $reciever=$subuser->username;
+        $lock = $this->input->post("lock");
+       $selectdelivery = $this->input->post("selectdelivery");
+        $recieverusername =$reciever;
+         $date=Date("y-m-d");
+        $dt=date("dmy",strtotime($date));
+    // $senderusername=$this->session->userdata("username");
+        $count=$this->db->Count_All("assignproduct");
+        $count=$count+1;
+        $invoice = $dt."PI".$count;
+        $randamnum = rand(9999,99999);
+            $arras=array(
+                "sender_username"=>$this->session->userdata("username"),
+                "invoice_no"=>$invoice,
+                "del_boy"=>$selectdelivery,
+                "date"=>date("Y-m-d"),
+                "reciver_usernm"=>$recieverusername,
+                "status"=>0,
+                "lock_no"=>$lock,
+                "otp"=>$randamnum,
+                  
+                   );
+        if($this->db->insert("assignproduct",$arras)){
         $loop = $this->input->post('loop');
         for($k=0; $k < $loop; $k++){
             $pr="proidt".$k;
             $pq="proqt".$k;
             $pcode = $this->input->post($pr);
            $sendq =  $this->input->post($pq);
-          
             $updated['p_code']=$pcode;
             $updated['quantity']=$sendq;
             $updated['date']=date("Y-m-d");
             $updated['sender_usernm']=$this->session->userdata("username");
             $updated['reciver_usernm']=$subuser->username;
-            $updated['invoice_number']='';
+            $updated['invoice_number']=$invoice;
             $updated['status']=0;
-            $updated['del_boy']=$shopid = $this->input->post('selectdelivery');
-            $updated['lock_no']=$shopid = $this->input->post('lock');
-           
             
+           if(($htype=="1")&&($this->session->userdata("login_type")==1)){
+                $this->db->where('id',$pcode);
+                   $rty  =   $this->db->get("stock_products")->row();
+                    $darray = array(
+                    "quantity"=>$rty->quantity-$sendq
+                    );
+                     $this->db->where("id",$pcode);
+                    $this->db->update("stock_products",$darray);
+           }else{
+               if($this->session->userdata("login_type")==1){
+                    $this->db->where('id',$pcode);
+                   $rty  =   $this->db->get("stock_products")->row();
+                    $darray = array(
+                    "quantity"=>$rty->quantity-$sendq
+                    );
+                     $this->db->where("id",$pcode);
+                    $this->db->update("stock_products",$darray);
+               }else{
              $this->db->where("branch_id",$this->session->userdata('id'));
                     $this->db->where('p_code',$pcode);
                    $rty  =   $this->db->get("branch_wallet")->row();
@@ -55,18 +186,59 @@ class branchController extends CI_Controller{
                     $this->db->where("branch_id",$this->session->userdata('id'));
                     $this->db->where("p_code",$pcode);
                     $this->db->update("branch_wallet",$darray);
+           }      }
                      $this->db->insert("product_trans_detail", $updated);
-            
+                     //
+                    
+                     //
         }
-       redirect(base_url()."stockController/generate_invoice/".$subuser->username);
-                      
-               
+        
+        
+         $this->db->where("id",$selectdelivery);
+        $this->db->where("emp_type",5);
+        $di= $this->db->get("employee")->row();
+        $gn = $this->session->userdata("username");
+        $sms = "Dear ".$recieverusername." an Invoice [".$invoice."] has been successfully Generated by ".$gn." please Contact ".$di->name."[".$di->mobile."] with lock number ".$lock.". Your one time password is ".$randamnum." please keep and donot share with anyone. Feel free to login your account.https://passystem.in ";
+       $mobile =  $this->subscriber->getmobilefromuser($recieverusername);
+       $sms1 ="Dear ".$di->name." a new order ".$invoice."  has been assign to you for more details visit you login. https://www.passystem.in/";
+       $mobile1=$di->mobile;
+      $getv= sms($mobile,$sms);
+        $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($sms,2,$master_id,$getv);
+       $getv= sms($mobile1,$sms1);
+        $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($sms1,2,$master_id,$getv);
+      redirect("stockController/productinvoice/".$invoice);
 	}
-	
+	}
 	function branchavi(){
-	  //start
-	  
-	  $sid =   $this->input->post("sid");
+	     $j=0;
+	 $sid =   $this->input->post("sid");
+	     $type = $this->input->post("type");
+	       $shopid =array();
+	     if($type==1){
+	        	$this->db->where_in("district",$sid);
+    		$subBranchData = $this->db->get("sub_branch");
+    		if($subBranchData->num_rows()>0) {    
+    		    foreach($subBranchData->result() as $subBranchRow):
+    				 array_push($shopid, $subBranchRow->id);
+    				 endforeach;
+    			 $usernamefinal="sb";
+    		}
+	     }else{
+	        $usernamefinal="b";
+               $shopid[0]=$sid;
+	     }
+	     
+	     
+               $this->load->model("stock");
+               $finalData = $this->stock->getDemandAvailable1($shopid,$this->input->post("type"));
+               
+             /* echo "<pre>";
+              print_r($finalData);
+              echo "</pre>";*/
 	     ?>
 	       <div class="row">
 			<div class="col-md-12 space20">
@@ -101,93 +273,39 @@ class branchController extends CI_Controller{
             <table id="sample-table-2" class="table table-striped table-bordered ">
               <thead>
                 <tr >
-                  <th>#</th>
-                  <th>Com. Name</th>
-                  <th>P.Name</th>
-                  <th>P. Code</th>
-                   <th>Volume</th>
-                     <th>Price</th>
-                      <th>Req.</th>
-                  
+                    <th>#</th>
+                    <th>Com. Name</th>
+                    <th>P.Name</th>
+                    <th>P. Code</th>
+                    <th>Volume</th>
+                    <th>Price</th>
+                    <th>Req.</th>
                  <th>Order Number</th>
                   </tr>
               </thead>
               <tbody>
              
                 <?php 
+               if(!empty($finalData)){
                
-                 $subid =  $sid;
-                 $shopid=$sid;
-                 $ordernum=array();
-                 $proquan=array();
-               $prodarray =array();
-                          $this->db->where("sub_branchid",$shopid);
-                   
-                 $this->db->where("status",0);
-                 $osd = $this->db->get("order_serial");
-                 if($osd->num_rows()>0){
-                  $i=0;  foreach($osd->result() as $ods):
-                        $ordernum[$i]=$ods->order_no;
-                       $i++; endforeach;
-                        $this->db->distinct();
-                        $this->db->select('p_code');
-                        $this->db->where_in("order_no",$ordernum);
-                       $stckdt =  $this->db->get("order_detail");
-                       
-                 
-                
-                 
-                 if($stckdt->num_rows()>0){
-               $j=0;  foreach($stckdt->result() as $data):
-                 
-                         $this->db->where("subbranch_id",$subid);
-                          $this->db->where("p_code",$data->p_code);
-                 $dt= $this->db->get("subbranch_wallet");
+                foreach($finalData as $key=>$val):
+                   if($finalData[$key]>0){
+                    $this->db->where("id",$key);
+                    $stckdt1= $this->db->get("stock_products");
+                    $stckdt2=$stckdt1->row(); 
+                     if($usernamefinal=="sb"){
+                                                          $this->db->where("branch_id",$this->session->userdata("district"));
+                                                          $this->db->where("p_code",$key);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
+                                                      }else{
+                                                          
+                                                            $this->db->where("branch_id",$this->session->userdata("id"));
+                                                          $this->db->where("p_code",$key);
+                                                         $pprice =$this->db->get("branch_wallet")->row();
+                                                      }
+                                                      
+                    ?>
                   
-             if($dt->num_rows()>0){
-                
-                      $receive=  $dt->row()->rec_quantity;
-                $saleq = $dt->row()->sale_quantity;
-                
-             }else{
-                 $receive=0;
-                 $saleq=0;
-             }
-             
-           
-                  $rtty =0;
-                 $total=$receive;
-                 $this->db->select_sum("quantity");
-                 $this->db->where("p_code",$data->p_code);
-                 $this->db->where_in("order_no",$ordernum);
-                    $totquan =  $this->db->get("order_detail")->row();
-                 $branchqu = $receive-$saleq;
-                 
-                 if(($branchqu) < $totquan->quantity){
-                     $demandqu = $totquan->quantity-$branchqu;
-                     
-                     $this->db->where("p_code",$data->p_code);
-                     $this->db->where("branch_id",$this->session->userdata("id"));
-                    $bqw =  $this->db->get("branch_wallet");
-                     if($bqw->num_rows()>0){
-                
-                      $receiveb=  $bqw->row()->rec_quantity;
-                $saleqb = $bqw->row()->sale_quantity;
-                
-             }else{
-                 $receiveb=0;
-                 $saleqb=0;
-             }
-                if(($receiveb-$saleqb) > $demandqu){
-                    
-                    $orgd = ($receiveb-$saleqb)-$demandqu;
-                $prodarray[$j]=$data->p_code;
-               $proquan[$data->p_code] =$demandqu;
-                  $this->db->where("id",$data->p_code);
-                  $stckdt1= $this->db->get("stock_products");
-                 $stckdt2=$stckdt1->row();
-                 
-                  ?>
                   <tr >
                       
                     <td><?php echo $j+1;?></td>
@@ -199,57 +317,90 @@ class branchController extends CI_Controller{
                  </td>
                   <td><?php echo $stckdt2->hsn;?></td>
                   <td><?php echo $stckdt2->size;?></td>
-                         <td><?php echo $stckdt2->selling_price;?></td> 
-                  <td><a href="#"><span style="color:#01a9ac;font-size:20px;font-weight:1px;"><?php echo $demandqu; ?></span></a>
-
+                         <td><?php echo $pprice->selling_price;?></td> 
+                <td><a href="#"><span style="color:#01a9ac;font-size:20px;font-weight:1px;"><?php echo $finalData[$key]; ?></span></a>
+            <input type ="hidden" name="proidt<?php echo $j;?>" value ="<?php echo $key;?>" >
+            <input type ="hidden" name="proqt<?php echo $j;?>" value ="<?php echo $finalData[$key];?>" >
                   <!-- 
                    <span style="color:#01a9ac;"><?php echo $row1->name. " [ ". $row1->username . " ] ";?></span> -->
                    </td>
                  
                    <td>
                   <?php   
-                    $this->db->where("p_code",$data->p_code);
-                    $this->db->where_in("order_no",$ordernum);
-                    $onrdername  =  $this->db->get("order_detail");
-                   foreach($onrdername->result() as $odname):
-                   
-                   echo $odname->order_no."<br>";
-                   endforeach;
+                    if($this->session->userdata("login_type")!=2){
+                    $sbid = $this->session->userdata("id");
+                    
+                       $bide =   $this->db->query("select distinct(order_serial.order_no)  from order_serial join order_detail on order_serial.order_no = order_detail.order_no where order_serial.sub_branchid ='$sbid' and order_detail.p_code='$key' and order_serial.status=0 ");
+                       foreach($bide->result() as $t):
+                           echo $t->order_no."<br>";
+                           endforeach;
+                 }
+                 else{
+                     $this->db->distinct();
+                     $this->db->select('order_serial.sub_branchid'); 
+                        $this->db->from('order_serial');
+                        $this->db->join('order_detail', 'order_serial.order_no = order_detail.order_no', 'left'); 
+                        $this->db->where_in("order_serial.sub_branchid",$shopid);
+                        $this->db->where('order_detail.p_code',$key);
+                        $bide = $this->db->get();
+                      // $bide =   $this->db->query("select distinct(order_serial.sub_branchid)  from order_serial join order_detail on order_serial.order_no = order_detail.order_no where order_detail.p_code='$key' and order_serial.status=0  and  order_serial.sub_branchid IN  '$subBranchID' ");
+                    if($bide->num_rows()>0){
+                        foreach($bide->result() as $t):
+                                $ordernum=array();
+                                $this->db->where("id",$t->sub_branchid);
+                                $getsbd = $this->db->get("sub_branch")->row();
+                                echo $getsbd->username;
+                                 $prequiredQuantity = $this->db->query("select sum(order_detail.quantity) AS quantity from order_detail join order_serial on order_detail.order_no=order_serial.order_no where order_serial.sub_branchid='$t->sub_branchid' and order_serial.status=0 and p_code='$key'")->row();
+                
+                               echo "[".$prequiredQuantity->quantity."] <br>";
+                        
+                        endforeach;
+                    }
+                 }
                    ?> </td>
                   
                   
                    </tr>
-                    <?php  $j++; }} endforeach; }  
+                    <?php  $j++; } endforeach; }  
                    
-                   }?>
+                   ?>
               </tbody>
               
             </table>
            
-            <?php 
-            $this->db->where("id",$sid);
-           $subu =  $this->db->get("sub_branch")->row();
-            $j =0; $arj =0; foreach($prodarray as $roi):
-                
-            $this->db->where("p_code",$roi);
-            $this->db->where("status",0);
-            $this->db->where("reciver_usernm",$subu->username);
-            $oldv = $this->db->get("product_trans_detail");
-            if($oldv->num_rows()>0){
-                $arj=$arj++;
-            }?>
-            <input type ="hidden" name="proidt<?php echo $j;?>" value ="<?php echo $roi;?>" >
-            <input type ="hidden" name="proqt<?php echo $j;?>" value ="<?php echo $proquan[$roi];?>" >
-            <?php $j++; endforeach;?>
+            <?php echo $j;
+             if(($this->session->userdata("login_type")==1) && ($this->input->post("type")==1)){
+                   $this->db->where("id",$sid);
+               $subu=  $this->db->get("branch")->row();
+             }else{
+                 $this->db->where("id",$sid);
+                $subu =  $this->db->get("sub_branch")->row();
+             }
+          
+            ?>
              <input type ="hidden" name="shopid" value ="<?php echo $sid;?> " >
+               <input type ="hidden" name="username" value ="<?php echo $subu->username;?> " >
              <input type ="hidden" name="loop" value ="<?php echo $j;?> " >
-             <?php if($arj<1){?>
+          
              <div class="col-md-12 row">
              <div class="col-md-4">
                                                              <label >Assign Delivery Incharge</label>
                                                             <?php 
-                                                           $id= $this->session->userdata("id");
+                                                            if($this->session->userdata("login_type")==1){
+                                                              $id=0; 
+                                                              $sub_branchid=0;
+                                                            }else{
+                                                                if($this->session->userdata("login_type")==2){
+                                                                $id= $this->session->userdata("id");
+                                                                $sub_branchid=0;
+                                                            }else{
+                                                                $sub_branchid= $this->session->userdata("id");
+                                                                $this->db->where("id",$sub_branchid);
+                                                               $id = $this->db->get("sub_branch")->row()->district;
+                                                            }
+                                                            }
                     $aa= array('district'=>$id,
+                                'sub_branchid'=>$sub_branchid,
                                 'emp_type'=>'5',
                                 'status'=>'1');
                      
@@ -279,12 +430,16 @@ class branchController extends CI_Controller{
                                                             });
                                                  </script>
                                                  <div class="col-md-2">
-                                                     <button class = "btn btn-success" id = "confirm" >Transfer to shop</button>
+                                                     <?php  if(($this->session->userdata("login_type")==1) && ($this->input->post("type")==1)){?>
+                                                     <button class = "btn btn-success" id = "confirm" >Transfer to Shop</button>
+                                                     <input type = "hidden" name ="htype" value='1'/>
+                                                     <?php }else{?>
+                                                           <button class = "btn btn-success" id = "confirm" >Transfer to shop</button>
+                                                              <input type = "hidden" name ="htype" value='2'/>
+                                                     <?php } ?>
                                                      </div>
                                              </div>    
-                                             <?php }else{
-                                             echo "<div class='alert alert-info'>Product already transfered and pending for recieving.</div>";
-                                             }?>
+                                           
             </form>
               <script>
 	TableExport.init();
@@ -293,6 +448,7 @@ class branchController extends CI_Controller{
 	
 </script>
           </div>
+          </form>
 	    <?php
 	     
 	  
@@ -325,7 +481,7 @@ class branchController extends CI_Controller{
 				$this->ocbalance->insert_ocbalance($cl_balance,$cl_balance,$username);
 			}
 			}else{
-				$this->ocbalance->insert_ocbalance(0,0,0);
+				$this->ocbalance->insert_ocbalance(0,0,$username);
 			}
 		}
 		$data['pageTitle'] = 'Branch Dashboard';
@@ -379,12 +535,16 @@ class branchController extends CI_Controller{
 		$value['password']=$this->input->post('password');
 		$bname = $this->input->post('b_name');
 		$passw = $this->input->post('password');
-		$dt=$this->branch->insert($value);
+		$adminStocklist = $this->db->get("stock_products");
+		$dt=$this->branch->insert($value,$adminStocklist);
 		  if($dt)
 		  {
-             $msg = "Dear ". $name . " Your Branch Registration in PAS System is Successfully Done. Your Branch Name is " .$bname . "  and Your Username is ".$username." and Password is ".$passw.". Please Wait For Activation. Best Regards from  PAS System Admin- 7394826066";
+             $msg = "Dear ". $name . " Your Branch Registration in PAS System is Successfully Done. Your Branch Name is " .$bname . "  and Your Username is ".$username." and Password is ".$passw.". Please Wait For Activation. Best Regards from  PAS System Admin- 7394826066. https://www.passystem.in/";
               $mobile = $this->input->post('mob_no');
-                  sms($mobile,$msg);
+                 $getv= sms($mobile,$msg);
+                   $max_id = $this->db->query("SELECT MAX(id) as maxid FROM sent_sms_master")->row();
+		        $master_id=$max_id->maxid+1;
+                $this->smsmodel->sentmasterRecord($msg,2,$master_id,$getv);
                   //echo $msg;
              redirect(base_url().'branchController/bregistration/5');
 		            //   // redirect('https://passystem.in/auth/signupShop','refresh');
@@ -452,10 +612,15 @@ class branchController extends CI_Controller{
 	}
 	
 	public function overalldlbarnch(){
-	    
-	    $data['branchid']   =$this->session->userdata("branch_id");
-	     $data['branchname']   =$this->session->userdata("your_school_name");
-	    $data['pageTitle'] = 'Branch Overall Demand List';
+	        $subBranchID =array();
+	     	$data['branchid'] = $this->session->userdata('id');
+    		$this->db->where("district",$this->session->userdata('id'));
+    		$subBranchData =  $this->db->get("sub_branch");
+	     	foreach($subBranchData->result() as $subBranchRow):
+	     	    array_push($subBranchID, $subBranchRow->id);
+        		endforeach;
+        $data['subBranchID']=$subBranchID;
+	    $data['pageTitle'] = 'Overall Demand';
 		$data['smallTitle'] = 'Branch Demand List';
 		$data['mainPage'] = 'Branch Demand';
 		$data['subPage'] = 'Branch Demand List';
@@ -496,6 +661,9 @@ class branchController extends CI_Controller{
 	}
 	public function updateBranch(){
 		$id= $this->uri->segment(3);
+		$value['b_name']=$this->input->post('b_name');
+			$value['name']=$this->input->post('name');
+				$value['mobile']=$this->input->post('mob_no');
 		$value['email_id'] = $this->input->post('email');
 		$value['bank_name'] = $this->input->post('bankname');
 		$value['account_no'] = $this->input->post('acc_no');
@@ -503,6 +671,8 @@ class branchController extends CI_Controller{
 		$value['ifsc'] = $this->input->post('ifsc');
 	//	$value['image'] =time().trim($_FILES['image']['name']);
 		$value['password'] = $this->input->post('password');
+		
+		
 		 $photo_name1 = time().trim($_FILES['image']['name']); 
 		// if($query)
 		// {

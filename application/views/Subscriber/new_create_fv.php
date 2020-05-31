@@ -9,7 +9,7 @@
 	    }
 	</script>-->
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
 			<!-- start: EXPORT DATA TABLE PANEL  -->
 			<div class="panel panel-white">
 			<div class="panel-heading panel-red">
@@ -54,8 +54,8 @@
                                         </p> 
                                 </div>
                               <div class="row">
-                                  <div class="col-md-12">
-                                       <div  id="number"  class="btn btn-success col-md-1" style="float:right;">
+                                 	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                       <div  id="number"  class="btn btn-success col-md-1 col-xs-1" style="float:right;">
             								<?php $id = $this->session->userdata('id');
             								$this->db->where('id',$id);
             								$sb_data=$this->db->get('customers')->row();
@@ -70,104 +70,144 @@
                                   </div>
                               </div>
                                     <div class="row">
-                                        <div class="col-md-3" style="border-right: 3px solid black;">
-                                            <?php $cat = $this->db->get('category')->result();
-                                             $i = 1;
-                                            foreach($cat as $catdt)
-                                            {
-                                                echo "<br><br><label style='color:purple; font-size:18px;'><b>".$catdt->name."</b></label>";
-                                                $this->db->where('cat_id',$catdt->id);
-                                                $subcat = $this->db->get('sub_category');
-                                                if($subcat->num_rows()>0)
+                                        	<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12">
+                                            <div class="col-md-3 col-sm-3 col-lg-3 col-xs-3" ">
+                                             <form id="mainForm" name="mainForm">
+                                              <?php  
+                                               $discountv = $this->db->get("discount_table_master");
+                                               if($discountv->num_rows()>0){
+                                                   $i=0;foreach($discountv->result() as $dis):?>
+                                                       <br><input type="radio" name="disoption"  value="<?php echo $dis->id;?>">
+                                                       
+                                                     <?php  echo "<label style='color:purple; font-size:12px;'><b>".$dis->discount_name."</b></label>";
+                                                     
+                                                     $i++; endforeach;?></form><?php
+                                               }
+                                            
+                                                $cat = $this->db->get('category')->result();
+                                                 $i = 1;
+                                                foreach($cat as $catdt)
                                                 {
-                                                   
-                                                    foreach($subcat->result() as $subcatdt)
-                                                    {  ?>
-                                                        <br><input type="radio" name="subcat" id="chkb<?php echo $i;?>" value="<?php echo $subcatdt->id;?>">
-                                                        <?php echo "<label style='font-size:14px;'>".$subcatdt->name."</label>"; 
-                                                    
-                                                        ?>
-                                                        <script>
-                                                             $("#chkb<?php echo $i;?>").click(function(){
-                                                                 var subcat_id =$("#chkb<?php echo $i;?>").val();
-                                                                  $.ajax({
-                                                                      "url": "<?php echo site_url();?>subscriberController/get_product",
-						"method": 'POST',
-						"data": {subcat_id:subcat_id},
-						beforeSend: function(data) {
-							$("#pro_list").html("<center><img src='<?= base_url()?>assets/wait.gif' /></center>")
-						},
-						success: function(data) {
-						 $('#pro_list').html(data);
-						},
-						error: function(data) {
-							$("#pro_list").html(data)
-						}
-					})
-					
-					});
-                                                              
-                                                         </script>
-                                                <?php  $i++; 
+                                                    echo "<br><br><label style='color:purple; font-size:12px;'><b>".$catdt->name."</b></label>";
+                                                    $this->db->where('cat_id',$catdt->id);
+                                                    $subcat = $this->db->get('sub_category');
+                                                    if($subcat->num_rows()>0)
+                                                    {
+                                                       
+                                                        foreach($subcat->result() as $subcatdt)
+                                                        {  ?>
+                                                            <input type="radio" name="subcat" id="chkb<?php echo $i;?>" value="<?php echo $subcatdt->id;?>">
+                                                            <?php echo "<label style='font-size:12px;'>".$subcatdt->name."</label>"; 
+                                                        
+                                                            ?>
+                                                            <script>
+                                                            
+                                                            document.mainForm.onclick = function(){
+                                                                         subcat_id=0;
+                                                                   
+                                                                    var fdis = document.querySelector('input[name = disoption]:checked').value;
+                                                                    //alert(subcat_id);
+                                                                    $.ajax({
+                                                                          "url": "<?php echo site_url();?>subscriberController/get_product",
+                                                        						"method": 'POST',
+                                                        						"data": {subcat_id:subcat_id , fdis : fdis},
+                                                        						beforeSend: function(data) {
+                                                        							$("#pro_list").html("<center><img src='<?= base_url()?>assets/wait.gif' /></center>")
+                                                        						},
+                                                        						success: function(data) {
+                                                        						 $('#pro_list').html(data);
+                                                        						},
+                                                        						error: function(data) {
+                                                        							$("#pro_list").html(data)
+                                                        						}
+                                                        					})
+                                                                }
+                                                                 $("#chkb<?php echo $i;?>").click(function(){
+                                                                     var subcat_id =$("#chkb<?php echo $i;?>").val();
+                                                                      var discat1 =$("#discat").val();
+                                                                     
+                                                                      var fdis=0;
+                                                                    var fdis = $("input:radio[name=disoption]:checked").val()
+                                                                           
+                                                                      //alert(fdis);
+                                                                      $.ajax({
+                                                                          "url": "<?php echo site_url();?>subscriberController/get_product",
+                                                        						"method": 'POST',
+                                                        						"data": {subcat_id:subcat_id , fdis : fdis},
+                                                        						beforeSend: function(data) {
+                                                        							$("#pro_list").html("<center><img src='<?= base_url()?>assets/wait.gif' /></center>")
+                                                        						},
+                                                        						success: function(data) {
+                                                        						 $('#pro_list').html(data);
+                                                        						},
+                                                        						error: function(data) {
+                                                        							$("#pro_list").html(data)
+                                                        						}
+                                                        					})
+                                                        					
+                                                        					});
+                                                                  
+                                                             </script>
+                                                    <?php  $i++; 
+                                                        }
                                                     }
+    
+                                                    
                                                 }
-
-                                                
-                                            }
-                                            ?>
-                                            <!--<input type="button" value="Filter">-->
-                                        </div>
-                                        <!--<div class="col-md-1" style=" border-left: 3px solid black;"></div>-->
-                                        <div class="col-md-9" >
-                                            <div class= "col-md-12" id="pro_list">
-                                                
+                                                ?>
+                                                </form>
+                                                <!--<input type="button" value="Filter">-->
                                             </div>
-						                    <div class="col-md-12">
-    						                    <div class="panel-heading panel-red">
-                                					<h4 class="panel-title"> <span class="text-bold">Add Other Product </span></h4>
-                                                </div>
-                                                <div class="panel-body">				
-                                					<!--<div class="table-responsive">-->
-                                						<div class="table-responsive">
-                                							<table class="table table-striped table-hover" >
-                                								<thead>
-                                									<tr style="background-color:#1ba593; color:white;">
-                                                                        <!--<th width:"10px">SNO</th>-->
-                                                                        <th>Company</th>
-                                                                        <th >Product Name</th> 
-                                                                         <th >Type</th>
-                                                                        <th >Size</th>
-                                                                         <th >Price (Approx)</th>
-                                                                         <th >Image</th>
-                                                                         <th ></th>
-                                                                       
-                                									</tr>
-                                								</thead>
-                                								<tbody>
-                                								    	<form action="<?php echo base_url();?>subscriberController/demand_prolist" enctype="multipart/form-data" method="post">
-                                										<tr class="text-uppercase text-center">
-                                										
-                                									
-                                											<td ><input type="text" id="company" class="form-control" name="company" required></td>
-                                											<td ><input type="text" id="productname" class="form-control" name="productname" required></td>
-                                											<td ><input type="text" id="type"  class="form-control" name="type"></td>
-                                											<td ><input type="text" id="size"  class="form-control"name="size" ></td>
-                                											<td ><input type="text" id="price"  class="form-control"name="price"></td>
-                                											<td ><input type="file" id="image1"  class="form-control" name="image"></td>
-                                											<td><input type="submit" id="addpd" name="addpd" class="btn btn-danger" value="Add Product"></td>
-                                											<!--</form>-->
-                                										</tr>
-                                										</form>
-                                									</tbody>   
-                                							
-                                							</table>
-                                						</div>
-                                					</div>
-						                    </div>
+                                            <!--<div class="col-md-1" style=" border-left: 3px solid black;"></div>-->
+                                            <div class="col-md-9 col-sm-9 col-lg-9 col-xs-9" id="pro_list">
+                                               </div>
+    						                    <div class="col-md-9 col-sm-9 col-lg-9 col-xs-9">
+        						                    <div class="panel-heading panel-red">
+                                    					<h5 class="panel-title"> <span class="text-bold">Add Other Product </span></h5>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        			
+                                    					<!--<div class="table-responsive">-->
+                                    						<div class="table-responsive">
+                                    							<table class="table table-striped table-hover" >
+                                    								<thead>
+                                    									<tr style="background-color:#1ba593; color:white;">
+                                                                            <!--<th width:"10px">SNO</th>-->
+                                                                            <th>Company</th>
+                                                                            <th >Product Name</th> 
+                                                                             <th >Type</th>
+                                                                            <th >Size</th>
+                                                                             <th >Price (Approx)</th>
+                                                                             <th >Image</th>
+                                                                             <th ></th>
+                                                                           
+                                    									</tr>
+                                    								</thead>
+                                    								<tbody>
+                                    								    	<form action="<?php echo base_url();?>subscriberController/demand_prolist" enctype="multipart/form-data" method="post">
+                                    										<tr class="text-uppercase text-center">
+                                    										
+                                    									
+                                    											<td ><input type="text" id="company" class="form-control" name="company" required></td>
+                                    											<td ><input type="text" id="productname" class="form-control" name="productname" required></td>
+                                    											<td ><input type="text" id="type"  class="form-control" name="type"></td>
+                                    											<td ><input type="text" id="size"  class="form-control"name="size" ></td>
+                                    											<td ><input type="text" id="price"  class="form-control"name="price"></td>
+                                    											<td ><input type="file" id="image1"  class="form-control" name="image"></td>
+                                    											<td><input type="submit" id="addpd" name="addpd" class="btn btn-danger" value="Add Product"></td>
+                                    											<!--</form>-->
+                                    										</tr>
+                                    										</form>
+                                    									</tbody>   
+                                    							
+                                    							</table>
+                                    						</div>
+                                    					</div>
+    						                    </div>
                                         </div>
                                         
                                     </div>
-                               
+                                </div>
 			
 			<!-- end: EXPORT DATA TABLE PANEL -->
 			    </div>

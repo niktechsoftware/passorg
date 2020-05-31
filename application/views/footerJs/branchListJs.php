@@ -1,13 +1,4 @@
-<!-- end: EXPORT DATA TABLE PANEL -->
-				<!-- start: MAIN JAVASCRIPTS -->
-		<!--[if lt IE 9]>
-		<script src="<?php echo base_url(); ?>assets/plugins/respond.min.js"></script>
-		<script src="<?php echo base_url(); ?>assets/plugins/excanvas.min.js"></script>
-		<![endif]-->
-		<!--[if gte IE 9]><!-->
-		
-		<!--<script src="<?php echo base_url(); ?>assets/plugins/jQuery/jquery-2.1.1.min.js"></script>-->
-		<!--<![endif]-->
+
 		<script src="<?php echo base_url(); ?>assets/plugins/jquery-ui/jquery-ui-1.10.2.custom.min.js"></script>
 		<script src="<?php echo base_url(); ?>assets/plugins/bootstrap/js/bootstrap.min.js"></script>
 		<script src="<?php echo base_url(); ?>assets/plugins/blockUI/jquery.blockUI.js"></script>
@@ -119,8 +110,13 @@
 						$("#emplist1").html(data);
 						});
 				}else{
+				    alert(branch);
 				    	$.post("<?php echo site_url("employeeController/subBranch1") ?>",{branch : branch}, function(data){
 						$("#empsubbranch1").html(data);
+						});
+						 empsubbranch=0;
+				    $.post("<?php echo site_url("employeeController/emplist6") ?>",{empsubbranch : empsubbranch , branch: branch}, function(data){
+						$("#emplist1").html(data);
 						});
 				}
 			

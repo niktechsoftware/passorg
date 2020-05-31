@@ -86,7 +86,7 @@
                    				Email
                     		</div>
                 			<div class="col-md-8">
-                            <input type="text" name="email" id="email" onkeyup="emailId()" class="form-control"  required value="<?php echo $row->email;?>">
+                            <input type="text" name="email" id="email" onkeyup="emailId()" class="form-control"   value="<?php echo $row->email;?>">
                              <span id="emailID" style="color:red;" class=""></span>
                     		</div>
                			</div>               
@@ -194,9 +194,12 @@
                 			<div class="col-md-8">
 							<input type="hidden" name="district" value="<?php echo $row->district;?>">
 							<?php $this->db->where('id',$row->district);
-							$branch=$this->db->get('branch')->row(); 
-						?>
-                            <input type="text" class="form-control" name="" value="<?php echo $branch->b_name;?>" readonly>
+							$branch=$this->db->get('branch'); 
+					if($branch->num_rows()>0){	?>
+                            <input type="text" class="form-control" name="" value="<?php echo $branch->row()->b_name;?>" readonly>
+                            <?php }else{?>
+                            <input type="text" class="form-control" name="" value="N/A" readonly>
+                            <?php }?>
                     		</div>
                			</div> 
                      <div class="col-md-6">
@@ -206,9 +209,13 @@
                 			<div class="col-md-8">
 							<input type="hidden" name="subBranch" value="<?php echo $row->sub_branchid;?>">
 							<?php $this->db->where('id',$row->sub_branchid);
-							$subbranch=$this->db->get('sub_branch')->row(); ?>
-                            <input type="text" class="form-control" name="" value="<?php echo $subbranch->bname;?>" readonly>
-                    		</div>
+							$subbranch=$this->db->get('sub_branch') ;
+							if($subbranch->num_rows()>0){?>
+                            <input type="text" class="form-control" name="" value="<?php echo $subbranch->row()->bname;?>" readonly>
+                            <?php }else{
+                            ?>
+                             <input type="text" class="form-control" name="" value="N/A" readonly>
+                    		<?php }?></div>
                			</div> 
                    		              
                		</div>	 
@@ -229,7 +236,7 @@
                    				Bank Name
                     		</div>
                 			<div class="col-md-8">
-                            <input type="text"  style="text-transform:uppercase" name="bank_name" class="form-control" required="" value="<?php echo $row->bank_name;?>">
+                            <input type="text"  style="text-transform:uppercase" name="bank_name" class="form-control"  value="<?php echo $row->bank_name;?>">
                             <span class="form-bar" id="message"></span>
                             </div>
                			</div> 
@@ -243,7 +250,7 @@
                    				Account No
                     		</div>
                 			<div class="col-md-8">
-                            <input type="text" id="acc_no" name="acc_no" class="form-control" required="" value="<?php echo $row->account_no;?>">
+                            <input type="text" id="acc_no" name="acc_no" class="form-control"  value="<?php echo $row->account_no;?>">
                              <span class="form-bar"></span>
                              </div>
                			</div> 
@@ -252,7 +259,7 @@
                    				Branch Name
                     		</div>
                 			<div class="col-md-8">
-                            <input type="text"  style="text-transform:uppercase" name="branch_name" class="form-control" required="" value="<?php echo $row->branch_name;?>">
+                            <input type="text"  style="text-transform:uppercase" name="branch_name" class="form-control"  value="<?php echo $row->branch_name;?>">
                             <span class="form-bar" id="message"></span>
                             </div>
                			</div> 
@@ -266,7 +273,7 @@
                    				IFSC Code
                     		</div>
                 			<div class="col-md-8">
-                            <input type="text" id="ifsc" name="ifsc" class="form-control" required="" value="<?php echo $row->ifsc_code;?>">
+                            <input type="text" id="ifsc" name="ifsc" class="form-control"  value="<?php echo $row->ifsc_code;?>">
                              <span class="form-bar"></span>
                              </div>
                			</div> 
